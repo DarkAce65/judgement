@@ -7,6 +7,9 @@ EXPOSE 3000
 COPY ./client/package.json ./client/yarn.lock ./
 RUN yarn
 
+ARG REACT_APP_API_ROOT
+ENV REACT_APP_API_ROOT $REACT_APP_API_ROOT
+
 COPY ./client .
 RUN yarn build
 

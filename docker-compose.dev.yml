@@ -4,6 +4,9 @@ services:
   client:
     build: ./client
     command: yarn start
+    tty: true
+    environment:
+      REACT_APP_API_ROOT: "http://localhost:8000"
     ports:
       - 3000:3000
     volumes:
@@ -12,12 +15,12 @@ services:
       default:
         aliases:
           - frontend
-    tty: true
 
   server:
     build: ./server
+    env_file: .env
     ports:
-      - 8000:8000
+      - "8000:${BACKEND_PORT}"
     volumes:
       - ./server:/server
     networks:

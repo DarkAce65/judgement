@@ -7,7 +7,7 @@ server {
     try_files $uri $uri/ /index.html =404;
   }
 
-  location /api/ {
-    proxy_pass http://backend:8000/;
+  location ${API_ROOT}/ {
+    proxy_pass http://backend:${BACKEND_PORT}/;
   }
 }

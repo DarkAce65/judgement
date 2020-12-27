@@ -5,11 +5,15 @@ services:
     build:
       context: .
       dockerfile: ./proxy/Dockerfile
+      args:
+        - "REACT_APP_API_ROOT=${API_ROOT}"
+    env_file: .env
     ports:
       - 80:80
 
   server:
     build: ./server
+    env_file: .env
     networks:
       default:
         aliases:
