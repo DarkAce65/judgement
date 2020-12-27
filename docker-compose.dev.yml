@@ -16,7 +16,6 @@ services:
 
   server:
     build: ./server
-    command: deno run --allow-net --allow-read ./webserver.ts
     ports:
       - 8000:8000
     volumes:

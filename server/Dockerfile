@@ -10,3 +10,5 @@ RUN deno cache deps.ts
 
 COPY . .
 RUN deno cache webserver.ts
+
+CMD ["run", "--allow-env", "--allow-net", "--allow-read", "webserver.ts"]

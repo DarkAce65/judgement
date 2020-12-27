@@ -10,7 +10,6 @@ services:
 
   server:
     build: ./server
-    command: deno run --allow-net --allow-read ./webserver.ts
     networks:
       default:
         aliases:
