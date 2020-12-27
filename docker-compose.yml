@@ -1,20 +1,19 @@
 version: "3.9"
 
 services:
-  client:
-    build: ./client
-    command: yarn start
+  proxy:
+    build:
+      context: .
+      dockerfile: ./proxy/Dockerfile
     ports:
-      - 3000:3000
-    volumes:
-      - ./client:/client
-    tty: true
+      - 80:80
 
   server:
     build: ./server
-    command: deno run --allow-net ./webserver.ts
+    command: deno run --allow-net --allow-read ./webserver.ts
     ports:
       - 8000:8000
-    volumes:
-      - ./server:/server
-    tty: true
+    networks:
+      default:
+        aliases:
+          - backend
