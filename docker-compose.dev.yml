@@ -19,6 +19,8 @@ services:
   server:
     build: ./server
     env_file: .env
+    environment:
+      APP_REQUEST_ORIGIN: "http://localhost:3000"
     ports:
       - "8000:${BACKEND_PORT}"
     volumes:
