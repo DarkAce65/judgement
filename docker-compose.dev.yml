@@ -1,0 +1,27 @@
+version: "3.9"
+
+services:
+  client:
+    build: ./client
+    command: yarn start
+    ports:
+      - 3000:3000
+    volumes:
+      - ./client:/client
+    networks:
+      default:
+        aliases:
+          - frontend
+    tty: true
+
+  server:
+    build: ./server
+    command: deno run --allow-net --allow-read ./webserver.ts
+    ports:
+      - 8000:8000
+    volumes:
+      - ./server:/server
+    networks:
+      default:
+        aliases:
+          - backend
