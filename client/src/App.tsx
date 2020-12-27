@@ -1,10 +1,16 @@
 import React from 'react';
 
+import { fetchAPI } from './api/client';
 import logo from './logo.svg';
 
 import './App.css';
 
 function App() {
+  fetchAPI('/hello')
+    .then((res) => res.json())
+    .then(console.log)
+    .catch((...args) => console.error('failed', ...args));
+
   return (
     <div className="App">
       <header className="App-header">
