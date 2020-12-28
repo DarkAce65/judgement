@@ -18,9 +18,12 @@ services:
 
   server:
     build: ./server
+    command: poetry run flask run -h 0.0.0.0 -p $BACKEND_PORT
     env_file: .env
     environment:
-      APP_REQUEST_ORIGIN: "http://localhost:3000"
+      FLASK_ENV: development
+      FLASK_APP: "server/app.py"
+      CORS_ORIGINS: "http://localhost:3000"
     ports:
       - "8000:${BACKEND_PORT}"
     volumes:
