@@ -14,7 +14,7 @@ class Decks:
 
         for _ in range(num_decks):
             for suit in Suit:
-                for number in range(2, 15):
+                for number in range(1, 14):
                     self.cards.append(Card.to_str(suit, number))
 
     def shuffle(self) -> None:

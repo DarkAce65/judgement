@@ -16,7 +16,7 @@ class Card:
     rank: int
 
     def __init__(self, suit: Suit, rank: int) -> None:
-        if rank < 2 or rank > 14:
+        if rank < 1 or rank > 13:
             raise ValueError("Card rank is out of bounds", rank)
 
         self.suit = suit
@@ -32,7 +32,7 @@ class Card:
 
         try:
             if rank_str == "A":
-                rank = 14
+                rank = 1
             elif rank_str == "K":
                 rank = 13
             elif rank_str == "Q":
@@ -48,10 +48,10 @@ class Card:
 
     @staticmethod
     def to_str(suit: Suit, rank: int) -> str:
-        if rank < 2 or rank > 14:
+        if rank < 1 or rank > 13:
             raise ValueError("Card rank is out of bounds", rank)
 
-        if rank == 14:
+        if rank == 1:
             rank_str = "A"
         elif rank == 13:
             rank_str = "K"
