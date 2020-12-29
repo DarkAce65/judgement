@@ -1,16 +1,18 @@
 import random
 from typing import List
 
-from . import Card, Suit
+from .card import Card, Suit
 
 
 class Decks:
     cards: List[Card]
+    num_decks: int
 
-    def __init__(self, count: int = 1) -> None:
+    def __init__(self, num_decks: int = 1) -> None:
         self.cards = []
+        self.num_decks = num_decks
 
-        for _ in range(count):
+        for _ in range(num_decks):
             for suit in Suit:
                 for number in range(2, 15):
                     self.cards.append(Card(suit, number))
@@ -24,6 +26,13 @@ class Decks:
             temp = self.cards[shuffle_index]
             self.cards[shuffle_index] = self.cards[rand_index]
             self.cards[rand_index] = temp
+
+    def draw(self, count: int = 1) -> List[Card]:
+        drawn_cards = []
+        for _ in range(count):
+            drawn_cards.append(self.cards.pop())
+
+        return drawn_cards
 
     def __str__(self) -> str:
         return f"[{', '.join(map(str, self.cards))}]"
