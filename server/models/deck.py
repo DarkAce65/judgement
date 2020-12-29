@@ -5,7 +5,7 @@ from .card import Card, Suit
 
 
 class Decks:
-    cards: List[Card]
+    cards: List[str]
     num_decks: int
 
     def __init__(self, num_decks: int = 1) -> None:
@@ -15,7 +15,7 @@ class Decks:
         for _ in range(num_decks):
             for suit in Suit:
                 for number in range(2, 15):
-                    self.cards.append(Card(suit, number))
+                    self.cards.append(Card.to_str(suit, number))
 
     def shuffle(self) -> None:
         shuffle_index = len(self.cards)
@@ -30,7 +30,7 @@ class Decks:
     def draw(self, count: int = 1) -> List[Card]:
         drawn_cards = []
         for _ in range(count):
-            drawn_cards.append(self.cards.pop())
+            drawn_cards.append(Card.from_str(self.cards.pop()))
 
         return drawn_cards
 

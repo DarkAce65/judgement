@@ -48,6 +48,9 @@ class Card:
 
     @staticmethod
     def to_str(suit: Suit, number: int) -> str:
+        if number < 2 or number > 14:
+            raise ValueError("Card number is out of bounds", number)
+
         if number == 14:
             number_str = "A"
         elif number == 13:
