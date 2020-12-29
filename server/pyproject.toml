@@ -6,7 +6,7 @@ authors = []
 
 [tool.isort]
 profile = "black"
-src_paths = ["server", "wsgi.py"]
+src_paths = ["models", "server", "wsgi.py"]
 
 [tool.black]
 line-length = 90
@@ -32,8 +32,8 @@ pre_format = "isort ."
 format = "black ."
 pre_lint = "task format"
 lint = "task lint_mypy && task lint_pylint"
-lint_mypy = "mypy --check-untyped-defs wsgi.py **/*.py"
-lint_pylint = "pylint wsgi.py **/*.py"
+lint_mypy = "mypy --check-untyped-defs models server wsgi.py"
+lint_pylint = "pylint models server wsgi.py"
 
 [tool.poetry.dependencies]
 python = "^3.9"
