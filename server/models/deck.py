@@ -23,7 +23,7 @@ class Decks:
                     self.cards.append(Card.to_str(suit, number))
 
     def shuffle(self) -> None:
-        shuffle_index = len(self.cards)
+        shuffle_index = len(self.cards) - 1
 
         while shuffle_index > 0:
             rand_index = random.randint(0, shuffle_index)
