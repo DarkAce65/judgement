@@ -8,12 +8,14 @@ services:
       args:
         - "REACT_APP_API_ROOT=${API_ROOT}"
     env_file: .env
+    restart: on-failure
     ports:
       - 80:80
 
   server:
     build: ./server
     env_file: .env
+    restart: on-failure
     networks:
       default:
         aliases:
