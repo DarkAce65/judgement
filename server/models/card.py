@@ -9,6 +9,9 @@ class Suit(Enum):
 
 
 class Card:
+    suit: Suit
+    number: int
+
     def __init__(self, suit: Suit, number: int) -> None:
         if number < 2 or number > 14:
             raise ValueError("number is out of bounds")

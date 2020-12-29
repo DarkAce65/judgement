@@ -1,15 +1,19 @@
 import random
+from typing import List
 
 from . import Card, Suit
 
 
-class Deck:
-    def __init__(self) -> None:
+class Decks:
+    cards: List[Card]
+
+    def __init__(self, count: int = 1) -> None:
         self.cards = []
 
-        for suit in Suit:
-            for number in range(2, 15):
-                self.cards.append(Card(suit, number))
+        for _ in range(count):
+            for suit in Suit:
+                for number in range(2, 15):
+                    self.cards.append(Card(suit, number))
 
     def shuffle(self) -> None:
         shuffle_index = len(self.cards)
