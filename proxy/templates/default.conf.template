@@ -8,6 +8,6 @@ server {
   }
 
   location ${API_ROOT}/ {
-    proxy_pass http://backend:${BACKEND_PORT}/;
+    proxy_pass http://backend:${API_PORT}/;
   }
 }

@@ -8,10 +8,10 @@ RUN apk update \
 ENV PATH="/root/.poetry/bin:${PATH}"
 
 WORKDIR /server
-EXPOSE "$BACKEND_PORT"
+EXPOSE "$API_PORT"
 
 COPY pyproject.toml poetry.lock ./
 RUN poetry install --no-dev --no-interaction
 
 COPY . .
-CMD ["sh", "-c", "poetry run gunicorn --worker-class eventlet -w 1 wsgi:app --bind 0.0.0.0:$BACKEND_PORT"]
+CMD ["sh", "-c", "poetry run gunicorn --worker-class eventlet -w 1 wsgi:app --bind 0.0.0.0:$API_PORT"]

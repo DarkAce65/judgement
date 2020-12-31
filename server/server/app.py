@@ -1,4 +1,4 @@
-from flask_cors import CORS
+# from flask_cors import CORS
 import os
 
 
@@ -8,13 +8,13 @@ from flask_socketio import SocketIO, emit, send
 
 
 app = Flask(__name__)
+socketio = SocketIO(app, cors_allowed_origins="*")
 
-if "CORS_ORIGINS" in os.environ:
-    origins = os.environ.get("CORS_ORIGINS")
-    CORS(app)
-    socketio = SocketIO(app, cors_allowed_origins=origins)
-else:
-    socketio = SocketIO(app, cors_allowed_origins="http://localhost")
+# if "CORS_ORIGINS" in os.environ:
+#     # origins = os.environ.get("CORS_ORIGINS")
+#     CORS(app)
+# else:
+#     socketio = SocketIO(app, cors_allowed_origins="http://localhost")
 
 
 @app.route("/hello")
@@ -44,4 +44,4 @@ def test_disconnect():
 
 
 if __name__ == "__main__":
-    socketio.run(app, host="0.0.0.0", port=os.environ.get("BACKEND_PORT"))
+    socketio.run(app, host="0.0.0.0", port=os.environ.get("API_PORT"))

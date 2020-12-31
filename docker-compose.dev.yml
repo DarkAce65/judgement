@@ -5,7 +5,7 @@ services:
     build: ./client
     command: yarn start
     environment:
-      REACT_APP_BACKEND_HOST: "http://localhost:8000"
+      REACT_APP_API_HOST: "http://localhost:8000"
       REACT_APP_API_ROOT: "/"
     ports:
       - 3000:3000
@@ -19,6 +19,6 @@ services:
     environment:
       FLASK_ENV: development
     ports:
-      - "8000:$BACKEND_PORT"
+      - "8000:$API_PORT"
     volumes:
       - ./server:/server
