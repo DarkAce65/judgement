@@ -1,15 +1,16 @@
-export const getBackendHost = (): string | null =>
-  process.env.REACT_APP_BACKEND_HOST?.replace(/\/+$/, '') ?? null;
+const getAPIHost = (): string | null => process.env.REACT_APP_API_HOST?.replace(/\/+$/, '') ?? null;
 
-export const getAPIBase = (): string => {
+const getAPIRoot = (): string | null => process.env.REACT_APP_API_ROOT?.replace(/\/+$/, '') ?? null;
+
+const buildAPIRequestBase = (): string => {
   const apiBase = [];
-  const backendHost = getBackendHost();
-  if (backendHost !== null && backendHost.length > 0) {
-    apiBase.push(backendHost);
+  const apiHost = getAPIHost();
+  if (apiHost !== null && apiHost.length > 0) {
+    apiBase.push(apiHost);
   }
 
-  const apiRoot = process.env.REACT_APP_API_ROOT?.replace(/^\/+/, '').replace(/\/+$/, '');
-  if (apiRoot && apiRoot.length > 0) {
+  const apiRoot = getAPIRoot();
+  if (apiRoot !== null && apiRoot.length > 0) {
     apiBase.push(apiRoot);
   }
 
@@ -17,11 +18,9 @@ export const getAPIBase = (): string => {
 };
 
 export const buildRequestPath = (path: string): string => {
-  const requestPath = [getAPIBase()];
-
   if (path.length > 0) {
-    requestPath.push(path.replace(/^\/+/, ''));
+    return `${buildAPIRequestBase()}/${path.replace(/^\/+/, '')}`;
   }
 
-  return requestPath.join('/');
+  return buildAPIRequestBase();
 };

@@ -1,34 +1,112 @@
-import React from 'react';
+import React, { PureComponent } from 'react';
 
-import { fetchAPI } from './api/client';
+import { Socket, io } from 'socket.io-client';
+
+import { buildRequestPath, getBackendHost } from './api/client';
 import logo from './logo.svg';
 
 import './App.css';
 
-function App() {
-  fetchAPI('/hello')
-    .then((res) => res.json())
-    .then(console.log)
-    .catch((...args) => console.error('failed', ...args));
+interface Props {}
 
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+interface State {
+  socket: Socket | null;
+  logs: string[];
+}
+
+class App extends PureComponent<Props, State> {
+  constructor(props: Props) {
+    super(props);
+
+    this.state = {
+      socket: null,
+      logs: [],
+    };
+
+    this.initSocket = this.initSocket.bind(this);
+    this.sendMessage = this.sendMessage.bind(this);
+    this.disconnect = this.disconnect.bind(this);
+  }
+
+  initSocket() {
+    if (this.state.socket !== null) {
+      return;
+    }
+
+    const socket = io(getBackendHost() ?? '/');
+
+    socket.on('connect', () => {
+      this.setState({ logs: [...this.state.logs, 'connected'] });
+    });
+    socket.on('message', (data: string) => {
+      this.setState({ logs: [...this.state.logs, data] });
+    });
+    socket.on('disconnect', () => {
+      console.log('disconnected');
+    });
+
+    this.setState({ socket });
+  }
+
+  sendMessage() {
+    this.state.socket?.send('test');
+  }
+
+  disconnect() {
+    if (this.state.socket === null) {
+      return;
+    }
+
+    this.state.socket.disconnect();
+    this.setState({ socket: null, logs: [] });
+  }
+
+  render() {
+    const { socket, logs } = this.state;
+
+    return (
+      <div className="App">
+        <header className="App-header">
+          <img src={logo} className="App-logo" alt="logo" />
+          <p>
+            Edit <code>src/App.tsx</code> and save to reload.
+          </p>
+          <p>
+            <button
+              onClick={() =>
+                fetch(buildRequestPath('/hello'))
+                  .then((res) => res.json())
+                  .then(console.log)
+                  .catch((...args) => console.error('failed', ...args))
+              }
+            >
+              Make request
+            </button>
+            <button onClick={this.initSocket}>Init socket</button>
+            {socket !== null && (
+              <>
+                <button onClick={this.sendMessage}>Send message</button>
+                <button onClick={this.disconnect}>Disconnect</button>
+              </>
+            )}
+          </p>
+          <a
+            className="App-link"
+            href="https://reactjs.org"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Learn React
+          </a>
+          <div style={{ fontSize: 10 }}>
+            {logs.map((log, i) => (
+              <div key={i}>{log}</div>
+            ))}
+          </div>
+        </header>
+      </div>
+    );
+  }
 }
 
 export default App;

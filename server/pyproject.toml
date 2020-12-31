@@ -38,8 +38,10 @@ lint_pylint = "pylint models server wsgi.py"
 
 [tool.poetry.dependencies]
 python = "^3.9"
+eventlet = "^0.30.0"
 flask = "^1.1.2"
 flask-cors = "^3.0.9"
+flask-socketio = "^5.0.1"
 gunicorn = "^20.0.4"
 
 [tool.poetry.dev-dependencies]

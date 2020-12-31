@@ -5,7 +5,8 @@ services:
     build: ./client
     command: yarn start
     environment:
-      REACT_APP_API_ROOT: "http://localhost:8000"
+      REACT_APP_BACKEND_HOST: "http://localhost:8000"
+      REACT_APP_API_ROOT: "/"
     ports:
       - 3000:3000
     volumes:
@@ -13,13 +14,11 @@ services:
 
   server:
     build: ./server
-    command: poetry run flask run -h 0.0.0.0 -p $BACKEND_PORT
+    command: poetry run python -m server.app
     env_file: .env
     environment:
       FLASK_ENV: development
-      FLASK_APP: "server/app.py"
-      CORS_ORIGINS: "http://localhost:3000"
     ports:
-      - "8000:${BACKEND_PORT}"
+      - "8000:$BACKEND_PORT"
     volumes:
       - ./server:/server
