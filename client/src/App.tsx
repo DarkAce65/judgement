@@ -1,8 +1,8 @@
 import React, { PureComponent } from 'react';
 
-import { Socket, io } from 'socket.io-client';
+import { Socket } from 'socket.io-client';
 
-import { buildRequestPath, getBackendHost } from './api/client';
+import { buildRequestPath, buildSocket } from './api/client';
 import logo from './logo.svg';
 
 import './App.css';
@@ -33,7 +33,7 @@ class App extends PureComponent<Props, State> {
       return;
     }
 
-    const socket = io(getBackendHost() ?? '/');
+    const socket = buildSocket();
 
     socket.on('connect', () => {
       this.setState({ logs: [...this.state.logs, 'connected'] });
