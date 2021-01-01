@@ -31,7 +31,11 @@ export const buildRequestPath = (path: string): string => {
 
   const apiRoot = getAPIRoot();
   if (apiRoot.length > 0) {
-    apiBase.push(apiRoot);
+    if (apiBase.length > 0) {
+      apiBase.push(apiRoot.replace(/^\/+/, ''));
+    } else {
+      apiBase.push(apiRoot);
+    }
   }
 
   const apiHostAndRoot = apiBase.join('/');
