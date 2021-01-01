@@ -6,6 +6,12 @@ from flask_socketio import SocketIO, emit, send
 
 app = Flask(__name__)
 
+
+if "FLASK_PROPAGATE_EXCEPTIONS" in os.environ:
+    app.config["PROPAGATE_EXCEPTIONS"] = (
+        os.environ.get("FLASK_PROPAGATE_EXCEPTIONS") == "True"
+    )
+
 if "CORS_ALLOWED_ORIGIN" in os.environ:
     origin = os.environ.get("CORS_ALLOWED_ORIGIN")
     CORS(app, origins=origin)

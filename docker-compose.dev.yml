@@ -18,6 +18,7 @@ services:
     env_file: .env
     environment:
       FLASK_ENV: development
+      FLASK_PROPAGATE_EXCEPTIONS: "False"
       CORS_ALLOWED_ORIGIN: "http://localhost:3000"
     ports:
       - "8000:$API_PORT"
