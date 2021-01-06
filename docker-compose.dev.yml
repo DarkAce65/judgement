@@ -11,6 +11,7 @@ services:
       - 3000:3000
     volumes:
       - ./client:/client
+      - /client/node_modules/
 
   server:
     build: ./server
