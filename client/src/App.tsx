@@ -1,11 +1,20 @@
 import React, { PureComponent } from 'react';
 
 import { Socket } from 'socket.io-client';
+import styled from 'styled-components';
 
 import { buildRequestPath, buildSocket } from './api/client';
 import logo from './logo.svg';
 
 import './App.css';
+
+const Logs = styled.div`
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  font-size: 12px;
+  text-align: right;
+`;
 
 interface Props {}
 
@@ -35,14 +44,14 @@ class App extends PureComponent<Props, State> {
 
     const socket = buildSocket();
 
-    socket.on('connect', () => {
-      this.setState({ logs: [...this.state.logs, 'connected'] });
-    });
-    socket.on('message', (data: string) => {
-      this.setState({ logs: [...this.state.logs, data] });
-    });
-    socket.on('disconnect', () => {
-      console.log('disconnected');
+    socket.onAny((event: string, data: string | { data: string }) => {
+      console.log(data);
+
+      if (typeof data === 'object' && Object.prototype.hasOwnProperty.call(data, 'data')) {
+        data = data.data;
+      }
+
+      this.setState({ logs: [...this.state.logs, `${data}/${event}`] });
     });
 
     this.setState({ socket });
@@ -58,7 +67,7 @@ class App extends PureComponent<Props, State> {
     }
 
     this.state.socket.disconnect();
-    this.setState({ socket: null, logs: [] });
+    this.setState({ socket: null });
   }
 
   render() {
@@ -72,6 +81,7 @@ class App extends PureComponent<Props, State> {
             Edit <code>src/App.tsx</code> and save to reload.
           </p>
           <p>
+            <button onClick={() => this.setState({ logs: [] })}>Clear logs</button>
             <button
               onClick={() =>
                 fetch(buildRequestPath('/hello'))
@@ -98,11 +108,11 @@ class App extends PureComponent<Props, State> {
           >
             Learn React
           </a>
-          <div style={{ fontSize: 10 }}>
+          <Logs>
             {logs.map((log, i) => (
               <div key={i}>{log}</div>
             ))}
-          </div>
+          </Logs>
         </header>
       </div>
     );

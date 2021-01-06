@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, send
 
@@ -21,18 +21,22 @@ def hello_world():
 
 @socketio.on("connect")
 def test_connect():
-    emit("response", {"data": "Connected"})
+    emit("response", {"data": "Connected: " + request.sid}, broadcase=True)
 
 
 @socketio.on("message")
 def handle_message(message):
     send(message)
-    send("broadcast", broadcast=True)
+    send("broadcast from " + request.sid, broadcast=True)
 
 
 @socketio.on("disconnect")
 def test_disconnect():
-    emit("client_disconnect", {"data": "Client disconnected"})
+    emit(
+        "client_disconnect",
+        {"data": "Client disconnected: " + request.sid},
+        broadcast=True,
+    )
 
 
 if __name__ == "__main__":
