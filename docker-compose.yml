@@ -17,7 +17,3 @@ services:
     build: ./server
     env_file: .env
     restart: on-failure
-    networks:
-      default:
-        aliases:
-          - backend
