@@ -33,7 +33,7 @@ pre_format = "isort ."
 format = "black ."
 pre_lint = "task format"
 lint = "task lint_mypy && task lint_pylint"
-lint_mypy = "mypy --check-untyped-defs models server wsgi.py"
+lint_mypy = "mypy models server wsgi.py"
 lint_pylint = "pylint models server wsgi.py"
 
 [tool.poetry.dependencies]
