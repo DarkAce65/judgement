@@ -3,6 +3,8 @@ from __future__ import annotations
 import random
 from collections import Counter, deque
 from collections.abc import Iterable, Sequence
+from typing import Counter as CounterType
+from typing import Deque, List
 
 from .card import Card, Suit
 
@@ -10,10 +12,10 @@ NUM_CARDS_IN_DECK = 52
 
 
 class Decks:
-    cards: deque[str]
+    cards: Deque[str]
     num_decks: int
 
-    __drawn_card_counts: Counter[str]
+    __drawn_card_counts: CounterType[str]
 
     def __init__(self, num_decks: int = 1) -> None:
         self.cards = deque(maxlen=num_decks * NUM_CARDS_IN_DECK)
@@ -39,13 +41,13 @@ class Decks:
     def sort(self) -> None:
         self.cards = deque(sorted(self.cards))
 
-    def draw(self, count: int = 1) -> deque[Card]:
+    def draw(self, count: int = 1) -> Deque[Card]:
         if len(self.cards) < count:
             raise ValueError(
                 f"Not enough cards left in the deck to draw - cards in deck: {len(self.cards)}"
             )
 
-        drawn_cards: list[str] = []
+        drawn_cards: List[str] = []
         for _ in range(count):
             drawn_cards.append(self.cards.popleft())
 
