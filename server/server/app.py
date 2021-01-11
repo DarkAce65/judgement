@@ -1,9 +1,10 @@
 import os
-from typing import Any
+from typing import Any, Tuple
 
-from flask import Flask, jsonify, request
+from flask import Flask, request
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, send
+from redis import Redis
 
 app = Flask(__name__)
 
@@ -14,10 +15,22 @@ if "CORS_ALLOWED_ORIGIN" in os.environ:
 else:
     socketio = SocketIO(app)
 
+redis_client = Redis(host="redis")
+
 
 @app.route("/hello")
 def hello_world() -> Any:
-    return jsonify("Hello, World!")
+    test = redis_client.get("test")
+    if test is None:
+        return "0"
+
+    return test
+
+
+@app.route("/inc")
+def inc() -> Tuple[str, int]:
+    redis_client.incr("test")
+    return ("", 204)
 
 
 @socketio.on("connect")

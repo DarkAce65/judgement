@@ -13,6 +13,11 @@ services:
       - ./client:/client
       - /client/node_modules/
 
+  redis:
+    image: redis
+    ports:
+      - 6379:6379
+
   server:
     build: ./server
     command: poetry run python -m server.app
