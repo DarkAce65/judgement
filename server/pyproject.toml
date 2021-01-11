@@ -6,7 +6,7 @@ authors = []
 
 [tool.isort]
 profile = "black"
-src_paths = ["models", "server", "wsgi.py"]
+src_paths = ["models", "server", "main.py"]
 
 [tool.black]
 line-length = 90
@@ -33,17 +33,15 @@ pre_format = "isort ."
 format = "black ."
 pre_lint = "task format"
 lint = "task lint_mypy && task lint_pylint"
-lint_mypy = "mypy models server wsgi.py"
-lint_pylint = "pylint models server wsgi.py"
+lint_mypy = "mypy models server main.py"
+lint_pylint = "pylint models server main.py"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-eventlet = "^0.30.0"
-flask = "^1.1.2"
-flask-cors = "^3.0.9"
-flask-socketio = "^5.0.1"
-gunicorn = "^20.0.4"
+fastapi = "^0.63.0"
+python-socketio = "^5.0.4"
 redis = "^3.5.3"
+uvicorn = { version = "^0.13.3", extras = ["standard"] }
 
 [tool.poetry.dev-dependencies]
 black = "^20.8b1"

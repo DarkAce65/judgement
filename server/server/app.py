@@ -1,24 +1,32 @@
 import os
-from typing import Any, Tuple
+from typing import Any
 
-from flask import Flask, request
-from flask_cors import CORS
-from flask_socketio import SocketIO, emit, send
+from fastapi import FastAPI, status
+from fastapi.middleware.cors import CORSMiddleware
 from redis import Redis
-
-app = Flask(__name__)
-
-if "CORS_ALLOWED_ORIGIN" in os.environ:
-    origin = os.environ.get("CORS_ALLOWED_ORIGIN")
-    CORS(app, origins=origin)
-    socketio = SocketIO(app, cors_allowed_origins=origin)
-else:
-    socketio = SocketIO(app)
+from socketio import ASGIApp, AsyncServer
+from starlette.responses import Response
 
 redis_client = Redis(host="redis")
 
+app = FastAPI()
 
-@app.route("/hello")
+if "CORS_ALLOWED_ORIGIN" in os.environ:
+    origin = os.environ.get("CORS_ALLOWED_ORIGIN")
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[origin],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+sio = AsyncServer(async_mode="asgi", cors_allowed_origins=[])
+socket_asgi = ASGIApp(sio)
+app.mount("/ws", socket_asgi)
+
+
+@app.get("/hello")
 def hello_world() -> Any:
     test = redis_client.get("test")
     if test is None:
@@ -27,34 +35,24 @@ def hello_world() -> Any:
     return test
 
 
-@app.route("/inc")
-def inc() -> Tuple[str, int]:
+@app.post("/inc")
+def inc() -> Response:
     redis_client.incr("test")
-    return ("", 204)
+
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@socketio.on("connect")
-def test_connect() -> None:
-    sid = request.sid  # type: ignore
-    emit("response", {"data": "Connected: " + sid}, broadcase=True)
+@sio.on("connect")
+async def connect(sid: str, _environ: dict) -> None:
+    await sio.emit("response", {"data": "Client connected: " + sid})
 
 
-@socketio.on("message")
-def handle_message(message: str) -> None:
-    sid = request.sid  # type: ignore
-    send(message)
-    send("broadcast from " + sid, broadcast=True)
+@sio.on("message")
+async def handle_message(sid: str, message: str) -> None:
+    await sio.send(message, to=sid)
+    await sio.send("broadcast from " + sid)
 
 
-@socketio.on("disconnect")
-def test_disconnect() -> None:
-    sid = request.sid  # type: ignore
-    emit(
-        "client_disconnect",
-        {"data": "Client disconnected: " + sid},
-        broadcast=True,
-    )
-
-
-if __name__ == "__main__":
-    socketio.run(app, host="0.0.0.0", port=os.environ.get("API_PORT"))
+@sio.on("disconnect")
+async def disconnect(sid: str) -> None:
+    await sio.emit("client_disconnect", {"data": "Client disconnected: " + sid})

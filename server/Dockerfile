@@ -10,6 +10,7 @@ RUN apk add --no-cache \
   curl \
   gcc \
   libc-dev \
+  make \
   && (curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -)
 ENV PATH="$POETRY_HOME/bin:$PATH"
 
@@ -20,4 +21,4 @@ COPY pyproject.toml poetry.lock ./
 RUN poetry install --no-dev
 
 COPY . .
-CMD ["sh", "-c", "poetry run gunicorn --worker-class eventlet -w 1 wsgi:app --bind 0.0.0.0:$API_PORT"]
+CMD ["sh", "-c", "poetry run uvicorn main:app --host 0.0.0.0 --port $API_PORT"]

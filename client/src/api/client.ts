@@ -4,12 +4,10 @@ const getAPIHost = (): string => process.env.REACT_APP_API_HOST?.replace(/\/+$/,
 const getAPIRoot = (): string => process.env.REACT_APP_API_ROOT?.replace(/\/+$/, '') ?? '';
 
 export const buildSocket = (): Socket => {
-  const socketParams: Partial<ManagerOptions & SocketOptions> = {};
-
   const apiRoot = getAPIRoot();
-  if (apiRoot.length > 0) {
-    socketParams.path = `${apiRoot}/socket.io`;
-  }
+  const socketParams: Partial<ManagerOptions & SocketOptions> = {
+    path: `${apiRoot}/ws/socket.io`,
+  };
 
   let socket;
   const apiHost = getAPIHost();
