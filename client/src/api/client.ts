@@ -3,7 +3,7 @@ import { ManagerOptions, Socket, SocketOptions, io } from 'socket.io-client';
 const getAPIHost = (): string => process.env.REACT_APP_API_HOST?.replace(/\/+$/, '') ?? '';
 const getAPIRoot = (): string => process.env.REACT_APP_API_ROOT?.replace(/\/+$/, '') ?? '';
 
-export const buildSocket = (): Socket => {
+export const buildSocket = (namespace?: string): Socket => {
   const apiRoot = getAPIRoot();
   const socketParams: Partial<ManagerOptions & SocketOptions> = {
     path: `${apiRoot}/ws/socket.io`,
@@ -12,9 +12,17 @@ export const buildSocket = (): Socket => {
   let socket;
   const apiHost = getAPIHost();
   if (apiHost.length > 0) {
-    socket = io(apiHost, socketParams);
+    if (namespace) {
+      socket = io(`${apiHost}/${namespace.replace(/^\/+/, '')}`, socketParams);
+    } else {
+      socket = io(apiHost, socketParams);
+    }
   } else {
-    socket = io(socketParams);
+    if (namespace) {
+      socket = io(namespace, socketParams);
+    } else {
+      socket = io(socketParams);
+    }
   }
 
   return socket;
