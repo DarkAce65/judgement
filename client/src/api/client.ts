@@ -9,12 +9,16 @@ const API_BASE = join(API_HOST, API_ROOT);
 
 const WEBSOCKET_PATH = join(API_ROOT, '/ws/socket.io');
 
-export const buildSocket = (namespace?: string): Socket => {
+export const buildSocket = (namespace = ''): Socket => {
   const socketParams: Partial<ManagerOptions & SocketOptions> = { path: WEBSOCKET_PATH };
 
   let socket;
-  if (namespace) {
+  if (API_HOST.length > 0 && namespace.length > 0) {
     socket = io(join(API_HOST, namespace), socketParams);
+  } else if (API_HOST.length > 0) {
+    socket = io(API_HOST, socketParams);
+  } else if (namespace.length > 0) {
+    socket = io(namespace, socketParams);
   } else {
     socket = io(socketParams);
   }

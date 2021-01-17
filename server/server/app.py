@@ -44,7 +44,7 @@ def inc() -> Response:
 
 @sio.on("connect")
 async def connect(sid: str, _environ: dict) -> None:
-    await sio.emit("response", {"data": "Client connected: " + sid})
+    await sio.emit("client_connect", {"data": "Client connected: " + sid})
 
 
 @sio.on("message")
