@@ -213,12 +213,24 @@ it('tests edge cases for joining', () => {
 
   expect(() => join('http:')).toThrow();
   expect(join('http:', 'test.domain.com')).toBe('http://test.domain.com');
+  expect(join('http:test.domain.com')).toBe('http://test.domain.com');
+  expect(join('http://test.domain.com')).toBe('http://test.domain.com');
   expect(join('http://', 'test.domain.com')).toBe('http://test.domain.com');
-  expect(join('http:///', 'test.domain.com')).toBe('http://test.domain.com');
-  expect(join('http://', '//test.domain.com')).toBe('http://test.domain.com');
-  expect(join('http:/', '/test.domain.com')).toBe('http://test.domain.com');
   expect(join('http:', '//test.domain.com')).toBe('http://test.domain.com');
+  expect(join('http://', '//test.domain.com')).toBe('http://test.domain.com');
+  expect(join('http:///', 'test.domain.com')).toBe('http://test.domain.com');
+  expect(join('http:/', '/test.domain.com')).toBe('http://test.domain.com');
   expect(join('http:', 'test.domain.com', 'api')).toBe('http://test.domain.com/api');
+
+  expect(join('http:', 'localhost:8000')).toBe('http://localhost:8000');
+  expect(join('http:localhost:8000')).toBe('http://localhost:8000');
+  expect(join('http://localhost:8000')).toBe('http://localhost:8000');
+  expect(join('http://', 'localhost:8000')).toBe('http://localhost:8000');
+  expect(join('http:', '//localhost:8000')).toBe('http://localhost:8000');
+  expect(join('http://', '//localhost:8000')).toBe('http://localhost:8000');
+  expect(join('http:///', 'localhost:8000')).toBe('http://localhost:8000');
+  expect(join('http:/', '/localhost:8000')).toBe('http://localhost:8000');
+  expect(join('http:', 'localhost:8000', 'api')).toBe('http://localhost:8000/api');
 
   expect(join('a', 'b//c')).toBe('a/b/c');
   expect(join('a', '//b//c')).toBe('a/b/c');

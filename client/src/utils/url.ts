@@ -3,13 +3,11 @@ const normalizeProtocolSegment = (protocolSegment: string): string => {
     throw new Error(`Malformed protocol segment: ${protocolSegment}`);
   }
 
-  const [protocol, afterProtocol, ...extraParts] = protocolSegment.split(':');
+  const protocolSplitIndex = protocolSegment.indexOf(':');
+  const protocol = protocolSegment.slice(0, protocolSplitIndex + 1);
+  const afterProtocol = protocolSegment.slice(protocolSplitIndex + 1);
 
-  if (extraParts.length !== 0) {
-    throw new Error(`Malformed protocol segment: ${protocolSegment}`);
-  }
-
-  let normalizedSegment = `${protocol}:`;
+  let normalizedSegment = protocol;
 
   let slashes = 0;
   let c = 0;
@@ -20,7 +18,7 @@ const normalizeProtocolSegment = (protocolSegment: string): string => {
     }
 
     slashes++;
-    if ((protocol === 'file' && slashes > 3) || (protocol !== 'file' && slashes > 2)) {
+    if ((protocol === 'file:' && slashes > 3) || (protocol !== 'file:' && slashes > 2)) {
       continue;
     }
 
@@ -45,11 +43,7 @@ export const join = (...segments: string[]): string => {
       continue;
     }
 
-    if (segment.indexOf(':') !== -1) {
-      if (url.length !== 0) {
-        throw new Error(`Unexpected protocol segment: ${segment}`);
-      }
-
+    if (url.length === 0 && segment.indexOf(':') !== -1) {
       url += normalizeProtocolSegment(segment);
 
       continue;
