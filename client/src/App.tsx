@@ -45,11 +45,11 @@ class App extends PureComponent<Props, State> {
     const socket = buildSocket();
 
     socket.onAny((event: string, data: string | { data: string }) => {
-      console.log(data);
-
       if (typeof data === 'object' && Object.prototype.hasOwnProperty.call(data, 'data')) {
         data = data.data;
       }
+
+      console.log({ event, data });
 
       this.setState({ logs: [...this.state.logs, `${data}/${event}`] });
     });
