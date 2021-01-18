@@ -35,6 +35,7 @@ pre_lint = "task format"
 lint = "task lint_mypy && task lint_pylint"
 lint_mypy = "mypy models main.py"
 lint_pylint = "pylint models main.py"
+test = "python -m unittest"
 
 [tool.poetry.dependencies]
 python = "^3.9"
