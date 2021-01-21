@@ -18,13 +18,21 @@ services:
   redis:
     build: ./redis
     restart: on-failure
+    secrets:
+      - redis_password
+    environment:
+      REDIS_PASSWORD_FILE: /run/secrets/redis_password
     networks:
       - db
 
   server:
     build: ./server
     restart: on-failure
+    secrets:
+      - redis_password
     env_file: .env
+    environment:
+      REDIS_PASSWORD_FILE: /run/secrets/redis_password
     networks:
       - proxy
       - db
@@ -32,3 +40,7 @@ services:
 networks:
   proxy:
   db:
+
+secrets:
+  redis_password:
+    file: .REDIS_PASSWORD

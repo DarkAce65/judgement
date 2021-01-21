@@ -15,6 +15,10 @@ services:
 
   redis:
     build: ./redis
+    secrets:
+      - redis_password
+    environment:
+      REDIS_PASSWORD_FILE: /run/secrets/redis_password
     ports:
       - 6379:6379
     volumes:
@@ -23,11 +27,18 @@ services:
   server:
     build: ./server
     command: poetry run uvicorn main:app --host 0.0.0.0 --port $API_PORT --reload
+    secrets:
+      - redis_password
     env_file: .env
     environment:
+      REDIS_PASSWORD_FILE: /run/secrets/redis_password
       FLASK_ENV: development
       CORS_ALLOWED_ORIGIN: "http://localhost:3000"
     ports:
       - "8000:$API_PORT"
     volumes:
       - ./server:/server
+
+secrets:
+  redis_password:
+    file: .REDIS_PASSWORD
