@@ -8,22 +8,23 @@ services:
       args:
         - "REACT_APP_API_HOST=$API_HOST"
         - "REACT_APP_API_ROOT=$API_ROOT"
-    env_file: .env
     restart: on-failure
+    env_file: .env
     networks:
       - proxy
     ports:
       - 80:80
 
   redis:
-    image: redis
+    build: ./redis
+    restart: on-failure
     networks:
       - db
 
   server:
     build: ./server
-    env_file: .env
     restart: on-failure
+    env_file: .env
     networks:
       - proxy
       - db
