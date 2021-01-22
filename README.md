@@ -23,3 +23,10 @@ Supports live reloading of both the backend and the frontend.
 `docker-compose up --build`
 
 - App accessible at http://localhost
+
+### Tests
+
+Running tests locally requires that either [`yarn`](https://yarnpkg.com/) (frontend) or [`poetry`](https://python-poetry.org/) (backend) be installed and that dependencies are installed using `yarn install` or `poetry install` for the frontend and backend respectively.
+
+- Frontend tests can be run by running `yarn test` from the [client](./client) folder
+- Backend tests can be run by running `poetry run task test` from the [server](./server) folder
