@@ -4,8 +4,9 @@ from typing import Any
 from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
 from socketio import ASGIApp, AsyncServer
-from redis_client import redis_client
 from starlette.responses import Response
+
+from redis_client import redis_client
 
 app = FastAPI()
 
