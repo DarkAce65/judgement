@@ -21,4 +21,4 @@ COPY pyproject.toml poetry.lock ./
 RUN poetry install --no-dev
 
 COPY . .
-CMD ["sh", "-c", "poetry run uvicorn main:app --host 0.0.0.0 --port $API_PORT"]
+CMD ["sh", "-c", "poetry run uvicorn main:app --host 0.0.0.0 --port $API_PORT --proxy-headers"]
