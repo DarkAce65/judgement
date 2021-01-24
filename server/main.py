@@ -3,20 +3,9 @@ from typing import Any
 
 from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
-from redis import Redis
 from socketio import ASGIApp, AsyncServer
+from redis_client import redis_client
 from starlette.responses import Response
-
-if "REDIS_PASSWORD_FILE" in os.environ:
-    redis_password_file = os.environ.get("REDIS_PASSWORD_FILE")
-    if redis_password_file is None:
-        raise Exception("Missing path to redis password secret")
-
-    with open(redis_password_file) as f:
-        redis_password = f.readline().strip()
-        redis_client = Redis(host="redis", password=redis_password)
-else:
-    redis_client = Redis(host="redis")
 
 app = FastAPI()
 
@@ -59,7 +48,7 @@ async def connect(sid: str, _environ: dict) -> None:
 @sio.on("message")
 async def handle_message(sid: str, message: str) -> None:
     await sio.send(message, to=sid)
-    await sio.send("broadcast from " + sid)
+    await sio.send("broadcast from " + sid, skip_sid=sid)
 
 
 @sio.on("disconnect")

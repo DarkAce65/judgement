@@ -6,7 +6,7 @@ authors = []
 
 [tool.isort]
 profile = "black"
-src_paths = ["models", "main.py"]
+src_paths = ["models", "redis_client.py", "main.py"]
 
 [tool.black]
 line-length = 90
@@ -33,8 +33,8 @@ pre_format = "isort ."
 format = "black ."
 pre_lint = "task format"
 lint = "task lint_mypy && task lint_pylint"
-lint_mypy = "mypy models main.py"
-lint_pylint = "pylint models main.py"
+lint_mypy = "mypy models redis_client.py main.py"
+lint_pylint = "pylint models redis_client.py main.py"
 test = "python -m unittest"
 
 [tool.poetry.dependencies]
