@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from socketio import ASGIApp, AsyncServer
 from starlette.responses import Response
 
-from redis_client import redis_client
+from server.redis_client import redis_client
 
 app = FastAPI()
 
@@ -43,6 +43,7 @@ def inc() -> Response:
 
 @sio.on("connect")
 async def connect(sid: str, _environ: dict) -> None:
+
     await sio.emit("client_connect", {"data": "Client connected: " + sid})
 
 
