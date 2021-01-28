@@ -51,6 +51,10 @@ class App extends PureComponent<Props, State> {
 
       console.log({ event, data });
 
+      if (typeof data === 'object') {
+        data = JSON.stringify(data);
+      }
+
       this.setState({ logs: [...this.state.logs, `${data}/${event}`] });
     });
 
@@ -92,8 +96,9 @@ class App extends PureComponent<Props, State> {
             >
               Make request
             </button>
-            <button onClick={this.initSocket}>Init socket</button>
-            {socket !== null && (
+            {socket === null ? (
+              <button onClick={this.initSocket}>Init socket</button>
+            ) : (
               <>
                 <button onClick={this.sendMessage}>Send message</button>
                 <button onClick={this.disconnect}>Disconnect</button>
