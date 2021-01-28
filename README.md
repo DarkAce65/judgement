@@ -12,7 +12,7 @@ A dockerized, full-stack website to play the card game ["Judgement"](https://en.
 
 Supports live reloading of both the backend and the frontend.
 
-`docker-compose -f docker-compose.dev.yml up`
+`docker-compose -p judgement_dev -f docker-compose.dev.yml up`
 
 - Frontend accessible at http://localhost:3000
 - Backend accessible at http://localhost:8000
