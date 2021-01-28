@@ -9,6 +9,8 @@ if "REDIS_PASSWORD_FILE" in os.environ:
 
     with open(redis_password_file) as f:
         redis_password = f.readline().strip()
-        redis_client = Redis(host="redis", password=redis_password)
+        redis_client = Redis(
+            host="redis", password=redis_password, charset="utf-8", decode_responses=True
+        )
 else:
-    redis_client = Redis(host="redis")
+    redis_client = Redis(host="redis", charset="utf-8", decode_responses=True)
