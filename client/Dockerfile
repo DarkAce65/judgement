@@ -1,5 +1,6 @@
 FROM node:15.5.0
 
+USER node
 WORKDIR /client
 EXPOSE 3000
 

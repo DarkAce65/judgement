@@ -1,6 +1,7 @@
 # Client builder stage
 FROM node:15.5.0 as client_builder
 
+USER node
 WORKDIR /client
 
 COPY ./client/package.json ./client/yarn.lock ./
