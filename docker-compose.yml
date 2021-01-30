@@ -26,6 +26,8 @@ services:
       - db
 
   server:
+    depends_on:
+      - redis
     build: ./server
     restart: on-failure
     secrets:
