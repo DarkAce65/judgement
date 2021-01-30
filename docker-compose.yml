@@ -30,7 +30,9 @@ services:
   server:
     depends_on:
       - redis
-    build: ./server
+    build:
+      context: ./server
+      target: production
     restart: on-failure
     secrets:
       - redis_password

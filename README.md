@@ -16,6 +16,7 @@ Supports live reloading of both the backend and the frontend.
 
 - Frontend accessible at http://localhost:3000
 - Backend accessible at http://localhost:8000
+  - VSCode debugger attachable at http://localhost:5678
 - Redis database accessible at http://localhost:6379
 
 ### Production

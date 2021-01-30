@@ -27,8 +27,9 @@ services:
   server:
     depends_on:
       - redis
-    build: ./server
-    command: poetry run uvicorn main:app --host 0.0.0.0 --port $API_PORT --reload --reload-dir server
+    build:
+      context: ./server
+      target: debug
     secrets:
       - redis_password
     env_file: .env
@@ -37,6 +38,7 @@ services:
       FLASK_ENV: development
       CORS_ALLOWED_ORIGIN: "http://localhost:3000"
     ports:
+      - 5678:5678
       - "8000:$API_PORT"
     volumes:
       - ./server:/server

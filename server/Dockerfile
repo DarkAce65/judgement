@@ -1,4 +1,5 @@
-FROM python:3.9-alpine
+# Base dependency stage
+FROM python:3.9-alpine as base
 
 ENV PYTHONUNBUFFERED=1 \
   PYTHONDONTWRITEBYTECODE=1 \
@@ -20,5 +21,13 @@ EXPOSE "$API_PORT"
 COPY pyproject.toml poetry.lock ./
 RUN poetry install --no-dev
 
+# Debug/hot-reloading container
+FROM base as debug
+RUN poetry install --no-dev -E debug
+COPY . .
+CMD ["sh", "-c", "poetry run python -m debugpy --listen 0.0.0.0:5678 -m uvicorn main:app --host 0.0.0.0 --port $API_PORT --reload --reload-dir server"]
+
+# Production container
+FROM base as production
 COPY . .
 CMD ["sh", "-c", "poetry run uvicorn main:app --host 0.0.0.0 --port $API_PORT --proxy-headers"]
