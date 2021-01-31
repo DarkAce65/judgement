@@ -1,127 +1,34 @@
-import React, { PureComponent } from 'react';
+import React from 'react';
 
-import { Socket } from 'socket.io-client';
-import styled from 'styled-components';
+import { Link, Route, BrowserRouter as Router, Switch } from 'react-router-dom';
 
-import { buildRequestPath, buildSocket } from './api/client';
-import logo from './logo.svg';
+import Home from './Home';
 
-import './App.css';
-
-const Logs = styled.div`
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  font-size: 12px;
-  text-align: right;
-`;
-
-interface Props {}
-
-interface State {
-  socket: Socket | null;
-  logs: string[];
-}
-
-class App extends PureComponent<Props, State> {
-  constructor(props: Props) {
-    super(props);
-
-    this.state = {
-      socket: null,
-      logs: [],
-    };
-
-    this.initSocket = this.initSocket.bind(this);
-    this.sendMessage = this.sendMessage.bind(this);
-    this.disconnect = this.disconnect.bind(this);
-  }
-
-  initSocket() {
-    if (this.state.socket !== null) {
-      return;
-    }
-
-    const socket = buildSocket();
-
-    socket.onAny((event: string, data: string | { data: string }) => {
-      if (typeof data === 'object' && Object.prototype.hasOwnProperty.call(data, 'data')) {
-        data = data.data;
-      }
-
-      console.log({ event, data });
-
-      if (typeof data === 'object') {
-        data = JSON.stringify(data);
-      }
-
-      this.setState({ logs: [...this.state.logs, `${data}/${event}`] });
-    });
-
-    this.setState({ socket });
-  }
-
-  sendMessage() {
-    this.state.socket?.send('test');
-  }
-
-  disconnect() {
-    if (this.state.socket === null) {
-      return;
-    }
-
-    this.state.socket.disconnect();
-    this.setState({ socket: null });
-  }
-
-  render() {
-    const { socket, logs } = this.state;
-
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.tsx</code> and save to reload.
-          </p>
-          <p>
-            <button onClick={() => this.setState({ logs: [] })}>Clear logs</button>
-            <button
-              onClick={() =>
-                fetch(buildRequestPath('/hello'))
-                  .then((res) => res.json())
-                  .then(console.log)
-                  .catch((...args) => console.error('failed', ...args))
-              }
-            >
-              Make request
-            </button>
-            {socket === null ? (
-              <button onClick={this.initSocket}>Init socket</button>
-            ) : (
-              <>
-                <button onClick={this.sendMessage}>Send message</button>
-                <button onClick={this.disconnect}>Disconnect</button>
-              </>
-            )}
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
+const App = () => {
+  return (
+    <Router>
+      <Switch>
+        <Route path="/hello">
+          <Link
+            to="/"
+            style={{ position: 'fixed', top: 20, right: 20, fontSize: 18, color: 'red' }}
           >
-            Learn React
-          </a>
-          <Logs>
-            {logs.map((log, i) => (
-              <div key={i}>{log}</div>
-            ))}
-          </Logs>
-        </header>
-      </div>
-    );
-  }
-}
+            To home
+          </Link>
+          Somewhere else
+        </Route>
+        <Route path="/">
+          <Link
+            to="/hello"
+            style={{ position: 'fixed', top: 20, right: 20, fontSize: 18, color: 'red' }}
+          >
+            To hello
+          </Link>
+          <Home />
+        </Route>
+      </Switch>
+    </Router>
+  );
+};
 
 export default App;
