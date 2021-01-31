@@ -1,5 +1,6 @@
 import { ManagerOptions, Socket, SocketOptions, io } from 'socket.io-client';
 
+import isDev from '../utils/isDev';
 import { join } from '../utils/url';
 
 const API_HOST = process.env.REACT_APP_API_HOST?.replace(/\/+$/, '') ?? '';
@@ -32,4 +33,18 @@ export const buildRequestPath = (path: string): string => {
   }
 
   return API_BASE;
+};
+
+export const fetchAPI = (path: string, init?: RequestInit): Promise<Response> => {
+  const requestPath = buildRequestPath(path);
+  const requestInit: RequestInit = {
+    ...(isDev && { credentials: 'include' }),
+    ...init,
+  };
+
+  if (Object.keys(requestInit).length === 0) {
+    return fetch(requestPath);
+  }
+
+  return fetch(requestPath, requestInit);
 };
