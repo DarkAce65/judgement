@@ -2,6 +2,7 @@ import random
 import string
 import time
 import uuid
+from typing import Optional
 
 ROOM_ID_LENGTH = 4
 
@@ -80,7 +81,14 @@ class LobbyHandler:
 
         return self.rooms[room_id]
 
-    def create_player(self, player_name: str) -> Player:
+    def ensure_player_with_name(
+        self, player_name: str, player_id: Optional[str] = None
+    ) -> Player:
+        if player_id is not None and player_id in self.active_players:
+            player = self.get_player(player_id)
+            player.name = player_name
+            return player
+
         player = Player(player_name)
 
         self.active_players[player.player_id] = player
