@@ -23,6 +23,10 @@ class Room:
         self.created_at = int(time.time_ns() / 1e6)
         self.updated_at = self.created_at
 
+    @staticmethod
+    def generate_id() -> str:
+        return "".join(random.sample(string.ascii_lowercase, 4))
+
     def __update(self) -> None:
         self.updated_at = int(time.time_ns() / 1e6)
 
@@ -49,10 +53,6 @@ class LobbyHandler:
     active_players: dict[str, Player] = {}
     rooms: dict[str, Room] = {}
 
-    @staticmethod
-    def generate_room_id() -> str:
-        return "".join(random.sample(string.ascii_lowercase, 4))
-
     def get_player(self, player_id: str) -> Player:
         return self.active_players.setdefault(player_id, Player(player_id, ""))
 
@@ -69,9 +69,11 @@ class LobbyHandler:
         return player
 
     def create_room(self, host_id: str) -> Room:
-        room_id = LobbyHandler.generate_room_id()
-        room = Room(room_id, host_id)
+        room_id = Room.generate_id()
+        while room_id in self.rooms:
+            room_id = Room.generate_id()
 
+        room = Room(room_id, host_id)
         self.rooms[room_id] = room
 
         return room
