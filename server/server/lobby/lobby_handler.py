@@ -88,4 +88,12 @@ class LobbyHandler:
         return self.get_room(room_id).add_player(player_id)
 
     def drop_player_from_room(self, room_id: str, player_id: str) -> bool:
-        return self.get_room(room_id).remove_player(player_id)
+        room = self.get_room(room_id)
+
+        if not room.remove_player(player_id):
+            return False
+
+        if len(room.player_ids) == 0:
+            del self.rooms[room.room_id]
+
+        return True
