@@ -27,6 +27,7 @@ disable = [
   "missing-function-docstring",
   "unsubscriptable-object"
 ]
+extension-pkg-whitelist = ["pydantic"]
 
 [tool.taskipy.tasks]
 pre_format = "isort ."
