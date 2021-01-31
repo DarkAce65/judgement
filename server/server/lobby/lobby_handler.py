@@ -1,6 +1,7 @@
 import random
 import string
 import time
+import uuid
 from typing import NamedTuple
 
 Player = NamedTuple("Player", [("player_id", str), ("name", str)])
@@ -61,7 +62,9 @@ class LobbyHandler:
 
         return self.rooms[room_id]
 
-    def create_player(self, player: Player) -> Player:
+    def create_player(self, player_name: str) -> Player:
+        player = Player(str(uuid.uuid4()), player_name)
+
         self.active_players[player.player_id] = player
         return player
 
