@@ -100,19 +100,6 @@ class LobbyHandler:
 
         return room
 
-    def create_room_with_id(self, room_id: str, host_id: str) -> Room:
-        player = self.get_player(host_id)
-
-        if not Room.is_valid_id(room_id):
-            raise ValueError(f"Invalid room id: {room_id}")
-
-        room = Room(room_id, host_id)
-        self.rooms[room_id] = room
-
-        player.num_joined_rooms += 1
-
-        return room
-
     def get_players_in_room(self, room_id: str) -> dict[str, Player]:
         return {
             player_id: self.get_player(player_id)
@@ -121,11 +108,7 @@ class LobbyHandler:
 
     def add_player_to_room(self, room_id: str, player_id: str) -> Room:
         player = self.get_player(player_id)
-
-        try:
-            room = self.get_room(room_id)
-        except ValueError:
-            room = self.create_room_with_id(room_id, player_id)
+        room = self.get_room(room_id)
 
         if room.add_player(player_id):
             player.num_joined_rooms += 1
