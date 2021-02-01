@@ -19,11 +19,11 @@ WORKDIR /server
 EXPOSE "$API_PORT"
 
 COPY pyproject.toml poetry.lock ./
-RUN poetry install --no-dev
+RUN poetry install --no-dev --no-interaction
 
 # Debug/hot-reloading container
 FROM base as debug
-RUN poetry install --no-dev -E debug
+RUN poetry install --no-dev -E debug --no-interaction
 COPY . .
 CMD ["sh", "-c", "poetry run python -m debugpy --listen 0.0.0.0:5678 -m uvicorn main:app --host 0.0.0.0 --port $API_PORT --reload --reload-dir server"]
 
