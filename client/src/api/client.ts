@@ -11,7 +11,10 @@ const API_BASE = join(API_HOST, API_ROOT);
 const WEBSOCKET_PATH = join(API_ROOT, '/ws/socket.io');
 
 export const buildSocket = (namespace = ''): Socket => {
-  const socketParams: Partial<ManagerOptions & SocketOptions> = { path: WEBSOCKET_PATH };
+  const socketParams: Partial<ManagerOptions & SocketOptions> = {
+    path: WEBSOCKET_PATH,
+    ...(isDev && { withCredentials: true }),
+  };
 
   let socket;
   if (API_HOST.length > 0 && namespace.length > 0) {
