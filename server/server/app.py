@@ -4,9 +4,10 @@ from typing import Any, Optional
 from fastapi import Cookie, FastAPI, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from socketio import ASGIApp, AsyncServer
+from starlette.status import HTTP_204_NO_CONTENT
 
-from server.lobby.lobby_handler import LobbyHandler
-from server.models.requests import CreateGameRequest
+from server.lobby.lobby_handler import create_room, ensure_player_with_name
+from server.models.requests import CreateGameEnsurePlayerRequest, EnsurePlayerRequest
 from server.models.responses import GameResponse
 from server.redis_client import redis_client
 
@@ -27,9 +28,6 @@ socket_asgi = ASGIApp(sio)
 app.mount("/ws", socket_asgi)
 
 
-lobby_handler = LobbyHandler()
-
-
 @app.get("/hello")
 def hello_world() -> Any:
     test = redis_client.get("test")
@@ -46,16 +44,33 @@ def inc() -> Response:
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
+@app.post("/ensure-player", status_code=HTTP_204_NO_CONTENT)
+async def ensure_player(
+    request: EnsurePlayerRequest,
+    response: Response,
+    player_id: Optional[str] = Cookie(None, alias="player_id"),
+) -> None:
+    player = ensure_player_with_name(request.player_name, player_id)
+
+    if player_id is None or player_id != player.player_id:
+        response.set_cookie(
+            key="player_id", value=player.player_id, max_age=7 * 24 * 60 * 60
+        )
+
+
 @app.post("/create-game", response_model=GameResponse)
 async def create_game(
-    request: CreateGameRequest,
+    request: CreateGameEnsurePlayerRequest,
     response: Response,
     player_id: Optional[str] = Cookie(None, alias="player_id"),
 ) -> dict[str, str]:
-    player = lobby_handler.ensure_player_with_name(request.player_name, player_id)
-    room = lobby_handler.create_room(player.player_id)
+    player = ensure_player_with_name(request.player_name, player_id)
+    room = create_room(player.player_id)
 
-    response.set_cookie(key="player_id", value=player.player_id, max_age=7 * 24 * 60 * 60)
+    if player_id is None or player_id != player.player_id:
+        response.set_cookie(
+            key="player_id", value=player.player_id, max_age=7 * 24 * 60 * 60
+        )
 
     return {"room_id": room.room_id}
 
