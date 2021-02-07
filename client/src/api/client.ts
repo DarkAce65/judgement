@@ -45,9 +45,18 @@ export const fetchAPI = (path: string, init?: RequestInit): Promise<Response> =>
     ...init,
   };
 
+  let request;
   if (Object.keys(requestInit).length === 0) {
-    return fetch(requestPath);
+    request = fetch(requestPath);
+  } else {
+    request = fetch(requestPath, requestInit);
   }
 
-  return fetch(requestPath, requestInit);
+  return request.then((response) => {
+    if (response.ok) {
+      return response;
+    }
+
+    return Promise.reject(response);
+  });
 };
