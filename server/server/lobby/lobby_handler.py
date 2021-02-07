@@ -130,10 +130,7 @@ class LobbyHandler:
         if not room.remove_player(player_id):
             return False
 
-        if player.num_joined_rooms <= 1:
-            del self.active_players[player_id]
-        else:
-            player.num_joined_rooms -= 1
+        player.num_joined_rooms -= 1
 
         if len(room.player_ids) == 0:
             del self.rooms[room.room_id]
