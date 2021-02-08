@@ -49,7 +49,7 @@ export const join = (...segments: string[]): string => {
       continue;
     }
 
-    let normalizedSegment = segment.replaceAll(/([^\/]+)\/+/g, '$1/');
+    let normalizedSegment = segment.replaceAll(/([^/]+)\/+/g, '$1/');
     if (url.length === 0) {
       normalizedSegment = normalizedSegment.replace(/^\/{2,}/, '//');
     } else {
@@ -71,7 +71,7 @@ export const join = (...segments: string[]): string => {
     }
   }
 
-  if (url !== 'file://' && /^[^\/]+:\/{2}$/.test(url)) {
+  if (url !== 'file://' && /^[^/]+:\/{2}$/.test(url)) {
     throw new Error(
       `Malformed url from segments: [${segments.map((segment) => `'${segment}'`).join(', ')}]`
     );

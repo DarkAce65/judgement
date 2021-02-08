@@ -32,6 +32,7 @@ module.exports = {
     eqeqeq: 'warn',
     'guard-for-in': 'error',
     'no-console': 'off',
+    'import/no-anonymous-default-export': 'off',
     'no-multiple-empty-lines': ['warn', { max: 1 }],
     'no-duplicate-imports': 'warn',
     'no-shadow': 'error',
