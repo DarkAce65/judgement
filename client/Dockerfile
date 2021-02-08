@@ -1,4 +1,4 @@
-FROM node:15.5.0
+FROM node:15
 
 USER node
 WORKDIR /client

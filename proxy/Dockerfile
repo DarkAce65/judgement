@@ -1,5 +1,5 @@
 # Client builder stage
-FROM node:15.5.0 as client_builder
+FROM node:15 as client_builder
 
 USER node
 WORKDIR /client
