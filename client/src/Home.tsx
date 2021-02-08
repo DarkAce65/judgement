@@ -1,9 +1,10 @@
 import React, { PureComponent } from 'react';
 
+import { RouteComponentProps } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 import styled from 'styled-components';
 
-import { buildRequestPath, buildSocket } from './api/client';
+import { buildRequestPath, buildSocket, fetchAPI } from './api/client';
 import logo from './logo.svg';
 
 import './Home.css';
@@ -16,7 +17,7 @@ const Logs = styled.div`
   text-align: right;
 `;
 
-interface Props {}
+interface Props extends RouteComponentProps {}
 
 interface State {
   socket: Socket | null;
@@ -75,6 +76,7 @@ class Home extends PureComponent<Props, State> {
   }
 
   render() {
+    const { history } = this.props;
     const { socket, logs } = this.state;
 
     return (
@@ -104,6 +106,24 @@ class Home extends PureComponent<Props, State> {
                 <button onClick={this.disconnect}>Disconnect</button>
               </>
             )}
+            <br />
+            <button
+              onClick={() => {
+                const playerName = localStorage.getItem('playerName') || 'hello';
+
+                fetchAPI('/create-game', {
+                  method: 'POST',
+                  body: JSON.stringify({ playerName }),
+                })
+                  .then((res) => res.json())
+                  .then(({ roomId }) => {
+                    history.push(`/lobby/${roomId}`);
+                  })
+                  .catch((...args) => console.error('failed', ...args));
+              }}
+            >
+              Create room
+            </button>
           </p>
           <a
             className="Home-link"
