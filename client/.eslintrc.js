@@ -1,16 +1,25 @@
 const prettierConfig = require('./prettier.config');
 
 module.exports = {
+  root: true,
   parser: '@typescript-eslint/parser',
   plugins: ['prettier', 'react', 'import'],
   extends: [
     'plugin:react/recommended',
+    'react-app',
     'plugin:@typescript-eslint/recommended',
     'prettier/@typescript-eslint',
+    'prettier/react',
     'plugin:prettier/recommended',
   ],
-  parserOptions: { ecmaVersion: 2020, sourceType: 'module', ecmaFeatures: { jsx: true } },
-  settings: { react: { version: 'detect' } },
+  parserOptions: {
+    ecmaVersion: 2020,
+    sourceType: 'module',
+    ecmaFeatures: { jsx: true },
+  },
+  settings: {
+    react: { version: 'detect' },
+  },
   rules: {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-empty-interface': 'off',
