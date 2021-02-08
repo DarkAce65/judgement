@@ -3,7 +3,6 @@ version: "3.9"
 services:
   client:
     build: ./client
-    command: yarn start
     environment:
       REACT_APP_ENV: development
       REACT_APP_API_HOST: "http://localhost:8000"
