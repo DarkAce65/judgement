@@ -15,6 +15,7 @@ const Logs = styled.div`
   right: 10px;
   font-size: 12px;
   text-align: right;
+  pointer-events: none;
 `;
 
 interface Props extends RouteComponentProps {}
@@ -59,6 +60,25 @@ class Home extends PureComponent<Props, State> {
       this.setState({ logs: [...this.state.logs, `${data}/${event}`] });
     });
 
+    socket.on('unknown_player_id', () => {
+      const playerName = localStorage.getItem('playerName') || 'hello';
+
+      fetchAPI('/ensure-player', {
+        method: 'POST',
+        body: JSON.stringify({ playerName }),
+      })
+        .then(() => {
+          if (this.state.socket?.disconnected) {
+            this.state.socket.connect();
+          }
+        })
+        .catch((...args) => console.error('failed', ...args));
+    });
+
+    socket.on('disconnect', () => {
+      this.forceUpdate();
+    });
+
     this.setState({ socket });
   }
 
@@ -98,7 +118,7 @@ class Home extends PureComponent<Props, State> {
             >
               Make request
             </button>
-            {socket === null ? (
+            {socket === null || !socket.connected ? (
               <button onClick={this.initSocket}>Init socket</button>
             ) : (
               <>
