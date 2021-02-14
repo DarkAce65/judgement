@@ -1,12 +1,16 @@
+import functools
+import inspect
 import os
-from typing import Any, Optional
+from http.cookies import SimpleCookie
+from typing import Any, Callable, Optional, TypeVar, cast
 
 from fastapi import Cookie, FastAPI, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from socketio import ASGIApp, AsyncServer
 from starlette.status import HTTP_204_NO_CONTENT
 
-from server.lobby.lobby_handler import create_room, ensure_player_with_name
+from server.lobby.lobby_manager import create_room, ensure_player_with_name, get_player
+from server.lobby.player import Player
 from server.models.requests import CreateGameEnsurePlayerRequest, EnsurePlayerRequest
 from server.models.responses import GameResponse
 from server.redis_client import redis_client
@@ -26,6 +30,49 @@ if "CORS_ALLOWED_ORIGIN" in os.environ:
 sio = AsyncServer(async_mode="asgi", cors_allowed_origins=[])
 socket_asgi = ASGIApp(sio)
 app.mount("/ws", socket_asgi)
+
+
+def get_cookie_from_environ(environ: dict[str, Any]) -> SimpleCookie:
+    if "asgi.scope" not in environ or "headers" not in environ["asgi.scope"]:
+        return SimpleCookie()
+
+    return SimpleCookie(
+        next(
+            (
+                header[1]
+                for header in environ["asgi.scope"]["headers"]
+                if header[0] == b"cookie"
+            ),
+            b"",
+        ).decode("utf-8")
+    )
+
+
+F = TypeVar("F", bound=Callable[..., Any])
+
+
+def require_player(socket_handler: F) -> F:
+    @functools.wraps(socket_handler)
+    async def wrapper(sid: str, *args, **kwargs):  # type: ignore
+        cookies = get_cookie_from_environ(sio.get_environ(sid))
+        player_id = cookies.get("player_id")
+
+        try:
+            player = get_player(player_id.value) if player_id is not None else None
+        except ValueError:
+            player = None
+
+        if player is None:
+            await sio.emit("unknown_player_id", to=sid)
+            await sio.disconnect(sid)
+            return
+
+        if "player" in inspect.getfullargspec(socket_handler).kwonlyargs:
+            kwargs["player"] = player
+
+        return await socket_handler(sid, *args, **kwargs)
+
+    return cast(F, wrapper)
 
 
 @app.get("/hello")
@@ -81,9 +128,10 @@ async def connect(sid: str, _environ: dict) -> None:
 
 
 @sio.on("message")
-async def handle_message(sid: str, message: str) -> None:
+@require_player
+async def handle_message(sid: str, message: str, *, player: Player) -> None:
     await sio.send(message, to=sid)
-    await sio.send("broadcast from " + sid, skip_sid=sid)
+    await sio.send("broadcast from " + player.name, skip_sid=sid)
 
 
 @sio.on("disconnect")
