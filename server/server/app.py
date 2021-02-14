@@ -7,9 +7,16 @@ from typing import Any, Callable, Optional, TypeVar, cast
 from fastapi import Cookie, FastAPI, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from socketio import ASGIApp, AsyncServer
+from socketio.exceptions import ConnectionRefusedError
 from starlette.status import HTTP_204_NO_CONTENT
 
-from server.lobby.lobby_manager import create_room, ensure_player_with_name, get_player
+from server.lobby.connection_manager import disconnect_player_client
+from server.lobby.lobby_manager import (
+    create_room,
+    ensure_player_with_name,
+    get_player,
+    player_exists,
+)
 from server.lobby.player import Player
 from server.models.requests import CreateGameEnsurePlayerRequest, EnsurePlayerRequest
 from server.models.responses import GameResponse
@@ -54,16 +61,15 @@ F = TypeVar("F", bound=Callable[..., Any])
 def require_player(socket_handler: F) -> F:
     @functools.wraps(socket_handler)
     async def wrapper(sid: str, *args, **kwargs):  # type: ignore
-        cookies = get_cookie_from_environ(sio.get_environ(sid))
-        player_id = cookies.get("player_id")
+        session = await sio.get_session(sid)
+        player_id = session["player_id"]
 
         try:
-            player = get_player(player_id.value) if player_id is not None else None
+            player = None if player_id is None else get_player(player_id)
         except ValueError:
             player = None
 
         if player is None:
-            await sio.emit("unknown_player_id", to=sid)
             await sio.disconnect(sid)
             return
 
@@ -123,7 +129,14 @@ async def create_game(
 
 
 @sio.on("connect")
-async def connect(sid: str, _environ: dict) -> None:
+async def connect(sid: str, environ: dict) -> None:
+    cookies = get_cookie_from_environ(environ)
+    player_id = cookies.get("player_id")
+
+    if player_id is None or not player_exists(player_id.value):
+        raise ConnectionRefusedError("unknown_player_id")
+
+    await sio.save_session(sid, {"player_id": player_id.value})
     await sio.emit("client_connect", {"data": "Client connected: " + sid})
 
 
@@ -136,4 +149,7 @@ async def handle_message(sid: str, message: str, *, player: Player) -> None:
 
 @sio.on("disconnect")
 async def disconnect(sid: str) -> None:
+    session = await sio.get_session(sid)
+
+    disconnect_player_client(session["player_id"], sid)
     await sio.emit("client_disconnect", {"data": "Client disconnected: " + sid})

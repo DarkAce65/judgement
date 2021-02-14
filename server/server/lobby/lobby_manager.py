@@ -7,8 +7,12 @@ active_players: dict[str, Player] = {}
 rooms: dict[str, Room] = {}
 
 
+def player_exists(player_id: str) -> bool:
+    return player_id in active_players
+
+
 def get_player(player_id: str) -> Player:
-    if player_id not in active_players:
+    if not player_exists(player_id):
         raise ValueError(f"Invalid player id: {player_id}")
 
     return active_players[player_id]
@@ -22,14 +26,14 @@ def get_room(room_id: str) -> Room:
 
 
 def ensure_player_with_name(player_name: str, player_id: Optional[str] = None) -> Player:
-    if player_id is not None and player_id in active_players:
+    if player_id is not None and player_exists(player_id):
         player = get_player(player_id)
         player.name = player_name
         return player
 
     player = Player(player_name)
-
     active_players[player.player_id] = player
+
     return player
 
 
