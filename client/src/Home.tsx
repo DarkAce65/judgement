@@ -41,13 +41,13 @@ class Home extends PureComponent<Props, State> {
 
   initSocket() {
     if (this.state.socket !== null) {
-      return;
+      this.state.socket.disconnect();
     }
 
     const socket = buildSocket();
 
     socket.onAny((event: string, data: string | { data: string }) => {
-      if (typeof data === 'object' && Object.prototype.hasOwnProperty.call(data, 'data')) {
+      if (typeof data === 'object') {
         data = data.data;
       }
 
@@ -60,19 +60,23 @@ class Home extends PureComponent<Props, State> {
       this.setState({ logs: [...this.state.logs, `${data}/${event}`] });
     });
 
-    socket.on('unknown_player_id', () => {
-      const playerName = localStorage.getItem('playerName') || 'hello';
+    socket.on('connect_error', (error: Error) => {
+      if (error.message === 'unknown_player_id') {
+        const playerName = localStorage.getItem('playerName') || 'hello';
 
-      fetchAPI('/ensure-player', {
-        method: 'POST',
-        body: JSON.stringify({ playerName }),
-      })
-        .then(() => {
-          if (this.state.socket?.disconnected) {
-            this.state.socket.connect();
-          }
+        fetchAPI('/ensure-player', {
+          method: 'POST',
+          body: JSON.stringify({ playerName }),
         })
-        .catch((...args) => console.error('failed', ...args));
+          .then(() => {
+            this.initSocket();
+          })
+          .catch((...args) => console.error('failed', ...args));
+      }
+    });
+
+    socket.on('connect', () => {
+      this.forceUpdate();
     });
 
     socket.on('disconnect', () => {
