@@ -6,6 +6,7 @@ import styled from 'styled-components';
 
 import { buildRequestPath, buildSocket, fetchAPI } from './api/client';
 import logo from './logo.svg';
+import getCookie from './utils/getCookie';
 
 import './Home.css';
 
@@ -39,12 +40,16 @@ class Home extends PureComponent<Props, State> {
     this.disconnect = this.disconnect.bind(this);
   }
 
+  componentWillUnmount() {
+    this.state.socket?.disconnect();
+  }
+
   initSocket() {
     if (this.state.socket !== null) {
       this.state.socket.disconnect();
     }
 
-    const socket = buildSocket();
+    const socket = buildSocket((auth) => auth({ player_id: getCookie('player_id') }));
 
     socket.onAny((event: string, data: string | { data: string }) => {
       if (typeof data === 'object') {

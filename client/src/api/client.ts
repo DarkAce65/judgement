@@ -1,4 +1,4 @@
-import { ManagerOptions, Socket, SocketOptions, io } from 'socket.io-client';
+import { Socket, io } from 'socket.io-client';
 
 import isDev from '../utils/isDev';
 import { join } from '../utils/url';
@@ -10,10 +10,12 @@ const API_BASE = join(API_HOST, API_ROOT);
 
 const WEBSOCKET_PATH = join(API_ROOT, '/ws/socket.io');
 
-export const buildSocket = (namespace = ''): Socket => {
-  const socketParams: Partial<ManagerOptions & SocketOptions> = {
+type SocketParams = Exclude<Parameters<typeof io>[1], undefined>;
+
+export const buildSocket = (auth?: SocketParams['auth'], namespace = ''): Socket => {
+  const socketParams: SocketParams = {
     path: WEBSOCKET_PATH,
-    ...(isDev && { withCredentials: true }),
+    ...(isDev && { auth, withCredentials: true }),
   };
 
   let socket;
