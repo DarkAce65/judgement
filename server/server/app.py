@@ -1,7 +1,6 @@
 import functools
 import inspect
 import os
-from http.cookies import SimpleCookie
 from typing import Any, Callable, Optional, TypeVar, cast
 
 from fastapi import Cookie, FastAPI, Response, status
@@ -37,22 +36,6 @@ if "CORS_ALLOWED_ORIGIN" in os.environ:
 sio = AsyncServer(async_mode="asgi", cors_allowed_origins=[])
 socket_asgi = ASGIApp(sio)
 app.mount("/ws", socket_asgi)
-
-
-def get_cookie_from_environ(environ: dict[str, Any]) -> SimpleCookie:
-    if "asgi.scope" not in environ or "headers" not in environ["asgi.scope"]:
-        return SimpleCookie()
-
-    return SimpleCookie(
-        next(
-            (
-                header[1]
-                for header in environ["asgi.scope"]["headers"]
-                if header[0] == b"cookie"
-            ),
-            b"",
-        ).decode("utf-8")
-    )
 
 
 F = TypeVar("F", bound=Callable[..., Any])
@@ -129,14 +112,13 @@ async def create_game(
 
 
 @sio.on("connect")
-async def connect(sid: str, environ: dict) -> None:
-    cookies = get_cookie_from_environ(environ)
-    player_id = cookies.get("player_id")
+async def connect(sid: str, _environ: dict, auth: dict) -> None:
+    player_id = None if auth is None else auth["player_id"]
 
-    if player_id is None or not player_exists(player_id.value):
+    if player_id is None or not player_exists(player_id):
         raise ConnectionRefusedError("unknown_player_id")
 
-    await sio.save_session(sid, {"player_id": player_id.value})
+    await sio.save_session(sid, {"player_id": player_id})
     await sio.emit("client_connect", {"data": "Client connected: " + sid})
 
 

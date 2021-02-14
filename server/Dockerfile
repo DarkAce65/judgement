@@ -10,6 +10,7 @@ ENV PYTHONUNBUFFERED=1 \
 RUN apk add --no-cache \
   curl \
   gcc \
+  git \
   libc-dev \
   make \
   && (curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -)
