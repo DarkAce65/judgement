@@ -9,7 +9,11 @@ from socketio import ASGIApp, AsyncServer
 from socketio.exceptions import ConnectionRefusedError
 from starlette.status import HTTP_204_NO_CONTENT
 
-from server.lobby.connection_manager import disconnect_player_client
+from server.lobby.connection_manager import (
+    connect_player_client,
+    disconnect_player_client,
+    get_client_ids_for_player,
+)
 from server.lobby.lobby_manager import (
     create_room,
     ensure_player_with_name,
@@ -118,20 +122,27 @@ async def connect(sid: str, _environ: dict, auth: dict) -> None:
     if player_id is None or not player_exists(player_id):
         raise ConnectionRefusedError("unknown_player_id")
 
+    connect_player_client(sio, player_id, sid)
+
     await sio.save_session(sid, {"player_id": player_id})
     await sio.emit("client_connect", {"data": "Client connected: " + sid})
 
 
 @sio.on("message")
 @require_player
-async def handle_message(sid: str, message: str, *, player: Player) -> None:
-    await sio.send(message, to=sid)
-    await sio.send("broadcast from " + player.name, skip_sid=sid)
+async def handle_message(_sid: str, message: str, *, player: Player) -> None:
+    await sio.send(message, to=player.player_id)
+    await sio.send(
+        "broadcast from " + player.name,
+        skip_sid=list(get_client_ids_for_player(player.player_id)),
+    )
 
 
 @sio.on("disconnect")
 async def disconnect(sid: str) -> None:
     session = await sio.get_session(sid)
+    player_id = session["player_id"]
 
-    disconnect_player_client(session["player_id"], sid)
+    disconnect_player_client(sio, player_id, sid)
+
     await sio.emit("client_disconnect", {"data": "Client disconnected: " + sid})

@@ -1,3 +1,5 @@
+from socketio.server import Server
+
 from server.lobby.lobby_manager import player_exists
 
 player_id_to_client_ids: dict[str, set[str]] = {}
@@ -20,7 +22,7 @@ def get_client_ids_for_players(player_ids: set[str]) -> set[str]:
     }
 
 
-def connect_player_client(player_id: str, client_id: str) -> None:
+def connect_player_client(sio: Server, player_id: str, client_id: str) -> None:
     if not player_exists(player_id):
         raise ValueError(f"Invalid player id: {player_id}")
 
@@ -28,11 +30,13 @@ def connect_player_client(player_id: str, client_id: str) -> None:
         player_id_to_client_ids[player_id] = set()
 
     player_id_to_client_ids[player_id].add(client_id)
+    sio.enter_room(client_id, player_id)
 
 
-def disconnect_player_client(player_id: str, client_id: str) -> None:
+def disconnect_player_client(sio: Server, player_id: str, client_id: str) -> None:
     if player_id not in player_id_to_client_ids:
         return
 
     if client_id in player_id_to_client_ids[player_id]:
         player_id_to_client_ids[player_id].remove(client_id)
+        sio.leave_room(client_id, player_id)
