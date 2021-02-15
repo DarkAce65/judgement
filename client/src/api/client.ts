@@ -15,7 +15,8 @@ type SocketParams = Exclude<Parameters<typeof io>[1], undefined>;
 export const buildSocket = (auth?: SocketParams['auth'], namespace = ''): Socket => {
   const socketParams: SocketParams = {
     path: WEBSOCKET_PATH,
-    ...(isDev && { auth, withCredentials: true }),
+    auth,
+    ...(isDev && { withCredentials: true }),
   };
 
   let socket;
