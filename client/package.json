@@ -31,6 +31,10 @@
       "last 1 safari version"
     ]
   },
+  "jest": {
+    "resetMocks": false,
+    "clearMocks": true
+  },
   "devDependencies": {
     "@types/jest": "^26.0.20",
     "@types/node": "^14.14.25",

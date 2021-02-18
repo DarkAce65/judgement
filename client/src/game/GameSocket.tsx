@@ -103,7 +103,8 @@ class GameSocket {
 
     if (!this.listeners[namespace]) {
       this.listeners[namespace] = {};
-    } else if (!this.listeners[namespace][eventKey]) {
+    }
+    if (!this.listeners[namespace][eventKey]) {
       this.listeners[namespace][eventKey] = [];
     }
 
@@ -152,7 +153,7 @@ class GameSocket {
       for (const eventKey in namespacedListeners) {
         if (Object.prototype.hasOwnProperty.call(namespacedListeners, eventKey)) {
           for (const activeListener of namespacedListeners[eventKey]) {
-            this.socket.off(event, activeListener);
+            this.socket.off(eventKey.slice(1), activeListener);
           }
         }
       }
