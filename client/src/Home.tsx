@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { buildRequestPath, fetchAPI } from './api/client';
 import GameSocket from './game/GameSocket';
 import logo from './logo.svg';
+import getCookie from './utils/getCookie';
 
 import './Home.css';
 
@@ -105,6 +106,7 @@ class Home extends PureComponent<Props, State> {
           <p>
             Edit <code>src/Home.tsx</code> and save to reload.
           </p>
+          <p style={{ margin: 0 }}>{getCookie('player_id')}</p>
           <p>
             <button onClick={() => this.setState({ logs: [] })}>Clear logs</button>
             <button
