@@ -1,12 +1,11 @@
 import React, { PureComponent } from 'react';
 
 import { RouteComponentProps } from 'react-router-dom';
-import { Socket } from 'socket.io-client';
 import styled from 'styled-components';
 
-import { buildRequestPath, buildSocket, fetchAPI } from './api/client';
+import { buildRequestPath, fetchAPI } from './api/client';
+import GameSocket from './game/GameSocket';
 import logo from './logo.svg';
-import getCookie from './utils/getCookie';
 
 import './Home.css';
 
@@ -22,7 +21,7 @@ const Logs = styled.div`
 interface Props extends RouteComponentProps {}
 
 interface State {
-  socket: Socket | null;
+  socketListenersAdded: boolean;
   logs: string[];
 }
 
@@ -31,7 +30,7 @@ class Home extends PureComponent<Props, State> {
     super(props);
 
     this.state = {
-      socket: null,
+      socketListenersAdded: false,
       logs: [],
     };
 
@@ -40,18 +39,24 @@ class Home extends PureComponent<Props, State> {
     this.disconnect = this.disconnect.bind(this);
   }
 
+  componentDidMount() {
+    if (GameSocket.socket?.connected) {
+      this.initSocket();
+    }
+  }
+
   componentWillUnmount() {
-    this.state.socket?.disconnect();
+    GameSocket.offAnyNamespaced(Home.name);
+    GameSocket.offNamespaced(Home.name);
   }
 
   initSocket() {
-    if (this.state.socket !== null) {
-      this.state.socket.disconnect();
+    if (this.state.socketListenersAdded) {
+      GameSocket.socket?.connect();
+      return;
     }
 
-    const socket = buildSocket((auth) => auth({ player_id: getCookie('player_id') }));
-
-    socket.onAny((event: string, data: string | { data: string }) => {
+    GameSocket.onAnyNamespaced(Home.name, (event: string, data: string | { data: string }) => {
       if (typeof data === 'object') {
         data = data.data;
       }
@@ -65,48 +70,33 @@ class Home extends PureComponent<Props, State> {
       this.setState({ logs: [...this.state.logs, `${data}/${event}`] });
     });
 
-    socket.on('connect_error', (error: Error) => {
-      if (error.message === 'unknown_player_id') {
-        const playerName = localStorage.getItem('playerName') || 'hello';
-
-        fetchAPI('/ensure-player', {
-          method: 'POST',
-          body: JSON.stringify({ playerName }),
-        })
-          .then(() => {
-            this.initSocket();
-          })
-          .catch((...args) => console.error('failed', ...args));
-      }
-    });
-
-    socket.on('connect', () => {
+    GameSocket.onNamespaced(Home.name, 'connect', () => {
       this.forceUpdate();
     });
 
-    socket.on('disconnect', () => {
+    GameSocket.onNamespaced(Home.name, 'disconnect', () => {
       this.forceUpdate();
     });
 
-    this.setState({ socket });
+    if (GameSocket.socket?.disconnected) {
+      GameSocket.socket?.connect();
+    }
+    this.setState({ socketListenersAdded: true });
   }
 
   sendMessage() {
-    this.state.socket?.send('test');
+    GameSocket.socket?.send('test');
   }
 
   disconnect() {
-    if (this.state.socket === null) {
-      return;
-    }
-
-    this.state.socket.disconnect();
-    this.setState({ socket: null });
+    GameSocket.socket?.disconnect();
   }
 
   render() {
     const { history } = this.props;
-    const { socket, logs } = this.state;
+    const { logs } = this.state;
+
+    const socket = GameSocket.socket;
 
     return (
       <div className="Home">
