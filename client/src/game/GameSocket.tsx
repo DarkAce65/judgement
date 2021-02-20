@@ -37,6 +37,16 @@ class GameSocket {
     return this.socket;
   }
 
+  static connect(): Socket {
+    if (this.socket === null) {
+      return this.initializeSocket();
+    } else if (this.socket.disconnected) {
+      return this.socket.connect();
+    }
+
+    return this.socket;
+  }
+
   static onAnyNamespaced(
     namespace: string,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
