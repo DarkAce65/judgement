@@ -47,7 +47,7 @@ F = TypeVar("F", bound=Callable[..., Any])
 
 def require_player(socket_handler: F) -> F:
     @functools.wraps(socket_handler)
-    async def wrapper(sid: str, *args, **kwargs):  # type: ignore
+    async def wrapper(sid: str, *args: Any, **kwargs: Any) -> Any:
         session = await sio.get_session(sid)
         player_id = session["player_id"]
 
@@ -60,8 +60,12 @@ def require_player(socket_handler: F) -> F:
             await sio.disconnect(sid)
             return
 
-        if "player" in inspect.getfullargspec(socket_handler).kwonlyargs:
-            kwargs["player"] = player
+        for argname, annotation in inspect.getfullargspec(
+            socket_handler
+        ).annotations.items():
+            if annotation == Player:
+                kwargs[argname] = player
+                break
 
         return await socket_handler(sid, *args, **kwargs)
 
@@ -130,7 +134,7 @@ async def connect(sid: str, _environ: dict, auth: dict) -> None:
 
 @sio.on("message")
 @require_player
-async def handle_message(_sid: str, message: str, *, player: Player) -> None:
+async def handle_message(_sid: str, message: str, player: Player) -> None:
     await sio.send(message, to=player.player_id)
     await sio.send(
         "broadcast from " + player.name,
