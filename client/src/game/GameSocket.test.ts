@@ -66,8 +66,8 @@ describe('GameSocket', () => {
 
     expect(GameSocket.socket).toBe(mockSocket);
     expect(mockSocket.on).toHaveBeenCalledWith('test_event', listener);
-    expect(GameSocket['listeners']).toHaveProperty('test-ns.$test_event');
-    expect(GameSocket['listeners']['test-ns']['$test_event']).toContain(listener);
+    expect(GameSocket['listeners']).toHaveProperty('test-ns.test_event');
+    expect(GameSocket['listeners']['test-ns']['test_event']).toContain(listener);
   });
 
   it('adds an event listener initializing socket if necessary', () => {
@@ -79,8 +79,8 @@ describe('GameSocket', () => {
 
     expect(GameSocket.socket).toBe(mockSocket);
     expect(mockSocket.on).toHaveBeenCalledWith('test_event', listener);
-    expect(GameSocket['listeners']).toHaveProperty('test-ns.$test_event');
-    expect(GameSocket['listeners']['test-ns']['$test_event']).toContain(listener);
+    expect(GameSocket['listeners']).toHaveProperty('test-ns.test_event');
+    expect(GameSocket['listeners']['test-ns']['test_event']).toContain(listener);
   });
 
   it('registers multiple event listeners', () => {
@@ -112,16 +112,16 @@ describe('GameSocket', () => {
     expect(GameSocket['anyListeners']).toHaveProperty('test-ns');
     expect(GameSocket['anyListeners']['test-ns']).toContain(anyListener1);
     expect(GameSocket['anyListeners']['test-ns']).toContain(anyListener2);
-    expect(GameSocket['listeners']).toHaveProperty('test-ns.$test_event');
-    expect(GameSocket['listeners']['test-ns']['$test_event']).toContain(listener1);
-    expect(GameSocket['listeners']['test-ns']['$test_event']).toContain(listener2);
-    expect(GameSocket['listeners']).toHaveProperty('test-ns.$test_event2');
-    expect(GameSocket['listeners']['test-ns']['$test_event2']).toContain(listener3);
+    expect(GameSocket['listeners']).toHaveProperty('test-ns.test_event');
+    expect(GameSocket['listeners']['test-ns']['test_event']).toContain(listener1);
+    expect(GameSocket['listeners']['test-ns']['test_event']).toContain(listener2);
+    expect(GameSocket['listeners']).toHaveProperty('test-ns.test_event2');
+    expect(GameSocket['listeners']['test-ns']['test_event2']).toContain(listener3);
 
     expect(GameSocket['anyListeners']).toHaveProperty('test-ns2');
     expect(GameSocket['anyListeners']['test-ns2']).toContain(anyListener3);
-    expect(GameSocket['listeners']).toHaveProperty('test-ns2.$test_event');
-    expect(GameSocket['listeners']['test-ns2']['$test_event']).toContain(listener4);
+    expect(GameSocket['listeners']).toHaveProperty('test-ns2.test_event');
+    expect(GameSocket['listeners']['test-ns2']['test_event']).toContain(listener4);
   });
 
   describe('removing event listeners', () => {
@@ -175,13 +175,13 @@ describe('GameSocket', () => {
 
       expect(mockSocket.off).toBeCalledTimes(1);
       expect(mockSocket.off).toHaveBeenCalledWith('test_event', listener2);
-      expect(GameSocket['listeners']).toHaveProperty('test-ns.$test_event');
-      expect(GameSocket['listeners']['test-ns']['$test_event']).toContain(listener1);
-      expect(GameSocket['listeners']['test-ns']['$test_event']).not.toContain(listener2);
-      expect(GameSocket['listeners']).toHaveProperty('test-ns.$test_event2');
-      expect(GameSocket['listeners']['test-ns']['$test_event2']).toContain(listener3);
-      expect(GameSocket['listeners']).toHaveProperty('test-ns2.$test_event');
-      expect(GameSocket['listeners']['test-ns2']['$test_event']).toContain(listener4);
+      expect(GameSocket['listeners']).toHaveProperty('test-ns.test_event');
+      expect(GameSocket['listeners']['test-ns']['test_event']).toContain(listener1);
+      expect(GameSocket['listeners']['test-ns']['test_event']).not.toContain(listener2);
+      expect(GameSocket['listeners']).toHaveProperty('test-ns.test_event2');
+      expect(GameSocket['listeners']['test-ns']['test_event2']).toContain(listener3);
+      expect(GameSocket['listeners']).toHaveProperty('test-ns2.test_event');
+      expect(GameSocket['listeners']['test-ns2']['test_event']).toContain(listener4);
     });
 
     it('removes all event listeners listeners for a namespace and event', () => {
@@ -190,11 +190,11 @@ describe('GameSocket', () => {
       expect(mockSocket.off).toBeCalledTimes(2);
       expect(mockSocket.off).toHaveBeenCalledWith('test_event', listener1);
       expect(mockSocket.off).toHaveBeenCalledWith('test_event', listener2);
-      expect(GameSocket['listeners']).not.toHaveProperty('test-ns.$test_event');
-      expect(GameSocket['listeners']).toHaveProperty('test-ns.$test_event2');
-      expect(GameSocket['listeners']['test-ns']['$test_event2']).toContain(listener3);
-      expect(GameSocket['listeners']).toHaveProperty('test-ns2.$test_event');
-      expect(GameSocket['listeners']['test-ns2']['$test_event']).toContain(listener4);
+      expect(GameSocket['listeners']).not.toHaveProperty('test-ns.test_event');
+      expect(GameSocket['listeners']).toHaveProperty('test-ns.test_event2');
+      expect(GameSocket['listeners']['test-ns']['test_event2']).toContain(listener3);
+      expect(GameSocket['listeners']).toHaveProperty('test-ns2.test_event');
+      expect(GameSocket['listeners']['test-ns2']['test_event']).toContain(listener4);
     });
 
     it('removes all event listeners listeners for a namespace', () => {
@@ -204,10 +204,10 @@ describe('GameSocket', () => {
       expect(mockSocket.off).toHaveBeenCalledWith('test_event', listener1);
       expect(mockSocket.off).toHaveBeenCalledWith('test_event', listener2);
       expect(mockSocket.off).toHaveBeenCalledWith('test_event2', listener3);
-      expect(GameSocket['listeners']).not.toHaveProperty('test-ns.$test_event');
-      expect(GameSocket['listeners']).not.toHaveProperty('test-ns.$test_event2');
-      expect(GameSocket['listeners']).toHaveProperty('test-ns2.$test_event');
-      expect(GameSocket['listeners']['test-ns2']['$test_event']).toContain(listener4);
+      expect(GameSocket['listeners']).not.toHaveProperty('test-ns.test_event');
+      expect(GameSocket['listeners']).not.toHaveProperty('test-ns.test_event2');
+      expect(GameSocket['listeners']).toHaveProperty('test-ns2.test_event');
+      expect(GameSocket['listeners']['test-ns2']['test_event']).toContain(listener4);
     });
   });
 });
