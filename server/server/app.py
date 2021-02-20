@@ -21,7 +21,7 @@ from server.lobby.lobby_manager import (
     player_exists,
 )
 from server.lobby.player import Player
-from server.models.requests import CreateGameEnsurePlayerRequest, EnsurePlayerRequest
+from server.models.requests import EnsurePlayerRequest
 from server.models.responses import GameResponse
 from server.redis_client import redis_client
 
@@ -88,33 +88,36 @@ def inc() -> Response:
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
+def ensure_player_and_set_cookie(
+    response: Response, player_name: str, player_id: Optional[str]
+) -> Player:
+    player = ensure_player_with_name(player_name, player_id)
+
+    if player_id is None or player_id != player.player_id:
+        response.set_cookie(
+            key="player_id", value=player.player_id, max_age=7 * 24 * 60 * 60
+        )
+
+    return player
+
+
 @app.post("/ensure-player", status_code=HTTP_204_NO_CONTENT)
 async def ensure_player(
     request: EnsurePlayerRequest,
     response: Response,
     player_id: Optional[str] = Cookie(None, alias="player_id"),
 ) -> None:
-    player = ensure_player_with_name(request.player_name, player_id)
-
-    if player_id is None or player_id != player.player_id:
-        response.set_cookie(
-            key="player_id", value=player.player_id, max_age=7 * 24 * 60 * 60
-        )
+    ensure_player_and_set_cookie(response, request.player_name, player_id)
 
 
 @app.post("/create-game", response_model=GameResponse)
 async def create_game(
-    request: CreateGameEnsurePlayerRequest,
+    request: EnsurePlayerRequest,
     response: Response,
     player_id: Optional[str] = Cookie(None, alias="player_id"),
 ) -> dict[str, str]:
-    player = ensure_player_with_name(request.player_name, player_id)
+    player = ensure_player_and_set_cookie(response, request.player_name, player_id)
     room = create_room(player.player_id)
-
-    if player_id is None or player_id != player.player_id:
-        response.set_cookie(
-            key="player_id", value=player.player_id, max_age=7 * 24 * 60 * 60
-        )
 
     return {"room_id": room.room_id}
 

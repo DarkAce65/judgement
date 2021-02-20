@@ -58,7 +58,7 @@ def get_players_in_room(room_id: str) -> dict[str, Player]:
     }
 
 
-def add_player_to_room(room_id: str, player_id: str) -> Room:
+def add_player_to_room(player_id: str, room_id: str) -> Room:
     player = get_player(player_id)
     room = get_room(room_id)
 
@@ -68,7 +68,7 @@ def add_player_to_room(room_id: str, player_id: str) -> Room:
     return room
 
 
-def drop_player_from_room(room_id: str, player_id: str) -> bool:
+def drop_player_from_room(player_id: str, room_id: str) -> bool:
     player = get_player(player_id)
     room = get_room(room_id)
 
