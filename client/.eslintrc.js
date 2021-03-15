@@ -28,6 +28,7 @@ module.exports = {
     '@typescript-eslint/no-var-requires': 'off',
     'prettier/prettier': ['warn', prettierConfig],
     'react/prop-types': 'off',
+    'react-hooks/exhaustive-deps': 'error',
     eqeqeq: 'warn',
     'guard-for-in': 'error',
     'no-console': 'off',
