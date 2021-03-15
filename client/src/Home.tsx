@@ -35,25 +35,27 @@ class Home extends PureComponent<Props, State> {
       logs: [],
     };
 
-    this.initSocket = this.initSocket.bind(this);
+    this.attachSocketListeners = this.attachSocketListeners.bind(this);
     this.sendMessage = this.sendMessage.bind(this);
     this.disconnect = this.disconnect.bind(this);
   }
 
   componentDidMount() {
     if (GameSocket.socket?.connected) {
-      this.initSocket();
+      this.attachSocketListeners();
     }
   }
 
   componentWillUnmount() {
-    GameSocket.offAnyNamespaced(Home.name);
-    GameSocket.offNamespaced(Home.name);
+    if (this.state.socketListenersAdded) {
+      GameSocket.offAnyNamespaced(Home.name);
+      GameSocket.offNamespaced(Home.name);
+    }
   }
 
-  initSocket() {
+  attachSocketListeners() {
     if (this.state.socketListenersAdded) {
-      GameSocket.socket?.connect();
+      GameSocket.connect();
       return;
     }
 
@@ -79,9 +81,6 @@ class Home extends PureComponent<Props, State> {
       this.forceUpdate();
     });
 
-    if (GameSocket.socket?.disconnected) {
-      GameSocket.socket?.connect();
-    }
     this.setState({ socketListenersAdded: true });
   }
 
@@ -120,7 +119,7 @@ class Home extends PureComponent<Props, State> {
               Make request
             </button>
             {socket === null || !socket.connected ? (
-              <button onClick={this.initSocket}>Init socket</button>
+              <button onClick={this.attachSocketListeners}>Init socket</button>
             ) : (
               <>
                 <button onClick={this.sendMessage}>Send message</button>
