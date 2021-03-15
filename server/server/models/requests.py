@@ -1,8 +1,9 @@
+from typing import Optional
+
 from pydantic import Field
-from pydantic.fields import Undefined
 
 from server.models.camel_model import CamelModel
 
 
 class EnsurePlayerRequest(CamelModel):
-    player_name: str = Field(Undefined, title="The name of the player", min_length=1)
+    player_name: Optional[str] = Field(None, title="The name of the player", min_length=1)

@@ -89,9 +89,11 @@ def inc() -> Response:
 
 
 def ensure_player_and_set_cookie(
-    response: Response, player_name: str, player_id: Optional[str]
+    response: Response,
+    player_id: Optional[str],
+    player_name: Optional[str],
 ) -> Player:
-    player = ensure_player_with_name(player_name, player_id)
+    player = ensure_player_with_name(player_id, player_name)
 
     if player_id is None or player_id != player.player_id:
         response.set_cookie(
@@ -107,7 +109,7 @@ async def ensure_player(
     response: Response,
     player_id: Optional[str] = Cookie(None, alias="player_id"),
 ) -> None:
-    ensure_player_and_set_cookie(response, request.player_name, player_id)
+    ensure_player_and_set_cookie(response, player_id, request.player_name)
 
 
 @app.post("/create-game", response_model=GameResponse)
@@ -116,7 +118,7 @@ async def create_game(
     response: Response,
     player_id: Optional[str] = Cookie(None, alias="player_id"),
 ) -> dict[str, str]:
-    player = ensure_player_and_set_cookie(response, request.player_name, player_id)
+    player = ensure_player_and_set_cookie(response, player_id, request.player_name)
     room = create_room(player.player_id)
 
     return {"room_id": room.room_id}
@@ -139,8 +141,10 @@ async def connect(sid: str, _environ: dict, auth: dict) -> None:
 @require_player
 async def handle_message(_sid: str, message: str, player: Player) -> None:
     await sio.send(message, to=player.player_id)
+
+    sender = player.player_id if player.name is None else player.name
     await sio.send(
-        "broadcast from " + player.name,
+        "broadcast from " + sender,
         skip_sid=list(get_client_ids_for_player(player.player_id)),
     )
 
