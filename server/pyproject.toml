@@ -43,15 +43,15 @@ python = "^3.9"
 debugpy = { version = "^1.2.1", optional = true }
 fastapi = "^0.63.0"
 pyhumps = "^1.6.1"
-python-socketio = { git = "https://github.com/miguelgrinberg/python-socketio.git", rev = "11b6f1a" }
+python-socketio = "^5.1.0"
 redis = "^3.5.3"
-uvicorn = { version = "^0.13.3", extras = ["standard"] }
+uvicorn = { version = "^0.13.4", extras = ["standard"] }
 
 [tool.poetry.dev-dependencies]
 black = "^20.8b1"
 isort = "^5.6.4"
 mypy = "^0.800"
-pylint = "^2.6.0"
+pylint = "^2.7.2"
 taskipy = "^1.6.0"
 
 [tool.poetry.extras]
