@@ -55,11 +55,5 @@ export const fetchAPI = (path: string, init?: RequestInit): Promise<Response> =>
     request = fetch(requestPath, requestInit);
   }
 
-  return request.then((response) => {
-    if (response.ok) {
-      return response;
-    }
-
-    return Promise.reject(response);
-  });
+  return request.then((response) => (response.ok ? response : Promise.reject(response)));
 };
