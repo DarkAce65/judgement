@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import { ArrowRightOutlined } from '@ant-design/icons';
 import { Button, Form, Input } from 'antd';
