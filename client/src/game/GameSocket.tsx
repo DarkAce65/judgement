@@ -167,6 +167,11 @@ class GameSocket {
       delete this.listeners[namespace];
     }
   }
+
+  static offAllNamespaced(namespace: string) {
+    this.offAnyNamespaced(namespace);
+    this.offNamespaced(namespace);
+  }
 }
 
 export default GameSocket;
