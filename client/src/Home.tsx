@@ -1,11 +1,12 @@
 import { useState } from 'react';
 
 import { ArrowRightOutlined } from '@ant-design/icons';
-import { Button, Form, Input } from 'antd';
+import { Button, Form, Input, notification } from 'antd';
 
 import { fetchAPI } from './api/client';
 
 const Home = () => {
+  const [loading, setLoading] = useState(false);
   const [playerName, setPlayerName] = useState(localStorage.getItem('playerName') || '');
 
   return (
@@ -20,7 +21,11 @@ const Home = () => {
       </Form.Item>
       <Form.Item>
         <Button
+          loading={loading ? { delay: 100 } : false}
+          icon={<ArrowRightOutlined />}
           onClick={() => {
+            setLoading(true);
+
             fetchAPI('/ensure-player', {
               method: 'POST',
               body: JSON.stringify({ playerName }),
@@ -28,11 +33,14 @@ const Home = () => {
               .then(() => {
                 localStorage.setItem('playerName', playerName);
               })
-              .catch((...args) => console.error('failed', ...args));
+              .catch(() => {
+                notification.error({ message: 'Failed to set name', duration: 0 });
+              })
+              .then(() => {
+                setLoading(false);
+              });
           }}
-        >
-          <ArrowRightOutlined />
-        </Button>
+        />
       </Form.Item>
     </Form>
   );
