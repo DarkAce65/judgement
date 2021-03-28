@@ -1,21 +1,22 @@
 import { useCallback } from 'react';
 
+import { unwrapResult } from '@reduxjs/toolkit';
 import { Button, notification } from 'antd';
 
-import { fetchAPI } from './api/client';
+import { createLobby } from './data/lobbySlice';
+import { useAppDispatch } from './data/reduxHooks';
 
 interface Props {
   onCreate?: (roomId: string) => void;
 }
 
 const CreateLobbyButton = ({ onCreate }: Props) => {
+  const dispatch = useAppDispatch();
+
   const handleCreate = useCallback(() => {
-    fetchAPI('/create-game', {
-      method: 'POST',
-      body: JSON.stringify({ playerName: localStorage.getItem('playerName') }),
-    })
-      .then((res) => res.json())
-      .then(({ roomId }) => {
+    dispatch(createLobby())
+      .then(unwrapResult)
+      .then((roomId) => {
         if (onCreate) {
           onCreate(roomId);
         }
@@ -23,7 +24,7 @@ const CreateLobbyButton = ({ onCreate }: Props) => {
       .catch(() => {
         notification.error({ message: 'Failed to create a new lobby', duration: 0 });
       });
-  }, [onCreate]);
+  }, [dispatch, onCreate]);
 
   return <Button onClick={handleCreate}>Create room</Button>;
 };
