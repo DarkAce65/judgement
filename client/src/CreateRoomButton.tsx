@@ -3,18 +3,18 @@ import { useCallback } from 'react';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { Button, notification } from 'antd';
 
-import { createLobby } from './data/lobbySlice';
 import { useAppDispatch } from './data/reduxHooks';
+import { createRoom } from './data/roomSlice';
 
 interface Props {
   onCreate?: (roomId: string) => void;
 }
 
-const CreateLobbyButton = ({ onCreate }: Props) => {
+const CreateRoomButton = ({ onCreate }: Props) => {
   const dispatch = useAppDispatch();
 
   const handleCreate = useCallback(() => {
-    dispatch(createLobby())
+    dispatch(createRoom())
       .then(unwrapResult)
       .then((roomId) => {
         if (onCreate) {
@@ -22,11 +22,11 @@ const CreateLobbyButton = ({ onCreate }: Props) => {
         }
       })
       .catch(() => {
-        notification.error({ message: 'Failed to create a new lobby', duration: 0 });
+        notification.error({ message: 'Failed to create a new room', duration: 0 });
       });
   }, [dispatch, onCreate]);
 
   return <Button onClick={handleCreate}>Create room</Button>;
 };
 
-export default CreateLobbyButton;
+export default CreateRoomButton;

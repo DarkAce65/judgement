@@ -1,6 +1,6 @@
 from socketio.server import Server
 
-from server.lobby.lobby_manager import player_exists
+from .room_manager import player_exists
 
 player_id_to_client_ids: dict[str, set[str]] = {}
 

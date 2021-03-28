@@ -5,20 +5,20 @@ import { fetchAPI } from '../api/client';
 import { getPlayerName } from './playerSlice';
 import type { RootState } from './store';
 
-interface LobbyState {
+interface RoomState {
   roomId: string | null;
 }
 
-const initialState: LobbyState = {
+const initialState: RoomState = {
   roomId: null,
 };
 
-export const createLobby = createAsyncThunk<string, void, { state: RootState }>(
-  'lobby/createLobby',
+export const createRoom = createAsyncThunk<string, void, { state: RootState }>(
+  'room/createRoom',
   async (_, { getState }) => {
     const playerName = getPlayerName(getState());
 
-    const response = await fetchAPI('/create-game', {
+    const response = await fetchAPI('/create-room', {
       method: 'POST',
       body: JSON.stringify({ playerName }),
     });
@@ -28,12 +28,12 @@ export const createLobby = createAsyncThunk<string, void, { state: RootState }>(
   }
 );
 
-export const joinLobby = createAsyncThunk<string, string, { state: RootState }>(
-  'lobby/joinLobby',
+export const joinRoom = createAsyncThunk<string, string, { state: RootState }>(
+  'room/joinRoom',
   async (roomId, { getState }) => {
     const playerName = getPlayerName(getState());
 
-    await fetchAPI(`/join-game/${roomId}`, {
+    await fetchAPI(`/join-room/${roomId}`, {
       method: 'POST',
       body: JSON.stringify({ playerName }),
     });
@@ -42,20 +42,20 @@ export const joinLobby = createAsyncThunk<string, string, { state: RootState }>(
   }
 );
 
-export const lobbySlice = createSlice({
-  name: 'lobby',
+export const roomSlice = createSlice({
+  name: 'room',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(createLobby.fulfilled, (state, action: PayloadAction<string>) => {
+    builder.addCase(createRoom.fulfilled, (state, action: PayloadAction<string>) => {
       state.roomId = action.payload;
     });
-    builder.addCase(joinLobby.fulfilled, (state, action: PayloadAction<string>) => {
+    builder.addCase(joinRoom.fulfilled, (state, action: PayloadAction<string>) => {
       state.roomId = action.payload;
     });
   },
 });
 
-export const getRoomId = (state: RootState): string | null => state.lobby.roomId;
+export const getRoomId = (state: RootState): string | null => state.room.roomId;
 
-export default lobbySlice.reducer;
+export default roomSlice.reducer;

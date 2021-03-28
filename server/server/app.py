@@ -10,21 +10,10 @@ from socketio.exceptions import ConnectionRefusedError
 from starlette.middleware.errors import ServerErrorMiddleware
 from starlette.status import HTTP_204_NO_CONTENT
 
-from server.lobby.connection_manager import (
-    connect_player_client,
-    disconnect_player_client,
-    get_client_ids_for_player,
-)
-from server.lobby.lobby_manager import (
-    add_player_to_room,
-    create_room,
-    ensure_player_with_name,
-    get_player,
-    player_exists,
-)
-from server.lobby.player import Player
 from server.models.requests import EnsurePlayerRequest
-from server.models.responses import GameResponse
+from server.models.responses import RoomResponse
+from server.room import connection_manager, room_manager
+from server.room.player import Player
 
 app = FastAPI()
 
@@ -55,7 +44,7 @@ def require_player(socket_handler: F) -> F:
         player_id = session["player_id"]
 
         try:
-            player = None if player_id is None else get_player(player_id)
+            player = None if player_id is None else room_manager.get_player(player_id)
         except ValueError:
             player = None
 
@@ -80,7 +69,7 @@ def ensure_player_and_set_cookie(
     player_id: Optional[str],
     player_name: Optional[str],
 ) -> Player:
-    player = ensure_player_with_name(player_id, player_name)
+    player = room_manager.ensure_player_with_name(player_id, player_name)
 
     if player_id is None or player_id != player.player_id:
         response.set_cookie(
@@ -90,7 +79,7 @@ def ensure_player_and_set_cookie(
     return player
 
 
-@app.post("/ensure-player", status_code=HTTP_204_NO_CONTENT)
+@app.post("/ensure-player", status_code=HTTP_204_NO_CONTENT, tags=["player"])
 async def ensure_player(
     request: EnsurePlayerRequest,
     response: Response,
@@ -99,37 +88,37 @@ async def ensure_player(
     ensure_player_and_set_cookie(response, player_id, request.player_name)
 
 
-@app.post("/create-game", response_model=GameResponse)
-async def create_game(
+@app.post("/create-room", response_model=RoomResponse, tags=["room"])
+async def create_room(
     request: EnsurePlayerRequest,
     response: Response,
     player_id: Optional[str] = Cookie(None, alias="player_id"),
 ) -> dict[str, str]:
     player = ensure_player_and_set_cookie(response, player_id, request.player_name)
-    room = create_room(player.player_id)
+    room = room_manager.create_room(player.player_id)
 
     return {"room_id": room.room_id}
 
 
-@app.post("/join-game/{room_id}", status_code=HTTP_204_NO_CONTENT)
-async def join_game(
+@app.post("/join-room/{room_id}", status_code=HTTP_204_NO_CONTENT, tags=["room"])
+async def join_room(
     request: EnsurePlayerRequest,
     response: Response,
     room_id: str = Path(..., alias="room_id"),
     player_id: Optional[str] = Cookie(None, alias="player_id"),
 ) -> None:
     player = ensure_player_and_set_cookie(response, player_id, request.player_name)
-    add_player_to_room(player.player_id, room_id)
+    room_manager.add_player_to_room(player.player_id, room_id)
 
 
 @sio.on("connect")
 async def connect(sid: str, _environ: dict, auth: dict) -> None:
     player_id = None if auth is None else auth["player_id"]
 
-    if player_id is None or not player_exists(player_id):
+    if player_id is None or not room_manager.player_exists(player_id):
         raise ConnectionRefusedError("unknown_player_id")
 
-    connect_player_client(sio, player_id, sid)
+    connection_manager.connect_player_client(sio, player_id, sid)
 
     await sio.save_session(sid, {"player_id": player_id})
     await sio.emit("client_connect", {"data": "Client connected: " + sid})
@@ -143,7 +132,7 @@ async def handle_message(_sid: str, message: str, player: Player) -> None:
     sender = player.player_id if player.name is None else player.name
     await sio.send(
         "broadcast from " + sender,
-        skip_sid=list(get_client_ids_for_player(player.player_id)),
+        skip_sid=list(connection_manager.get_client_ids_for_player(player.player_id)),
     )
 
 
@@ -152,6 +141,6 @@ async def disconnect(sid: str) -> None:
     session = await sio.get_session(sid)
     player_id = session["player_id"]
 
-    disconnect_player_client(sio, player_id, sid)
+    connection_manager.disconnect_player_client(sio, player_id, sid)
 
     await sio.emit("client_disconnect", {"data": "Client disconnected: " + sid})

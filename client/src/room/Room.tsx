@@ -5,7 +5,7 @@ import GameSocket from '../game/GameSocket';
 import getCookie from '../utils/getCookie';
 import useMountEffect from '../utils/useMountEffect';
 
-const Lobby = () => {
+const Room = () => {
   const history = useHistory();
   const { roomId } = useParams<{ roomId: string }>();
 
@@ -14,12 +14,12 @@ const Lobby = () => {
 
     socket.emit('join_room', roomId);
 
-    GameSocket.onNamespaced(Lobby.name, 'lobby_players', (...args: unknown[]) => {
+    GameSocket.onNamespaced(Room.name, 'room_players', (...args: unknown[]) => {
       console.log(...args);
     });
 
     return () => {
-      GameSocket.offAllNamespaced(Lobby.name);
+      GameSocket.offAllNamespaced(Room.name);
     };
   });
 
@@ -39,4 +39,4 @@ const Lobby = () => {
   );
 };
 
-export default Lobby;
+export default Room;
