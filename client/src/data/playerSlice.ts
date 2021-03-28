@@ -12,7 +12,7 @@ const initialState: PlayerState = {
   playerName: localStorage.getItem('playerName'),
 };
 
-export const setPlayerName = createAsyncThunk(
+export const setPlayerName = createAsyncThunk<string, string, { state: RootState }>(
   'player/setPlayerName',
   async (playerName: string) => {
     await fetchAPI('/ensure-player', { method: 'POST', body: JSON.stringify({ playerName }) });
@@ -26,10 +26,10 @@ export const playerSlice = createSlice({
   name: 'player',
   initialState,
   reducers: {},
-  extraReducers: {
-    [setPlayerName.fulfilled.type]: (state, action: PayloadAction<string>) => {
+  extraReducers: (builder) => {
+    builder.addCase(setPlayerName.fulfilled, (state, action: PayloadAction<string>) => {
       state.playerName = action.payload;
-    },
+    });
   },
 });
 
