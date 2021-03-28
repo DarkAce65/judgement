@@ -7,6 +7,7 @@ from fastapi import Cookie, FastAPI, Path, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from socketio import ASGIApp, AsyncServer
 from socketio.exceptions import ConnectionRefusedError
+from starlette.middleware.errors import ServerErrorMiddleware
 from starlette.status import HTTP_204_NO_CONTENT
 
 from server.lobby.connection_manager import (
@@ -30,6 +31,8 @@ app = FastAPI()
 
 if "CORS_ALLOWED_ORIGIN" in os.environ:
     origin = os.environ.get("CORS_ALLOWED_ORIGIN")
+
+    app.add_middleware(ServerErrorMiddleware)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=[origin],
