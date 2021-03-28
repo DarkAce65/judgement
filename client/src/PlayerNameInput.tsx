@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 
 import { ArrowRightOutlined } from '@ant-design/icons';
-import { Button, Form, Input, notification } from 'antd';
+import { Button, Input, notification } from 'antd';
 
 import { getPlayerName, setPlayerName } from './data/playerSlice';
 import { useAppDispatch, useAppSelector } from './data/reduxHooks';
@@ -18,8 +18,13 @@ const PlayerNameInput = () => {
 
     dispatch(setPlayerName(stagedPlayerName))
       .then((action) => {
-        if (action.meta.requestStatus === 'rejected') {
-          notification.error({ message: 'Failed to set name', duration: 0 });
+        switch (action.meta.requestStatus) {
+          case 'fulfilled':
+            notification.success({ message: 'Updated name' });
+            break;
+          case 'rejected':
+            notification.error({ message: 'Failed to set name', duration: 0 });
+            break;
         }
       })
       .finally(() => {
@@ -28,23 +33,21 @@ const PlayerNameInput = () => {
   }, [dispatch, stagedPlayerName]);
 
   return (
-    <Form layout="inline">
-      <Form.Item label="Name">
-        <Input
-          value={stagedPlayerName}
-          onChange={({ target: { value } }) => {
-            setStagedPlayerName(value);
-          }}
-        />
-      </Form.Item>
-      <Form.Item>
-        <Button
-          loading={loading ? { delay: 100 } : false}
-          icon={<ArrowRightOutlined />}
-          onClick={handlePlayerNameChange}
-        />
-      </Form.Item>
-    </Form>
+    <Input.Group compact={true} style={{ display: 'flex' }}>
+      <Input
+        value={stagedPlayerName}
+        onChange={({ target: { value } }) => {
+          setStagedPlayerName(value);
+        }}
+        onPressEnter={handlePlayerNameChange}
+      />
+      <Button
+        loading={loading ? { delay: 100 } : false}
+        icon={<ArrowRightOutlined />}
+        onClick={handlePlayerNameChange}
+        style={{ flexShrink: 0 }}
+      />
+    </Input.Group>
   );
 };
 
