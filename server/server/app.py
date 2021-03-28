@@ -3,7 +3,7 @@ import inspect
 import os
 from typing import Any, Callable, Optional, TypeVar, cast
 
-from fastapi import Cookie, FastAPI, Response, status
+from fastapi import Cookie, FastAPI, Path, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from socketio import ASGIApp, AsyncServer
 from socketio.exceptions import ConnectionRefusedError
@@ -15,6 +15,7 @@ from server.lobby.connection_manager import (
     get_client_ids_for_player,
 )
 from server.lobby.lobby_manager import (
+    add_player_to_room,
     create_room,
     ensure_player_with_name,
     get_player,
@@ -122,6 +123,17 @@ async def create_game(
     room = create_room(player.player_id)
 
     return {"room_id": room.room_id}
+
+
+@app.post("/join-game/{room_id}", status_code=HTTP_204_NO_CONTENT)
+async def join_game(
+    request: EnsurePlayerRequest,
+    response: Response,
+    room_id: str = Path(..., alias="room_id"),
+    player_id: Optional[str] = Cookie(None, alias="player_id"),
+) -> None:
+    player = ensure_player_and_set_cookie(response, player_id, request.player_name)
+    add_player_to_room(player.player_id, room_id)
 
 
 @sio.on("connect")
