@@ -15,7 +15,7 @@ const initialState: PlayerState = {
 export const setPlayerName = createAsyncThunk<string, string, { state: RootState }>(
   'player/setPlayerName',
   async (playerName) => {
-    await fetchAPI('/ensure-player', { method: 'POST', body: JSON.stringify({ playerName }) });
+    await fetchAPI('/player', { method: 'PUT', body: JSON.stringify({ playerName }) });
     localStorage.setItem('playerName', playerName);
 
     return playerName;
