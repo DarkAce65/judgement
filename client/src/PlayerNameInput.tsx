@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 
 import { ArrowRightOutlined } from '@ant-design/icons';
+import { unwrapResult } from '@reduxjs/toolkit';
 import { Button, Input, notification } from 'antd';
 
 import { getPlayerName, setPlayerName } from './data/playerSlice';
@@ -17,15 +18,12 @@ const PlayerNameInput = () => {
     setLoading(true);
 
     dispatch(setPlayerName(stagedPlayerName))
-      .then((action) => {
-        switch (action.meta.requestStatus) {
-          case 'fulfilled':
-            notification.success({ message: 'Updated name' });
-            break;
-          case 'rejected':
-            notification.error({ message: 'Failed to set name', duration: 0 });
-            break;
-        }
+      .then(unwrapResult)
+      .then(() => {
+        notification.success({ message: 'Updated name' });
+      })
+      .catch(() => {
+        notification.error({ message: 'Failed to set name', duration: 0 });
       })
       .finally(() => {
         setLoading(false);
