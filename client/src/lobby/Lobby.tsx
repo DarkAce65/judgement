@@ -1,10 +1,12 @@
-import { useParams } from 'react-router-dom';
+import { Layout, PageHeader } from 'antd';
+import { useHistory, useParams } from 'react-router-dom';
 
 import GameSocket from '../game/GameSocket';
 import getCookie from '../utils/getCookie';
 import useMountEffect from '../utils/useMountEffect';
 
 const Lobby = () => {
+  const history = useHistory();
   const { roomId } = useParams<{ roomId: string }>();
 
   useMountEffect(() => {
@@ -22,10 +24,18 @@ const Lobby = () => {
   });
 
   return (
-    <>
-      <h1>hello {roomId}</h1>
-      <p style={{ margin: 0 }}>{getCookie('player_id')}</p>
-    </>
+    <Layout>
+      <Layout.Content>
+        <PageHeader
+          title={`hello ${roomId}`}
+          onBack={() => {
+            history.push('/');
+          }}
+        >
+          <p style={{ margin: 0 }}>{getCookie('player_id')}</p>
+        </PageHeader>
+      </Layout.Content>
+    </Layout>
   );
 };
 

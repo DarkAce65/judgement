@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 
-import { Layout } from 'antd';
+import { Layout, PageHeader } from 'antd';
 import { RouteComponentProps } from 'react-router-dom';
 
 import CreateLobbyButton from './CreateLobbyButton';
@@ -18,9 +18,11 @@ const Home = ({ history }: Props) => {
 
   return (
     <Layout>
-      <Layout.Content style={{ padding: 24 }}>
-        <PlayerNameInput />
-        <CreateLobbyButton onCreate={handleLobbyCreate} />
+      <Layout.Content>
+        <PageHeader title="Home">
+          <PlayerNameInput />
+          <CreateLobbyButton onCreate={handleLobbyCreate} />
+        </PageHeader>
       </Layout.Content>
     </Layout>
   );
