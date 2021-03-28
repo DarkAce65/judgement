@@ -3,7 +3,7 @@ import inspect
 import os
 from typing import Any, Callable, Optional, TypeVar, cast
 
-from fastapi import Cookie, FastAPI, Path, Response, status
+from fastapi import Cookie, FastAPI, Path, Response
 from fastapi.middleware.cors import CORSMiddleware
 from socketio import ASGIApp, AsyncServer
 from socketio.exceptions import ConnectionRefusedError
@@ -25,7 +25,6 @@ from server.lobby.lobby_manager import (
 from server.lobby.player import Player
 from server.models.requests import EnsurePlayerRequest
 from server.models.responses import GameResponse
-from server.redis_client import redis_client
 
 app = FastAPI()
 
@@ -74,22 +73,6 @@ def require_player(socket_handler: F) -> F:
         return await socket_handler(sid, *args, **kwargs)
 
     return cast(F, wrapper)
-
-
-@app.get("/hello")
-def hello_world() -> Any:
-    test = redis_client.get("test")
-    if test is None:
-        return "0"
-
-    return test
-
-
-@app.post("/inc")
-def inc() -> Response:
-    redis_client.incr("test")
-
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 def ensure_player_and_set_cookie(
