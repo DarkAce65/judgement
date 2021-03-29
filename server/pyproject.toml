@@ -49,8 +49,8 @@ uvicorn = { version = "^0.13.4", extras = ["standard"] }
 
 [tool.poetry.dev-dependencies]
 black = "^20.8b1"
-isort = "^5.6.4"
-mypy = "^0.800"
+isort = "^5.8.0"
+mypy = "^0.812"
 pylint = "^2.7.2"
 taskipy = "^1.6.0"
 
