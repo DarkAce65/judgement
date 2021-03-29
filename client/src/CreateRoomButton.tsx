@@ -26,7 +26,11 @@ const CreateRoomButton = ({ onCreate }: Props) => {
       });
   }, [dispatch, onCreate]);
 
-  return <Button onClick={handleCreate}>Create room</Button>;
+  return (
+    <Button type="primary" size="large" onClick={handleCreate}>
+      Create room
+    </Button>
+  );
 };
 
 export default CreateRoomButton;

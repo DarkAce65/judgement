@@ -23,11 +23,11 @@ class Room:
 
     @staticmethod
     def generate_id() -> str:
-        return "".join(random.choices(string.ascii_lowercase, k=ROOM_ID_LENGTH))
+        return "".join(random.choices(string.ascii_uppercase, k=ROOM_ID_LENGTH))
 
     @staticmethod
     def is_valid_id(room_id: str) -> bool:
-        return len(room_id) == ROOM_ID_LENGTH and room_id.islower()
+        return len(room_id) == ROOM_ID_LENGTH and room_id.isupper()
 
     def __update(self) -> None:
         self.updated_at = int(time.time_ns() / 1e6)

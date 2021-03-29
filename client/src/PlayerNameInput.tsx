@@ -14,8 +14,10 @@ const PlayerNameInput = () => {
   const [stagedPlayerName, setStagedPlayerName] = useState(() => playerName || '');
   const [loading, setLoading] = useState(false);
 
+  const isValid = stagedPlayerName.length > 0 && playerName !== stagedPlayerName;
+
   const handlePlayerNameChange = useCallback(() => {
-    if (playerName === stagedPlayerName) {
+    if (!isValid) {
       return;
     }
 
@@ -32,10 +34,10 @@ const PlayerNameInput = () => {
       .finally(() => {
         setLoading(false);
       });
-  }, [dispatch, playerName, stagedPlayerName]);
+  }, [dispatch, isValid, stagedPlayerName]);
 
   return (
-    <Input.Group compact={true} style={{ display: 'flex' }}>
+    <Input.Group compact={true} size="large" style={{ display: 'flex' }}>
       <Input
         value={stagedPlayerName}
         onChange={({ target: { value } }) => {
@@ -44,9 +46,10 @@ const PlayerNameInput = () => {
         onPressEnter={handlePlayerNameChange}
       />
       <Button
-        loading={loading ? { delay: 100 } : false}
         icon={<ArrowRightOutlined />}
-        disabled={playerName === stagedPlayerName}
+        size="large"
+        loading={loading ? { delay: 100 } : false}
+        disabled={!isValid}
         onClick={handlePlayerNameChange}
         style={{ flexShrink: 0 }}
       />
