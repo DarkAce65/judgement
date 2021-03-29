@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 
 import { ArrowRightOutlined } from '@ant-design/icons';
 import { unwrapResult } from '@reduxjs/toolkit';
-import { Button, Input, notification } from 'antd';
+import { Button, Input, message } from 'antd';
 
 import { getPlayerName, setPlayerName } from './data/playerSlice';
 import { useAppDispatch, useAppSelector } from './data/reduxHooks';
@@ -15,20 +15,24 @@ const PlayerNameInput = () => {
   const [loading, setLoading] = useState(false);
 
   const handlePlayerNameChange = useCallback(() => {
+    if (playerName === stagedPlayerName) {
+      return;
+    }
+
     setLoading(true);
 
     dispatch(setPlayerName(stagedPlayerName))
       .then(unwrapResult)
       .then(() => {
-        notification.success({ message: 'Updated name' });
+        message.success('Updated name');
       })
       .catch(() => {
-        notification.error({ message: 'Failed to set name', duration: 0 });
+        message.error('Failed to set name');
       })
       .finally(() => {
         setLoading(false);
       });
-  }, [dispatch, stagedPlayerName]);
+  }, [dispatch, playerName, stagedPlayerName]);
 
   return (
     <Input.Group compact={true} style={{ display: 'flex' }}>
@@ -42,6 +46,7 @@ const PlayerNameInput = () => {
       <Button
         loading={loading ? { delay: 100 } : false}
         icon={<ArrowRightOutlined />}
+        disabled={playerName === stagedPlayerName}
         onClick={handlePlayerNameChange}
         style={{ flexShrink: 0 }}
       />

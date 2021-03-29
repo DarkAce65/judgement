@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 
 import { unwrapResult } from '@reduxjs/toolkit';
-import { Button, notification } from 'antd';
+import { Button, message } from 'antd';
 
 import { useAppDispatch } from './data/reduxHooks';
 import { createRoom } from './data/roomSlice';
@@ -22,7 +22,7 @@ const CreateRoomButton = ({ onCreate }: Props) => {
         }
       })
       .catch(() => {
-        notification.error({ message: 'Failed to create a new room', duration: 0 });
+        message.error('Failed to create a new room');
       });
   }, [dispatch, onCreate]);
 
