@@ -1,11 +1,12 @@
 import { Socket } from 'socket.io-client';
 
-import { buildSocket, fetchAPI } from '../api/client';
+import { buildSocket } from '../api/client';
 import getCookie from '../utils/getCookie';
 
 class GameSocket {
   static socket: Socket | null = null;
-  private static connectionRetries = 0;
+
+  private static resetConnectionAttempts?: () => void;
 
   private static anyListeners: { [namespace: string]: (() => void)[] } = {};
   private static listeners: {
@@ -14,37 +15,41 @@ class GameSocket {
     };
   } = {};
 
-  static initializeSocket(): Socket {
-    this.socket = buildSocket((auth) => auth({ player_id: getCookie('player_id') }));
-    this.connectionRetries = 0;
-
-    this.socket.on('connect_error', (error: Error) => {
-      if (this.connectionRetries < 3 && error.message === 'unknown_player_id') {
-        const playerName = localStorage.getItem('playerName') || 'hello';
-
-        fetchAPI('/ensure-player', {
-          method: 'POST',
-          body: JSON.stringify({ playerName }),
-        })
-          .then(() => {
-            this.socket?.connect();
-            this.connectionRetries++;
-          })
-          .catch((...args) => console.error('failed', ...args));
-      }
+  static initializeSocket(
+    onConnectionError?: (error: Error, socket: Socket) => void,
+    resetConnectionAttempts?: () => void
+  ): Socket {
+    const socket = buildSocket({
+      auth: (auth) => auth({ player_id: getCookie('player_id') }),
+      autoConnect: false,
     });
+    this.socket = socket;
 
-    return this.socket;
+    if (onConnectionError) {
+      socket.on('connect_error', (error: Error) => onConnectionError(error, socket));
+    }
+    if (resetConnectionAttempts) {
+      this.resetConnectionAttempts = resetConnectionAttempts;
+      socket.on('connect', resetConnectionAttempts);
+    }
+
+    return socket;
   }
 
   static connect(): Socket {
     if (this.socket === null) {
-      return this.initializeSocket();
+      throw new Error('Socket not initialized');
     } else if (this.socket.disconnected) {
+      this.resetConnectionAttempts?.();
       return this.socket.connect();
     }
 
     return this.socket;
+  }
+
+  static disconnect(): void {
+    this.resetConnectionAttempts?.();
+    this.socket?.disconnect();
   }
 
   static onAnyNamespaced(
@@ -53,7 +58,7 @@ class GameSocket {
     listener: (...args: any[]) => void
   ): void {
     if (this.socket === null) {
-      this.initializeSocket();
+      throw new Error('Socket not initialized');
     }
 
     if (!this.anyListeners[namespace]) {
@@ -106,7 +111,7 @@ class GameSocket {
     listener: (...args: any[]) => void
   ) {
     if (this.socket === null) {
-      this.initializeSocket();
+      throw new Error('Socket not initialized');
     }
 
     if (!this.listeners[namespace]) {

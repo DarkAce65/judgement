@@ -12,10 +12,10 @@ const WEBSOCKET_PATH = join(API_ROOT, '/ws/socket.io');
 
 type SocketParams = Exclude<Parameters<typeof io>[1], undefined>;
 
-export const buildSocket = (auth?: SocketParams['auth'], namespace = ''): Socket => {
+export const buildSocket = (params?: SocketParams, namespace = ''): Socket => {
   const socketParams: SocketParams = {
     path: WEBSOCKET_PATH,
-    auth,
+    ...params,
     ...(isDev && { withCredentials: true }),
   };
 

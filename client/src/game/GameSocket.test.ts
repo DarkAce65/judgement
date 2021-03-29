@@ -7,6 +7,9 @@ const mockSocket = {
   offAny: jest.fn().mockName('offAny'),
 };
 
+const onConnectionError = jest.fn();
+const resetAttempts = jest.fn();
+
 jest.mock('../api/client', () => ({
   __esModule: true,
   buildSocket: jest.fn(() => mockSocket),
@@ -24,7 +27,7 @@ describe('GameSocket', () => {
   it('initializes a socket with a reconnect handler', () => {
     expect(GameSocket.socket).toBe(null);
 
-    expect(GameSocket.initializeSocket()).toBe(mockSocket);
+    expect(GameSocket.initializeSocket(onConnectionError, resetAttempts)).toBe(mockSocket);
     expect(GameSocket.socket).toBe(mockSocket);
     expect(mockSocket.on).toHaveBeenCalledWith('connect_error', expect.any(Function));
   });
@@ -34,7 +37,7 @@ describe('GameSocket', () => {
 
     const listener = jest.fn();
 
-    expect(GameSocket.initializeSocket()).toBe(mockSocket);
+    expect(GameSocket.initializeSocket(onConnectionError, resetAttempts)).toBe(mockSocket);
     GameSocket.onAnyNamespaced('test-ns', listener);
 
     expect(GameSocket.socket).toBe(mockSocket);
@@ -43,17 +46,14 @@ describe('GameSocket', () => {
     expect(GameSocket['anyListeners']['test-ns']).toContain(listener);
   });
 
-  it('adds a catch-all listener initializing socket if necessary', () => {
+  it('adds a catch-all listener, throwing an error if the socket is uninitialized', () => {
     expect(GameSocket.socket).toBe(null);
 
     const listener = jest.fn();
 
-    GameSocket.onAnyNamespaced('test-ns', listener);
-
-    expect(GameSocket.socket).toBe(mockSocket);
-    expect(mockSocket.onAny).toHaveBeenCalledWith(listener);
-    expect(GameSocket['anyListeners']).toHaveProperty('test-ns');
-    expect(GameSocket['anyListeners']['test-ns']).toContain(listener);
+    expect(() => {
+      GameSocket.onAnyNamespaced('test-ns', listener);
+    }).toThrow();
   });
 
   it('adds an event listener', () => {
@@ -61,7 +61,7 @@ describe('GameSocket', () => {
 
     const listener = jest.fn();
 
-    expect(GameSocket.initializeSocket()).toBe(mockSocket);
+    expect(GameSocket.initializeSocket(onConnectionError, resetAttempts)).toBe(mockSocket);
     GameSocket.onNamespaced('test-ns', 'test_event', listener);
 
     expect(GameSocket.socket).toBe(mockSocket);
@@ -70,17 +70,14 @@ describe('GameSocket', () => {
     expect(GameSocket['listeners']['test-ns']['test_event']).toContain(listener);
   });
 
-  it('adds an event listener initializing socket if necessary', () => {
+  it('adds an event listener, throwing an error if the socket is uninitialized', () => {
     expect(GameSocket.socket).toBe(null);
 
     const listener = jest.fn();
 
-    GameSocket.onNamespaced('test-ns', 'test_event', listener);
-
-    expect(GameSocket.socket).toBe(mockSocket);
-    expect(mockSocket.on).toHaveBeenCalledWith('test_event', listener);
-    expect(GameSocket['listeners']).toHaveProperty('test-ns.test_event');
-    expect(GameSocket['listeners']['test-ns']['test_event']).toContain(listener);
+    expect(() => {
+      GameSocket.onNamespaced('test-ns', 'test_event', listener);
+    }).toThrow();
   });
 
   it('registers multiple event listeners', () => {
@@ -92,6 +89,8 @@ describe('GameSocket', () => {
     const listener2 = jest.fn();
     const listener3 = jest.fn();
     const listener4 = jest.fn();
+
+    GameSocket.initializeSocket(onConnectionError, resetAttempts);
 
     GameSocket.onAnyNamespaced('test-ns', anyListener1);
     GameSocket.onAnyNamespaced('test-ns', anyListener2);
@@ -139,6 +138,8 @@ describe('GameSocket', () => {
     const listener4 = jest.fn();
 
     beforeEach(() => {
+      GameSocket.initializeSocket(onConnectionError, resetAttempts);
+
       GameSocket.onAnyNamespaced('test-ns', anyListener1);
       GameSocket.onAnyNamespaced('test-ns', anyListener2);
       GameSocket.onNamespaced('test-ns', 'test_event', listener1);
