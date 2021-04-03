@@ -1,12 +1,12 @@
 from socketio.server import Server
 
-from .room_manager import player_exists
+from . import player_manager
 
 player_id_to_client_ids: dict[str, set[str]] = {}
 
 
 def get_client_ids_for_player(player_id: str) -> set[str]:
-    if not player_exists(player_id):
+    if not player_manager.player_exists(player_id):
         raise ValueError(f"Invalid player id: {player_id}")
 
     return player_id_to_client_ids.get(player_id, set())
@@ -23,7 +23,7 @@ def get_client_ids_for_players(player_ids: set[str]) -> set[str]:
 
 
 def connect_player_client(sio: Server, player_id: str, client_id: str) -> None:
-    if not player_exists(player_id):
+    if not player_manager.player_exists(player_id):
         raise ValueError(f"Invalid player id: {player_id}")
 
     if player_id not in player_id_to_client_ids:

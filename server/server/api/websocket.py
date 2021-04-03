@@ -5,7 +5,7 @@ from typing import Any, Callable, TypeVar, cast
 from socketio import AsyncServer
 from socketio.exceptions import ConnectionRefusedError
 
-from server.room import connection_manager, room_manager
+from server.room import connection_manager, player_manager, room_manager
 from server.room.player import Player
 
 sio = AsyncServer(async_mode="asgi", cors_allowed_origins=[])
@@ -21,7 +21,7 @@ def require_player(socket_handler: F) -> F:
         player_id = session["player_id"]
 
         try:
-            player = None if player_id is None else room_manager.get_player(player_id)
+            player = None if player_id is None else player_manager.get_player(player_id)
         except ValueError:
             player = None
 
@@ -45,7 +45,7 @@ def require_player(socket_handler: F) -> F:
 async def connect(sid: str, _environ: dict, auth: dict) -> None:
     player_id = None if auth is None else auth["player_id"]
 
-    if player_id is None or not room_manager.player_exists(player_id):
+    if player_id is None or not player_manager.player_exists(player_id):
         raise ConnectionRefusedError("unknown_player_id")
 
     connection_manager.connect_player_client(sio, player_id, sid)
