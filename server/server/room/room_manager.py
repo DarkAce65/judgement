@@ -18,8 +18,16 @@ def get_player(player_id: str) -> Player:
     return active_players[player_id]
 
 
+def get_all_rooms() -> list[Room]:
+    return list(rooms.values())
+
+
+def room_exists(room_id: str) -> bool:
+    return room_id in rooms
+
+
 def get_room(room_id: str) -> Room:
-    if room_id not in rooms:
+    if not room_exists(room_id):
         raise ValueError(f"Invalid room id: {room_id}")
 
     return rooms[room_id]

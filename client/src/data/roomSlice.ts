@@ -18,7 +18,7 @@ export const createRoom = createAsyncThunk<string, void, { state: RootState }>(
   async (_, { getState }) => {
     const playerName = getPlayerName(getState());
 
-    const response = await fetchAPI('/room/create', {
+    const response = await fetchAPI('/rooms/create', {
       method: 'POST',
       body: JSON.stringify({ playerName }),
     });
@@ -33,7 +33,7 @@ export const joinRoom = createAsyncThunk<string, string, { state: RootState }>(
   async (roomId, { getState }) => {
     const playerName = getPlayerName(getState());
 
-    await fetchAPI(`/room/join/${roomId}`, {
+    await fetchAPI(`/rooms/${roomId}/join`, {
       method: 'POST',
       body: JSON.stringify({ playerName }),
     });

@@ -1,15 +1,20 @@
-from typing import Optional
+from typing import Any, Optional
 
 from fastapi import APIRouter, Cookie, Path, Response
 from starlette.status import HTTP_204_NO_CONTENT
 
 from server.models.requests import EnsurePlayerRequest
-from server.models.responses import RoomResponse
+from server.models.responses import ResourceExistsResponse, RoomResponse, RoomsResponse
 from server.room import room_manager
 
 from .player import ensure_player_and_set_cookie
 
-router = APIRouter(prefix="/room", tags=["room"])
+router = APIRouter(prefix="/rooms", tags=["rooms"])
+
+
+@router.get("", response_model=RoomsResponse)
+async def get_all_rooms() -> dict[str, Any]:
+    return {"rooms": [vars(room) for room in room_manager.get_all_rooms()]}
 
 
 @router.post("/create", response_model=RoomResponse)
@@ -24,7 +29,12 @@ async def create_room(
     return {"room_id": room.room_id}
 
 
-@router.post("/join/{room_id}", status_code=HTTP_204_NO_CONTENT)
+@router.get("/{room_id}/exists", response_model=ResourceExistsResponse)
+async def does_room_exist(room_id: str = Path(..., alias="room_id")) -> dict[str, Any]:
+    return {"exists": room_manager.room_exists(room_id)}
+
+
+@router.post("/{room_id}/join", status_code=HTTP_204_NO_CONTENT)
 async def join_room(
     request: EnsurePlayerRequest,
     response: Response,
