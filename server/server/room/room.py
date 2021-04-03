@@ -40,6 +40,9 @@ class Room:
         self.__update()
         return True
 
+    def has_player(self, player_id: str) -> bool:
+        return player_id in self.player_ids
+
     def remove_player(self, player_id: str) -> bool:
         if player_id not in self.player_ids:
             return False

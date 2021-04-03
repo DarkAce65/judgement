@@ -56,11 +56,21 @@ async def connect(sid: str, _environ: dict, auth: dict) -> None:
 
 @sio.on("join_room")
 @require_player
-async def handle_join_room(_sid: str, room_id: str, player: Player) -> None:
+async def handle_join_room(sid: str, room_id: str, player: Player) -> None:
+    if not room_manager.get_room(room_id).has_player(player.player_id):
+        room_manager.add_player_to_room(player.player_id, room_id)
+
+    connection_manager.add_player_client_to_room(sio, sid, room_id)
+
     await sio.emit(
         "players",
-        {"players": room_manager.get_players_in_room(room_id)},
-        to=player.player_id,
+        {
+            "players": [
+                player.name
+                for player in room_manager.get_players_in_room(room_id).values()
+            ]
+        },
+        to=room_id,
     )
 
 
