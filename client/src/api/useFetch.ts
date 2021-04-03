@@ -3,9 +3,9 @@ import { useEffect, useState } from 'react';
 import { FetchStatus } from './FetchStatus';
 import { fetchAPI } from './client';
 
-const useFetch = (...args: Parameters<typeof fetchAPI>) => {
+const useFetch = <R>(...args: Parameters<typeof fetchAPI>) => {
   const [status, setStatus] = useState<FetchStatus>('uninitialized');
-  const [response, setResponse] = useState<Response | null>(null);
+  const [response, setResponse] = useState<R | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [error, setError] = useState<any>(null);
 
