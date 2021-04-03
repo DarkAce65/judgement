@@ -33,19 +33,17 @@ class Room:
         self.updated_at = int(time.time_ns() / 1e6)
 
     def add_player(self, new_player_id: str) -> bool:
-        self.__update()
-
         if new_player_id in self.player_ids:
             return False
 
         self.player_ids.add(new_player_id)
+        self.__update()
         return True
 
     def remove_player(self, player_id: str) -> bool:
-        self.__update()
-
         if player_id not in self.player_ids:
             return False
 
         self.player_ids.remove(player_id)
+        self.__update()
         return True
