@@ -57,7 +57,7 @@ def create_room(host_id: str) -> Room:
     room = Room(room_id, host_id)
     rooms[room_id] = room
 
-    player.num_joined_rooms += 1
+    player.joined_room_ids.add(room_id)
 
     return room
 
@@ -73,7 +73,7 @@ def add_player_to_room(player_id: str, room_id: str) -> Room:
     room = get_room(room_id)
 
     if room.add_player(player_id):
-        player.num_joined_rooms += 1
+        player.joined_room_ids.add(room_id)
 
     return room
 
@@ -85,7 +85,7 @@ def drop_player_from_room(player_id: str, room_id: str) -> bool:
     if not room.remove_player(player_id):
         return False
 
-    player.num_joined_rooms -= 1
+    player.joined_room_ids.remove(room_id)
 
     if len(room.player_ids) == 0:
         del rooms[room.room_id]
