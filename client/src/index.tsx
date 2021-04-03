@@ -5,7 +5,7 @@ import { unwrapResult } from '@reduxjs/toolkit';
 import { Button, message } from 'antd';
 import { Provider } from 'react-redux';
 
-import App from './App';
+import App from './components/App';
 import { getPlayerName, setPlayerName } from './data/playerSlice';
 import store from './data/store';
 import GameSocket from './game/GameSocket';

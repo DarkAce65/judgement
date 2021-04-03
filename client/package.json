@@ -5,7 +5,7 @@
   "scripts": {
     "prepare": "cd .. && husky install client/.husky",
     "eslint:fix": "eslint --fix \"*.config.js\" \"src/**/*.{ts,tsx}\"",
-    "prettier:write": "prettier --write \".eslintrc.js\" \"*.config.js\" \"tsconfig.json\" \"public/**/*.html\" \"src/**/*.{ts,tsx,css,less}\"",
+    "prettier:write": "prettier --write .eslintrc.js \"*.config.js\" tsconfig.json \"public/**/*.html\" \"src/**/*.{ts,tsx,css,less}\"",
     "start": "nodemon -w craco.config.js -w ./src/antd.customize.less --exec \"craco start\"",
     "build": "craco build",
     "test": "craco test"
@@ -44,7 +44,7 @@
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-prettier": "^3.3.1",
     "eslint-plugin-react": "^7.23.1",
-    "husky": "^5.2.0",
+    "husky": "^6.0.0",
     "lint-staged": "^10.5.4",
     "nodemon": "^2.0.7",
     "prettier": "^2.2.1"

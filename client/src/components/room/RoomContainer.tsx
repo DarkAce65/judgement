@@ -2,7 +2,7 @@ import { LoadingOutlined } from '@ant-design/icons';
 import { Button, Result, Spin } from 'antd';
 import { useHistory, useParams } from 'react-router-dom';
 
-import useFetch from '../api/useFetch';
+import useFetch from '../../api/useFetch';
 
 import Room from './Room';
 

@@ -4,8 +4,8 @@ import { ArrowRightOutlined } from '@ant-design/icons';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { Button, Input, message } from 'antd';
 
-import { useAppDispatch } from './data/reduxHooks';
-import { joinRoom } from './data/roomSlice';
+import { useAppDispatch } from '../data/reduxHooks';
+import { joinRoom } from '../data/roomSlice';
 
 interface Props {
   onJoin?: (roomId: string) => void;

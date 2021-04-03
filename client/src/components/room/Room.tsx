@@ -1,10 +1,10 @@
 import { PageHeader, Typography } from 'antd';
 import { useHistory, useParams } from 'react-router-dom';
 
+import GameSocket from '../../game/GameSocket';
+import getCookie from '../../utils/getCookie';
+import useMountEffect from '../../utils/useMountEffect';
 import PlayerNameInput from '../PlayerNameInput';
-import GameSocket from '../game/GameSocket';
-import getCookie from '../utils/getCookie';
-import useMountEffect from '../utils/useMountEffect';
 
 const Room = () => {
   const history = useHistory();

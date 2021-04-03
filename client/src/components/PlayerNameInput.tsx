@@ -4,8 +4,8 @@ import { ArrowRightOutlined } from '@ant-design/icons';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { Button, Input, message } from 'antd';
 
-import { getPlayerName, setPlayerName } from './data/playerSlice';
-import { useAppDispatch, useAppSelector } from './data/reduxHooks';
+import { getPlayerName, setPlayerName } from '../data/playerSlice';
+import { useAppDispatch, useAppSelector } from '../data/reduxHooks';
 
 const PlayerNameInput = () => {
   const dispatch = useAppDispatch();

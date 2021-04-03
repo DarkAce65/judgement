@@ -3,8 +3,8 @@ import { useCallback } from 'react';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { Button, message } from 'antd';
 
-import { useAppDispatch } from './data/reduxHooks';
-import { createRoom } from './data/roomSlice';
+import { useAppDispatch } from '../data/reduxHooks';
+import { createRoom } from '../data/roomSlice';
 
 interface Props {
   onCreate?: (roomId: string) => void;
