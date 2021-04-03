@@ -30,4 +30,4 @@ CMD ["sh", "-c", "poetry run python -m debugpy --listen 0.0.0.0:5678 -m uvicorn 
 # Production container
 FROM base as production
 COPY . .
-CMD ["sh", "-c", "poetry run uvicorn main:app --host 0.0.0.0 --port $API_PORT --proxy-headers"]
+CMD ["sh", "-c", "poetry run uvicorn main:app --root-path \"$API_ROOT\" --host 0.0.0.0 --port $API_PORT --proxy-headers"]
