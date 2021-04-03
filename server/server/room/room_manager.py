@@ -36,13 +36,12 @@ def get_room(room_id: str) -> Room:
 def ensure_player_with_name(
     player_id: Optional[str] = None, player_name: Optional[str] = None
 ) -> Player:
-    if player_id is not None and player_exists(player_id):
+    if player_id is None or not player_exists(player_id):
+        player = Player(player_name)
+        active_players[player.player_id] = player
+    else:
         player = get_player(player_id)
         player.name = player_name
-        return player
-
-    player = Player(player_name)
-    active_players[player.player_id] = player
 
     return player
 
