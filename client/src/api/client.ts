@@ -41,7 +41,10 @@ export const buildRequestPath = (path: string): string => {
   return API_BASE;
 };
 
-export const fetchAPI = (path: string, init?: RequestInit): Promise<Response> => {
+export const fetchAPI = (
+  path: string,
+  init?: RequestInit & { additionalSuccessStatusCodes?: number[] }
+): Promise<Response> => {
   const requestPath = buildRequestPath(path);
   const requestInit: RequestInit = {
     ...(isDev && { credentials: 'include' }),
@@ -55,5 +58,15 @@ export const fetchAPI = (path: string, init?: RequestInit): Promise<Response> =>
     request = fetch(requestPath, requestInit);
   }
 
-  return request.then((response) => (response.ok ? response : Promise.reject(response)));
+  const additionalSuccessStatusCodes =
+    init && init.additionalSuccessStatusCodes !== undefined
+      ? init.additionalSuccessStatusCodes
+      : [];
+  return request.then((response) => {
+    if (response.ok || additionalSuccessStatusCodes.indexOf(response.status) !== -1) {
+      return response;
+    }
+
+    return Promise.reject(response);
+  });
 };
