@@ -10,7 +10,7 @@ const RoomContainer = () => {
   const history = useHistory();
   const { roomId } = useParams<{ roomId: string }>();
 
-  const { status, response } = useFetch<{ exists: boolean }>(`/rooms/${roomId}/exists`);
+  const { status, response } = useFetch(`/rooms/${roomId}/exists`);
 
   if (status === 'succeeded') {
     if (response && response.exists) {
