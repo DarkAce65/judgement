@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 
-import { Divider, Layout, PageHeader } from 'antd';
+import { Divider, PageHeader } from 'antd';
 import { RouteComponentProps } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -25,17 +25,13 @@ const Home = ({ history }: Props) => {
   );
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
-      <Layout.Content>
-        <PageHeader title="Home">
-          <CenteredBlock>
-            <CreateRoomButton onCreate={navigateToRoom} />
-            <Divider style={{ textTransform: 'lowercase', fontVariant: 'small-caps' }}>Or</Divider>
-            <JoinRoomInput onJoin={navigateToRoom} />
-          </CenteredBlock>
-        </PageHeader>
-      </Layout.Content>
-    </Layout>
+    <PageHeader title="Home">
+      <CenteredBlock>
+        <CreateRoomButton onCreate={navigateToRoom} />
+        <Divider style={{ textTransform: 'lowercase', fontVariant: 'small-caps' }}>Or</Divider>
+        <JoinRoomInput onJoin={navigateToRoom} />
+      </CenteredBlock>
+    </PageHeader>
   );
 };
 

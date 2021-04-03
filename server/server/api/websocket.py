@@ -54,6 +54,16 @@ async def connect(sid: str, _environ: dict, auth: dict) -> None:
     await sio.emit("client_connect", {"data": "Client connected: " + sid})
 
 
+@sio.on("join_room")
+@require_player
+async def handle_join_room(_sid: str, room_id: str, player: Player) -> None:
+    await sio.emit(
+        "players",
+        {"players": room_manager.get_players_in_room(room_id)},
+        to=player.player_id,
+    )
+
+
 @sio.on("message")
 @require_player
 async def handle_message(_sid: str, message: str, player: Player) -> None:

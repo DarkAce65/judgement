@@ -1,4 +1,4 @@
-import { Layout, PageHeader, Typography } from 'antd';
+import { PageHeader, Typography } from 'antd';
 import { useHistory, useParams } from 'react-router-dom';
 
 import PlayerNameInput from '../PlayerNameInput';
@@ -15,7 +15,7 @@ const Room = () => {
 
     socket.emit('join_room', roomId);
 
-    GameSocket.onNamespaced(Room.name, 'room_players', (...args: unknown[]) => {
+    GameSocket.onNamespaced(Room.name, 'players', (...args: unknown[]) => {
       console.log(...args);
     });
 
@@ -25,19 +25,15 @@ const Room = () => {
   });
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
-      <Layout.Content>
-        <PageHeader
-          title={`hello ${roomId}`}
-          onBack={() => {
-            history.push('/');
-          }}
-        >
-          <Typography.Paragraph>{getCookie('player_id')}</Typography.Paragraph>
-          <PlayerNameInput />
-        </PageHeader>
-      </Layout.Content>
-    </Layout>
+    <PageHeader
+      title={`hello ${roomId}`}
+      onBack={() => {
+        history.push('/');
+      }}
+    >
+      <Typography.Paragraph>{getCookie('player_id')}</Typography.Paragraph>
+      <PlayerNameInput />
+    </PageHeader>
   );
 };
 
