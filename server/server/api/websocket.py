@@ -4,7 +4,12 @@ from typing import Any, Callable, TypeVar, cast
 
 from socketio.exceptions import ConnectionRefusedError
 
-from server.data import connection_manager, player_manager, room_manager
+from server.data import (
+    connection_manager,
+    player_manager,
+    room_manager,
+    socket_messager,
+)
 from server.data.player import Player
 from server.sio_app import sio
 
@@ -58,17 +63,7 @@ async def handle_join_room(sid: str, room_id: str, player: Player) -> None:
         room_manager.add_player_to_room(player.player_id, room_id)
 
     await connection_manager.add_player_client_to_room(sid, room_id)
-
-    await sio.emit(
-        "players",
-        {
-            "players": [
-                player.name
-                for player in room_manager.get_players_in_room(room_id).values()
-            ]
-        },
-        to=room_id,
-    )
+    await socket_messager.emit_players(room_id)
 
 
 @sio.on("message")
