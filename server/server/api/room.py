@@ -23,7 +23,7 @@ async def create_room(
     response: Response,
     player_id: Optional[str] = Cookie(None, alias="player_id"),
 ) -> dict[str, str]:
-    player = ensure_player_and_set_cookie(response, player_id, request.player_name)
+    player = await ensure_player_and_set_cookie(response, player_id, request.player_name)
     room = room_manager.create_room(player.player_id)
 
     return {"room_id": room.room_id}
@@ -45,5 +45,5 @@ async def join_room(
     if not room_manager.room_exists(room_id):
         raise HTTPException(status_code=404, detail="Room not found")
 
-    player = ensure_player_and_set_cookie(response, player_id, request.player_name)
+    player = await ensure_player_and_set_cookie(response, player_id, request.player_name)
     room_manager.add_player_to_room(player.player_id, room_id)

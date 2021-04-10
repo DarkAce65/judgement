@@ -1,6 +1,6 @@
 from server.sio_app import sio
 
-from . import player_manager
+from . import player_manager, socket_messager
 
 player_id_to_client_ids: dict[str, set[str]] = {}
 client_id_to_room_id: dict[str, str] = {}
@@ -29,6 +29,15 @@ def connect_player_client(player_id: str, client_id: str) -> None:
 
     player_id_to_client_ids[player_id].add(client_id)
     sio.enter_room(client_id, player_id)
+
+
+async def propagate_name_change(player_id: str) -> None:
+    room_ids = {
+        client_id_to_room_id[client_id]
+        for client_id in get_client_ids_for_player(player_id)
+    }
+    for room_id in room_ids:
+        await socket_messager.emit_players(room_id)
 
 
 def add_player_client_to_room(client_id: str, room_id: str) -> None:
