@@ -1,22 +1,29 @@
+import { useState } from 'react';
+
 import { PageHeader, Typography } from 'antd';
-import { useHistory, useParams } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
 import GameSocket from '../../game/GameSocket';
 import getCookie from '../../utils/getCookie';
 import useMountEffect from '../../utils/useMountEffect';
 import PlayerNameInput from '../PlayerNameInput';
 
-const Room = () => {
+interface Props {
+  roomId: string;
+}
+
+const Room = ({ roomId }: Props) => {
   const history = useHistory();
-  const { roomId } = useParams<{ roomId: string }>();
+
+  const [players, setPlayers] = useState<string[]>([]);
 
   useMountEffect(() => {
     const socket = GameSocket.connect();
 
     socket.emit('join_room', roomId);
 
-    GameSocket.onNamespaced(Room.name, 'players', (...args: unknown[]) => {
-      console.log(...args);
+    GameSocket.onNamespaced(Room.name, 'players', (data: { players: string[] }) => {
+      setPlayers(data.players);
     });
 
     return () => {
@@ -32,6 +39,9 @@ const Room = () => {
       }}
     >
       <Typography.Paragraph>{getCookie('player_id')}</Typography.Paragraph>
+      {players.map((player, index) => (
+        <Typography.Paragraph key={index}>{player}</Typography.Paragraph>
+      ))}
       <PlayerNameInput />
     </PageHeader>
   );
