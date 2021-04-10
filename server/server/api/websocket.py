@@ -45,7 +45,7 @@ async def connect(sid: str, _environ: dict, auth: dict) -> None:
     if player_id is None or not player_manager.player_exists(player_id):
         raise ConnectionRefusedError("unknown_player_id")
 
-    connection_manager.connect_player_client(player_id, sid)
+    await connection_manager.connect_player_client(player_id, sid)
 
     await sio.save_session(sid, {"player_id": player_id})
     await sio.emit("client_connect", {"data": "Client connected: " + sid})
@@ -57,7 +57,7 @@ async def handle_join_room(sid: str, room_id: str, player: Player) -> None:
     if not room_manager.get_room(room_id).has_player(player.player_id):
         room_manager.add_player_to_room(player.player_id, room_id)
 
-    connection_manager.add_player_client_to_room(sid, room_id)
+    await connection_manager.add_player_client_to_room(sid, room_id)
 
     await sio.emit(
         "players",
@@ -89,5 +89,4 @@ async def disconnect(sid: str) -> None:
     player_id = session["player_id"]
 
     connection_manager.disconnect_player_client(player_id, sid)
-
     await sio.emit("client_disconnect", {"data": "Client disconnected: " + sid})
