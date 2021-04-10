@@ -1,34 +1,42 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import isEqual from 'lodash-es/isEqual';
 
 import { FetchStatus } from './FetchStatus';
 import { fetchAPI } from './client';
 
-const useFetch = (...args: Parameters<typeof fetchAPI>) => {
+interface FetchOptions {
+  fetchOnMount?: boolean;
+  fetchOnArgsChange?: boolean;
+}
+
+interface FetchResponse {
+  status: FetchStatus;
+  response: Response | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  error: any;
+
+  triggerFetch: () => void;
+}
+
+const useFetch = (
+  fetchArgs: Parameters<typeof fetchAPI>,
+  { fetchOnMount = false, fetchOnArgsChange = false }: FetchOptions = {}
+): FetchResponse => {
   const [status, setStatus] = useState<FetchStatus>('uninitialized');
   const [response, setResponse] = useState<Response | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [error, setError] = useState<any>(null);
 
   const firstRun = useRef(true);
-  const previousArgs = useRef(args);
-  useEffect(() => {
-    const isFirstRun = firstRun.current;
-    const isSame = previousArgs.current.every((arg, index) => isEqual(arg, args[index]));
+  const previousArgs = useRef(fetchArgs);
 
-    firstRun.current = false;
-    previousArgs.current = args;
-
-    if (!isFirstRun && isSame) {
-      return;
-    }
-
+  const triggerFetch = useCallback(() => {
     setStatus('pending');
     setResponse(null);
     setError(null);
 
-    fetchAPI(...args)
+    fetchAPI(...fetchArgs)
       .then((r) => {
         setResponse(r);
         setStatus('succeeded');
@@ -37,9 +45,21 @@ const useFetch = (...args: Parameters<typeof fetchAPI>) => {
         setError(e);
         setStatus('failed');
       });
-  }, [args]);
+  }, [fetchArgs]);
 
-  return { status, response, error };
+  useEffect(() => {
+    const isFirstRun = firstRun.current;
+    const isSame = previousArgs.current.every((arg, index) => isEqual(arg, fetchArgs[index]));
+
+    firstRun.current = false;
+    previousArgs.current = fetchArgs;
+
+    if ((fetchOnMount && isFirstRun) || (fetchOnArgsChange && !isSame)) {
+      triggerFetch();
+    }
+  }, [fetchArgs, fetchOnArgsChange, fetchOnMount, triggerFetch]);
+
+  return { status, response, error, triggerFetch };
 };
 
 export default useFetch;

@@ -10,10 +10,16 @@ const RoomContainer = () => {
   const history = useHistory();
   const { roomId } = useParams<{ roomId: string }>();
 
-  const { status, response } = useFetch(`/rooms/${roomId}/exists`, {
-    method: 'HEAD',
-    additionalSuccessStatusCodes: [404],
-  });
+  const { status, response } = useFetch(
+    [
+      `/rooms/${roomId}/exists`,
+      {
+        method: 'HEAD',
+        additionalSuccessStatusCodes: [404],
+      },
+    ],
+    { fetchOnMount: true }
+  );
 
   if (status === 'uninitialized' || status === 'pending') {
     return (
