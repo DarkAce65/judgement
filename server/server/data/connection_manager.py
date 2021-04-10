@@ -23,19 +23,19 @@ def get_client_ids_for_players(player_ids: set[str]) -> set[str]:
     }
 
 
-async def connect_player_client(player_id: str, client_id: str) -> None:
+def connect_player_client(player_id: str, client_id: str) -> None:
     if player_id not in player_id_to_client_ids:
         player_id_to_client_ids[player_id] = set()
 
     player_id_to_client_ids[player_id].add(client_id)
-    await sio.enter_room(client_id, player_id)
+    sio.enter_room(client_id, player_id)
 
 
-async def add_player_client_to_room(client_id: str, room_id: str) -> None:
+def add_player_client_to_room(client_id: str, room_id: str) -> None:
     if client_id in client_id_to_room_id:
-        await sio.leave_room(client_id, client_id_to_room_id[client_id])
+        sio.leave_room(client_id, client_id_to_room_id[client_id])
 
-    await sio.enter_room(client_id, room_id)
+    sio.enter_room(client_id, room_id)
     client_id_to_room_id[client_id] = room_id
 
 
