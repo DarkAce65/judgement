@@ -1,4 +1,4 @@
-from socketio.server import Server
+from server.sio_app import sio
 
 from . import player_manager
 
@@ -23,7 +23,7 @@ def get_client_ids_for_players(player_ids: set[str]) -> set[str]:
     }
 
 
-def connect_player_client(sio: Server, player_id: str, client_id: str) -> None:
+def connect_player_client(player_id: str, client_id: str) -> None:
     if player_id not in player_id_to_client_ids:
         player_id_to_client_ids[player_id] = set()
 
@@ -31,7 +31,7 @@ def connect_player_client(sio: Server, player_id: str, client_id: str) -> None:
     sio.enter_room(client_id, player_id)
 
 
-def add_player_client_to_room(sio: Server, client_id: str, room_id: str) -> None:
+def add_player_client_to_room(client_id: str, room_id: str) -> None:
     if client_id in client_id_to_room_id:
         sio.leave_room(client_id, client_id_to_room_id[client_id])
 
@@ -39,7 +39,7 @@ def add_player_client_to_room(sio: Server, client_id: str, room_id: str) -> None
     client_id_to_room_id[client_id] = room_id
 
 
-def disconnect_player_client(_sio: Server, player_id: str, client_id: str) -> None:
+def disconnect_player_client(player_id: str, client_id: str) -> None:
     if (
         player_id in player_id_to_client_ids
         and client_id in player_id_to_client_ids[player_id]
