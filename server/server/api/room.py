@@ -3,9 +3,9 @@ from typing import Any, Optional
 from fastapi import APIRouter, Cookie, HTTPException, Path, Response
 from starlette.status import HTTP_204_NO_CONTENT
 
+from server.data import room_manager
 from server.models.requests import EnsurePlayerRequest
 from server.models.responses import RoomResponse, RoomsResponse
-from server.room import room_manager
 
 from .player import ensure_player_and_set_cookie
 

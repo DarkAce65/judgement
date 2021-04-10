@@ -3,9 +3,9 @@ from typing import Optional
 from fastapi import APIRouter, Cookie, Response
 from starlette.status import HTTP_204_NO_CONTENT
 
+from server.data import player_manager
+from server.data.player import Player
 from server.models.requests import EnsurePlayerRequest
-from server.room import player_manager
-from server.room.player import Player
 
 router = APIRouter(prefix="/player", tags=["player"])
 

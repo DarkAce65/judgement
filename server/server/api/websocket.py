@@ -5,8 +5,8 @@ from typing import Any, Callable, TypeVar, cast
 from socketio import AsyncServer
 from socketio.exceptions import ConnectionRefusedError
 
-from server.room import connection_manager, player_manager, room_manager
-from server.room.player import Player
+from server.data import connection_manager, player_manager, room_manager
+from server.data.player import Player
 
 sio = AsyncServer(async_mode="asgi", cors_allowed_origins=[])
 
