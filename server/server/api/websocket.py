@@ -11,6 +11,7 @@ from server.data import (
     socket_messager,
 )
 from server.data.player import Player
+from server.models.websocket import StringMessage
 from server.sio_app import sio
 
 F = TypeVar("F", bound=Callable[..., Any])
@@ -53,7 +54,9 @@ async def connect(sid: str, _environ: dict, auth: dict) -> None:
     connection_manager.connect_player_client(player_id, sid)
 
     await sio.save_session(sid, {"player_id": player_id})
-    await sio.emit("client_connect", {"data": "Client connected: " + sid})
+    await sio.emit(
+        "client_connect", StringMessage(data="Client connected: " + sid).dict()
+    )
 
 
 @sio.on("join_room")
@@ -84,4 +87,6 @@ async def disconnect(sid: str) -> None:
     player_id = session["player_id"]
 
     connection_manager.disconnect_player_client(player_id, sid)
-    await sio.emit("client_disconnect", {"data": "Client disconnected: " + sid})
+    await sio.emit(
+        "client_disconnect", StringMessage(data="Client disconnected: " + sid).dict()
+    )
