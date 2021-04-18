@@ -6,7 +6,7 @@ authors = []
 
 [tool.isort]
 profile = "black"
-src_paths = ["server", "main.py"]
+src_paths = ["model_converter", "server", "main.py"]
 
 [tool.black]
 line-length = 90
@@ -34,18 +34,22 @@ pre_format = "isort ."
 format = "black ."
 pre_lint = "task format"
 lint = "task lint_mypy && task lint_pylint"
-lint_mypy = "mypy server main.py"
-lint_pylint = "pylint server main.py"
+lint_mypy = "mypy model_converter server main.py"
+lint_pylint = "pylint model_converter server main.py"
 test = "python -m unittest"
+generate = "python -m model_converter.model_converter"
+generate_watch = "python -m model_converter.watcher"
 
 [tool.poetry.dependencies]
 python = "^3.9"
 debugpy = { version = "^1.2.1", optional = true }
 fastapi = "^0.63.0"
+pydantic-to-typescript = { git = "https://github.com/phillipdupuis/pydantic-to-typescript.git", rev = "5ffc2a1", optional = true }
 pyhumps = "^1.6.1"
 python-socketio = "^5.1.0"
 redis = "^3.5.3"
 uvicorn = { version = "^0.13.4", extras = ["standard"] }
+watchgod = { version = "^0.7", optional = true }
 
 [tool.poetry.dev-dependencies]
 black = "^20.8b1"
@@ -56,6 +60,7 @@ taskipy = "^1.6.0"
 
 [tool.poetry.extras]
 debug = ["debugpy"]
+generator = ["pydantic-to-typescript", "watchgod"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

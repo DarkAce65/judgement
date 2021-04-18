@@ -212,6 +212,25 @@ dotenv = ["python-dotenv (>=0.10.4)"]
 email = ["email-validator (>=1.0.3)"]
 
 [[package]]
+name = "pydantic-to-typescript"
+version = "1.0.6"
+description = ""
+category = "main"
+optional = true
+python-versions = "*"
+develop = false
+
+[package.dependencies]
+click = "*"
+pydantic = "*"
+
+[package.source]
+type = "git"
+url = "https://github.com/phillipdupuis/pydantic-to-typescript.git"
+reference = "5ffc2a1"
+resolved_reference = "5ffc2a1f30e27839d1c3e6a2da1dce108d51f86c"
+
+[[package]]
 name = "pyhumps"
 version = "1.6.1"
 description = "🐫  Convert strings (and dictionary keys) between snake case, camel case and pascal case in Python. Inspired by Humps for Node"
@@ -412,11 +431,12 @@ python-versions = "*"
 
 [extras]
 debug = ["debugpy"]
+generator = ["pydantic-to-typescript", "watchgod"]
 
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "112fc49ed39825a6a93ae465d78c9107531a2c5ac9db2f9419fd81543f2a750a"
+content-hash = "8c3873a84309e20a25099293eb46269707ed0443a61f563291176fbaa6aee569"
 
 [metadata.files]
 appdirs = [
@@ -642,6 +662,7 @@ pydantic = [
     {file = "pydantic-1.8.1-py3-none-any.whl", hash = "sha256:e3f8790c47ac42549dc8b045a67b0ca371c7f66e73040d0197ce6172b385e520"},
     {file = "pydantic-1.8.1.tar.gz", hash = "sha256:26cf3cb2e68ec6c0cfcb6293e69fb3450c5fd1ace87f46b64f678b0d29eac4c3"},
 ]
+pydantic-to-typescript = []
 pyhumps = [
     {file = "pyhumps-1.6.1-py3-none-any.whl", hash = "sha256:58b367b73c57b64e32d211dc769addabd68ff6db07ce64b2e6565f7d5a12291f"},
     {file = "pyhumps-1.6.1.tar.gz", hash = "sha256:01612603c5ad73a407299d806d30708a3935052276fdd93776953bccc0724e0a"},
