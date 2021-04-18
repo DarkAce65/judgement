@@ -43,7 +43,7 @@ python = "^3.9"
 debugpy = { version = "^1.2.1", optional = true }
 fastapi = "^0.63.0"
 pyhumps = "^1.6.1"
-python-socketio = "5.1"
+python-socketio = "^5.1.0"
 redis = "^3.5.3"
 uvicorn = { version = "^0.13.4", extras = ["standard"] }
 
