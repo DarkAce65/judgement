@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { PageHeader, Typography } from 'antd';
 import { useHistory } from 'react-router-dom';
 
+import { PlayersMessage } from '../../../generated_types/websocket';
 import GameSocket from '../../game/GameSocket';
 import getCookie from '../../utils/getCookie';
 import useMountEffect from '../../utils/useMountEffect';
@@ -22,7 +23,7 @@ const Room = ({ roomId }: Props) => {
 
     socket.emit('join_room', roomId);
 
-    GameSocket.onNamespaced(Room.name, 'players', (data: { players: string[] }) => {
+    GameSocket.onNamespaced(Room.name, 'players', (data: PlayersMessage) => {
       setPlayers(data.players);
     });
 

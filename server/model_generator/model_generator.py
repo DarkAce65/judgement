@@ -15,16 +15,13 @@ logging.getLogger("pydantic2ts").propagate = False
 logger = logging.getLogger(__name__)
 
 
-
-
-
 MODEL_MODULES = ["requests", "responses", "websocket"]
-
 
 
 project_root = Path().resolve().parent
 current_dir = Path(__file__).parent
 json2ts_path = PurePath(current_dir / "node_modules/.bin/json2ts")
+out_dir = (project_root / "client/generated_types").resolve()
 
 
 def yarn_install() -> None:
@@ -34,7 +31,7 @@ def yarn_install() -> None:
 
 
 def generate(module_name: str) -> None:
-    out_filename = PurePath(current_dir / module_name).with_suffix(".ts")
+    out_filename = PurePath(out_dir / module_name).with_suffix(".ts")
     try:
         generate_typescript_defs(
             f"server.models.{module_name}", out_filename, json2ts_path

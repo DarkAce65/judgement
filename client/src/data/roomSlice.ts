@@ -1,5 +1,7 @@
 import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
+import { EnsurePlayerRequest } from '../../generated_types/requests';
+import { RoomResponse } from '../../generated_types/responses';
 import { fetchAPI } from '../api/client';
 
 import { getPlayerName } from './playerSlice';
@@ -18,11 +20,12 @@ export const createRoom = createAsyncThunk<string, void, { state: RootState }>(
   async (_, { getState }) => {
     const playerName = getPlayerName(getState());
 
+    const body: EnsurePlayerRequest = { playerName: playerName || undefined };
     const response = await fetchAPI('/rooms/create', {
       method: 'POST',
-      body: JSON.stringify({ playerName }),
+      body: JSON.stringify(body),
     });
-    const { roomId } = await response.json();
+    const { roomId }: RoomResponse = await response.json();
 
     return roomId;
   }
@@ -33,10 +36,8 @@ export const joinRoom = createAsyncThunk<string, string, { state: RootState }>(
   async (roomId, { getState }) => {
     const playerName = getPlayerName(getState());
 
-    await fetchAPI(`/rooms/${roomId}/join`, {
-      method: 'POST',
-      body: JSON.stringify({ playerName }),
-    });
+    const body: EnsurePlayerRequest = { playerName: playerName || undefined };
+    await fetchAPI(`/rooms/${roomId}/join`, { method: 'POST', body: JSON.stringify(body) });
 
     return roomId;
   }

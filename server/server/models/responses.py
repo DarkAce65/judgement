@@ -4,7 +4,7 @@ from server.models.camel_model import CamelModel
 
 
 class RoomResponse(CamelModel):
-    room_id: str = Field(None, title="The id of the room")
+    room_id: str = Field(title="The id of the room")
 
 
 class RoomsResponse(CamelModel):
