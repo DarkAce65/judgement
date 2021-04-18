@@ -6,7 +6,7 @@ authors = []
 
 [tool.isort]
 profile = "black"
-src_paths = ["model_converter", "server", "main.py"]
+src_paths = ["model_generator", "server", "main.py"]
 
 [tool.black]
 line-length = 90
@@ -34,11 +34,11 @@ pre_format = "isort ."
 format = "black ."
 pre_lint = "task format"
 lint = "task lint_mypy && task lint_pylint"
-lint_mypy = "mypy model_converter server main.py"
-lint_pylint = "pylint model_converter server main.py"
+lint_mypy = "mypy model_generator server main.py"
+lint_pylint = "pylint model_generator server main.py"
 test = "python -m unittest"
-generate = "python -m model_converter.model_converter"
-generate_watch = "python -m model_converter.watcher"
+generate = "python -m model_generator.model_generator"
+generate_watch = "python -m model_generator.watcher"
 
 [tool.poetry.dependencies]
 python = "^3.9"

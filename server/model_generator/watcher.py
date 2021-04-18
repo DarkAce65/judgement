@@ -5,7 +5,7 @@ from pathlib import Path, PurePath
 from watchgod import watch
 from watchgod.watcher import RegExpWatcher
 
-from model_converter.model_converter import MODEL_MODULES, yarn_install
+from model_generator.model_generator import MODEL_MODULES, yarn_install
 
 
 def run_generator(model_modules: list[str]) -> None:
@@ -13,7 +13,7 @@ def run_generator(model_modules: list[str]) -> None:
         [
             "python",
             "-m",
-            "model_converter.model_converter",
+            "model_generator.model_generator",
             "--skip-yarn",
             *[arg for module in model_modules for arg in ("--module", module)],
         ],
