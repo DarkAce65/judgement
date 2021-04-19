@@ -8,4 +8,4 @@ class RoomResponse(CamelModel):
 
 
 class RoomsResponse(CamelModel):
-    rooms: list[RoomResponse] = Field([], title="The available rooms")
+    rooms: list[RoomResponse] = Field(title="The available rooms")
