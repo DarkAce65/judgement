@@ -33,13 +33,10 @@ if __name__ == "__main__":
 
     for module_name in module_names:
         out_filename = (out_dir / module_name).with_suffix(".ts")
-        try:
-            generate_typescript_defs(
-                f"server.models.{module_name}", out_filename, json2ts_path
-            )
+        generate_typescript_defs(
+            f"server.models.{module_name}", out_filename, json2ts_path
+        )
 
-            logger.info(
-                "Wrote interfaces for server.models.%s to %s", module_name, out_filename
-            )
-        except:  # pylint: disable=bare-except
-            logger.exception("Failed to process models in server.models.%s", module_name)
+        logger.info(
+            "Wrote interfaces for server.models.%s to %s", module_name, out_filename
+        )

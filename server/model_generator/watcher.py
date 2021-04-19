@@ -2,12 +2,15 @@ import argparse
 import logging
 import subprocess
 from pathlib import Path, PurePath
+from subprocess import CalledProcessError
 from typing import Optional
 
 from watchgod import watch
 from watchgod.watcher import RegExpWatcher
 
 from model_generator.model_generator import MODEL_MODULES
+
+logger = logging.getLogger(__name__)
 
 
 def run_generator(
@@ -26,7 +29,10 @@ def run_generator(
         for module_name in module_names:
             generator_args.extend(["--module", module_name])
 
-    subprocess.run(generator_args, check=True)
+    try:
+        subprocess.run(generator_args, check=True)
+    except CalledProcessError:
+        logger.exception("Failed to process models in server.models.%s", module_name)
 
 
 if __name__ == "__main__":
