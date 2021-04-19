@@ -139,3 +139,21 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+# Additional ignores for model_converter
+
+# dependencies
+/model_converter/node_modules
+
+# misc
+/model_converter/.DS_Store
+
+/model_converter/npm-debug.log*
+/model_converter/yarn-debug.log*
+/model_converter/yarn-error.log*
+
+# Optional npm cache directory
+/model_converter/.npm
+
+# Optional eslint cache
+/model_converter/.eslintcache
