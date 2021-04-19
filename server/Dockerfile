@@ -57,8 +57,8 @@ RUN apk add --no-cache \
   && chmod -R +x "$POETRY_HOME/bin"
 ENV PATH="$POETRY_HOME/bin:$PATH"
 
-RUN addgroup -g 1000 -S generator \
-  && adduser -u 1000 -S generator -G generator
+RUN addgroup --gid 1000 --system generator \
+  && adduser --uid 1000 --system --disabled-password --ingroup generator --home /generator generator
 USER generator
 
 WORKDIR /server/model_generator

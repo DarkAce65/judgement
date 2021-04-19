@@ -17,10 +17,8 @@ RUN apk add --no-cache \
   && chmod -R +x "$POETRY_HOME/bin"
 ENV PATH="$POETRY_HOME/bin:$PATH"
 
-RUN addgroup -g 1000 -S generator \
-  && adduser -u 1000 -S generator -G generator \
-  && mkdir /generated_types \
-  && chown -R generator /generated_types
+RUN addgroup --gid 1000 --system generator \
+  && adduser --uid 1000 --system --disabled-password --ingroup generator --home /generator generator
 
 USER generator
 
@@ -34,7 +32,7 @@ RUN poetry install --no-dev -E generator --no-interaction
 
 COPY server ./
 
-RUN poetry run python -m model_generator.model_generator --out_dir /generated_types
+RUN poetry run python -m model_generator.model_generator --out_dir /generator/generated_types
 
 # Client builder stage
 FROM node:15 as client_builder
@@ -51,7 +49,7 @@ ENV REACT_APP_API_HOST="$REACT_APP_API_HOST" \
   REACT_APP_API_ROOT="$REACT_APP_API_ROOT"
 
 COPY client ./
-COPY --from=model_generator /generated_types ./generated_types/
+COPY --from=model_generator /generator/generated_types ./generated_types/
 RUN yarn build
 
 # nginx container
