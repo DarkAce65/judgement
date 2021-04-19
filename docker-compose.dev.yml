@@ -5,7 +5,8 @@ services:
     build:
       context: ./server
       target: model_generator
-    command: poetry run python -m model_generator.watcher --out_dir ../client/generated_types
+    environment:
+      GENERATED_TYPES_OUT_DIR: ../client/generated_types
     volumes:
       - ./client:/client
       - ./server:/server

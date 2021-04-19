@@ -71,3 +71,5 @@ WORKDIR /server
 COPY pyproject.toml poetry.lock ./
 RUN poetry install --no-dev -E generator --no-interaction
 COPY . .
+
+CMD ["sh", "-c", "poetry run python -m model_generator.watcher --out_dir \"$GENERATED_TYPES_OUT_DIR\""]
