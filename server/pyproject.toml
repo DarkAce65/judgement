@@ -37,8 +37,8 @@ lint = "task lint_mypy && task lint_pylint"
 lint_mypy = "mypy model_generator server main.py"
 lint_pylint = "pylint model_generator server main.py"
 test = "python -m unittest"
-generate = "python -m model_generator.model_generator"
-generate_watch = "python -m model_generator.watcher"
+generate = "python -m model_generator.model_generator --out_dir ../client/generated_types"
+generate_watch = "python -m model_generator.watcher --out_dir ../client/generated_types"
 
 [tool.poetry.dependencies]
 python = "^3.9"
