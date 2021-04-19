@@ -1,4 +1,5 @@
-# nginx dockerignore
+# Nginx dockerignore
+
 **/.git
 
 /client/node_modules
@@ -14,6 +15,7 @@
 # Optional eslint cache
 /client/.eslintcache
 
+/redis
 /server
 
 .REDIS_PASSWORD
