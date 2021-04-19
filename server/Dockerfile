@@ -10,10 +10,16 @@ ENV PYTHONUNBUFFERED=1 \
 RUN apk add --no-cache \
   curl \
   gcc \
+  git \
   libc-dev \
   make \
-  && (curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -)
+  && (curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -) \
+  && chmod -R +x "$POETRY_HOME/bin"
 ENV PATH="$POETRY_HOME/bin:$PATH"
+
+RUN addgroup -g 1000 -S serveruser \
+  && adduser -u 1000 -S serveruser -G serveruser
+USER serveruser
 
 WORKDIR /server
 EXPOSE "$API_PORT"
