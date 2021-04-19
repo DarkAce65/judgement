@@ -1,10 +1,48 @@
+# Model generator container
+FROM nikolaik/python-nodejs:python3.9-nodejs15-alpine as model_generator
+
+ENV PYTHONUNBUFFERED=1 \
+  PYTHONDONTWRITEBYTECODE=1 \
+  POETRY_VERSION=1.1.4 \
+  POETRY_HOME="/opt/poetry" \
+  POETRY_NO_INTERACTION=1
+
+RUN apk add --no-cache \
+  curl \
+  gcc \
+  git \
+  libc-dev \
+  make \
+  && (curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -) \
+  && chmod -R +x "$POETRY_HOME/bin"
+ENV PATH="$POETRY_HOME/bin:$PATH"
+
+RUN addgroup -g 1000 -S generator \
+  && adduser -u 1000 -S generator -G generator \
+  && mkdir /generated_types \
+  && chown -R generator /generated_types
+
+USER generator
+
+WORKDIR /server/model_generator
+COPY server/model_generator/package.json server/model_generator/yarn.lock ./
+RUN yarn
+
+WORKDIR /server
+COPY server/pyproject.toml server/poetry.lock ./
+RUN poetry install --no-dev -E generator --no-interaction
+
+COPY server ./
+
+RUN poetry run python -m model_generator.model_generator --out_dir /generated_types
+
 # Client builder stage
 FROM node:15 as client_builder
 
 USER node
 WORKDIR /client
 
-COPY ./client/package.json ./client/yarn.lock ./
+COPY client/package.json client/yarn.lock ./
 RUN yarn
 
 ARG REACT_APP_API_HOST
@@ -12,7 +50,8 @@ ARG REACT_APP_API_ROOT
 ENV REACT_APP_API_HOST="$REACT_APP_API_HOST" \
   REACT_APP_API_ROOT="$REACT_APP_API_ROOT"
 
-COPY ./client .
+COPY client ./
+COPY --from=model_generator /generated_types ./generated_types/
 RUN yarn build
 
 # nginx container
@@ -20,5 +59,5 @@ FROM nginx
 
 EXPOSE 80
 
-COPY ./proxy/templates /etc/nginx/templates
-COPY --from=client_builder /client/build /usr/share/nginx/html
+COPY proxy/templates /etc/nginx/templates/
+COPY --from=client_builder /client/build /usr/share/nginx/html/

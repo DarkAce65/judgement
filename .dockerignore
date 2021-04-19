@@ -15,7 +15,11 @@
 # Optional eslint cache
 /client/.eslintcache
 
+/client/.husky
+/client/generated_types
+
 /redis
-/server
+
+/server/model_generator/node_modules
 
 .REDIS_PASSWORD
