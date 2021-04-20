@@ -17,8 +17,8 @@ RUN apk add --no-cache \
   && chmod -R +x "$POETRY_HOME/bin"
 ENV PATH="$POETRY_HOME/bin:$PATH"
 
-RUN addgroup -g 1000 -S serveruser \
-  && adduser -u 1000 -S serveruser -G serveruser
+RUN addgroup --gid 1000 --system serveruser \
+  && adduser --uid 1000 --system --disabled-password --ingroup serveruser --no-create-home serveruser
 USER serveruser
 
 WORKDIR /server
