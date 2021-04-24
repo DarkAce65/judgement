@@ -48,7 +48,7 @@ generate_watch = "python -m model_generator.watcher --out_dir ../client/generate
 python = "^3.9"
 debugpy = { version = "^1.2.1", optional = true }
 fastapi = "^0.63.0"
-pydantic-to-typescript = { git = "https://github.com/phillipdupuis/pydantic-to-typescript.git", rev = "5ffc2a1", optional = true }
+pydantic-to-typescript = { git = "https://github.com/DarkAce65/pydantic-to-typescript.git", rev = "3c6aa14", optional = true }
 pyhumps = "^1.6.1"
 python-socketio = "^5.1.0"
 redis = "^3.5.3"
