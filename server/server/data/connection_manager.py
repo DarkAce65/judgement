@@ -80,8 +80,7 @@ async def propagate_name_change(player_id: str) -> None:
 def add_player_client_to_room(client_id: str, room_id: str) -> None:
     player_id = player_client_mapping.get_player_id_for_client(client_id)
 
-    if not room_manager.get_room(room_id).has_player(player_id):
-        room_manager.add_player_to_room(player_id, room_id)
+    room_manager.add_player_to_room(player_id, room_id)
 
     if client_id in client_id_to_room_id:
         sio.leave_room(client_id, client_id_to_room_id[client_id])
@@ -103,8 +102,8 @@ def remove_player_client_from_room(client_id: str, room_id: str) -> None:
             del client_id_to_room_id[client_id]
 
 
-def disconnect_player_client(player_id: str, client_id: str) -> None:
-    player_client_mapping.remove_pair(player_id, client_id)
+def disconnect_player_client(client_id: str) -> None:
+    player_client_mapping.remove_client_id(client_id)
 
     if client_id in client_id_to_room_id:
         del client_id_to_room_id[client_id]

@@ -4,12 +4,7 @@ from typing import Any, Callable, TypeVar, cast
 
 from socketio.exceptions import ConnectionRefusedError
 
-from server.data import (
-    connection_manager,
-    player_manager,
-    room_manager,
-    socket_messager,
-)
+from server.data import connection_manager, player_manager, socket_messager
 from server.data.player import Player
 from server.models.websocket import StringMessage
 from server.sio_app import sio
@@ -61,10 +56,7 @@ async def connect(sid: str, _environ: dict, auth: dict) -> None:
 
 @sio.on("join_room")
 @require_player
-async def handle_join_room(sid: str, room_id: str, player: Player) -> None:
-    if not room_manager.get_room(room_id).has_player(player.player_id):
-        room_manager.add_player_to_room(player.player_id, room_id)
-
+async def handle_join_room(sid: str, room_id: str) -> None:
     connection_manager.add_player_client_to_room(sid, room_id)
     await socket_messager.emit_players(room_id)
 
@@ -83,10 +75,7 @@ async def handle_message(_sid: str, message: str, player: Player) -> None:
 
 @sio.on("disconnect")
 async def disconnect(sid: str) -> None:
-    session = await sio.get_session(sid)
-    player_id = session["player_id"]
-
-    connection_manager.disconnect_player_client(player_id, sid)
+    connection_manager.disconnect_player_client(sid)
     await sio.emit(
         "client_disconnect", StringMessage(data="Client disconnected: " + sid).dict()
     )
