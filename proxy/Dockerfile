@@ -3,7 +3,7 @@ FROM nikolaik/python-nodejs:python3.9-nodejs15-alpine as model_generator
 
 ENV PYTHONUNBUFFERED=1 \
   PYTHONDONTWRITEBYTECODE=1 \
-  POETRY_VERSION=1.1.4 \
+  POETRY_VERSION=1.1.6 \
   POETRY_HOME="/opt/poetry" \
   POETRY_NO_INTERACTION=1
 
