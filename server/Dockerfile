@@ -18,7 +18,7 @@ RUN apk add --no-cache \
 ENV PATH="$POETRY_HOME/bin:$PATH"
 
 RUN addgroup --gid 1000 --system serveruser \
-  && adduser --uid 1000 --system --disabled-password --ingroup serveruser --no-create-home serveruser
+  && adduser --uid 1000 --system --disabled-password --ingroup serveruser --home /serveruser serveruser
 USER serveruser
 
 WORKDIR /server
@@ -43,7 +43,7 @@ FROM nikolaik/python-nodejs:python3.9-nodejs15-alpine as model_generator
 
 ENV PYTHONUNBUFFERED=1 \
   PYTHONDONTWRITEBYTECODE=1 \
-  POETRY_VERSION=1.1.4 \
+  POETRY_VERSION=1.1.6 \
   POETRY_HOME="/opt/poetry" \
   POETRY_NO_INTERACTION=1
 
