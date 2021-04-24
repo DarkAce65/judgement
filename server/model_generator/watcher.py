@@ -32,7 +32,7 @@ def run_generator(
     try:
         subprocess.run(generator_args, check=True)
     except CalledProcessError:
-        logger.exception("Failed to process models in server.models.%s", module_name)
+        logger.exception("Failed to process models: %s", generator_args)
 
 
 if __name__ == "__main__":
