@@ -13,23 +13,23 @@ import GameSocket from './game/GameSocket';
 
 import './index.less';
 
+const makeErrorMessage = (socket: Socket) => (
+  <>
+    <span>Error connecting to server</span>
+    <Button
+      type="link"
+      onClick={() => {
+        socket.connect();
+      }}
+    >
+      Retry
+    </Button>
+  </>
+);
+
 const initializeGameSocket = () => {
   const { dispatch, getState } = store;
   const playerName = getPlayerName(getState());
-
-  const makeErrorMessage = (socket: Socket) => (
-    <>
-      <span>Error connecting to server</span>
-      <Button
-        type="link"
-        onClick={() => {
-          socket.connect();
-        }}
-      >
-        Retry
-      </Button>
-    </>
-  );
 
   let socketRetries = 0;
   GameSocket.initializeSocket(
@@ -45,9 +45,9 @@ const initializeGameSocket = () => {
       } else {
         socket.disconnect();
         message.error({
+          key: 'socketError',
           content: makeErrorMessage(socket),
           duration: 0,
-          key: 'socketError',
         });
       }
     },

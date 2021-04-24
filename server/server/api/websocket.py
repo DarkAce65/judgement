@@ -6,7 +6,6 @@ from socketio.exceptions import ConnectionRefusedError
 
 from server.data import connection_manager, player_manager, socket_messager
 from server.data.player import Player
-from server.models.websocket import StringMessage
 from server.sio_app import sio
 
 F = TypeVar("F", bound=Callable[..., Any])
@@ -49,9 +48,6 @@ async def connect(client_id: str, _environ: dict, auth: dict) -> None:
     connection_manager.connect_player_client(player_id, client_id)
 
     await sio.save_session(client_id, {"player_id": player_id})
-    await sio.emit(
-        "client_connect", StringMessage(data="Client connected: " + client_id).dict()
-    )
 
 
 @sio.on("join_room")
@@ -61,22 +57,6 @@ async def handle_join_room(client_id: str, room_id: str) -> None:
     await socket_messager.emit_players(room_id)
 
 
-@sio.on("message")
-@require_player
-async def handle_message(_client_id: str, message: str, player: Player) -> None:
-    await sio.send(message, to=player.player_id)
-
-    sender = player.player_id if player.name is None else player.name
-    await sio.send(
-        "broadcast from " + sender,
-        skip_sid=list(connection_manager.get_client_ids_for_player(player.player_id)),
-    )
-
-
 @sio.on("disconnect")
 async def disconnect(client_id: str) -> None:
     connection_manager.disconnect_player_client(client_id)
-    await sio.emit(
-        "client_disconnect",
-        StringMessage(data="Client disconnected: " + client_id).dict(),
-    )
