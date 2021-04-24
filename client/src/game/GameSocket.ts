@@ -79,7 +79,6 @@ class GameSocket {
     }
 
     const namespacedListeners = this.anyListeners[namespace];
-
     if (!namespacedListeners) {
       return;
     }
@@ -140,42 +139,37 @@ class GameSocket {
       return;
     }
 
-    if (event) {
-      if (!namespacedListeners[event]) {
-        return;
-      }
-
-      if (listener) {
-        for (let i = 0; i < namespacedListeners[event].length; i++) {
-          if (namespacedListeners[event][i] === listener) {
-            this.socket.off(event, namespacedListeners[event][i]);
-            namespacedListeners[event].splice(i, 1);
-            if (namespacedListeners[event].length === 0) {
-              delete this.listeners[namespace][event];
-            }
-            break;
-          }
-        }
-      } else {
-        for (const activeListener of namespacedListeners[event]) {
-          this.socket.off(event, activeListener);
-        }
-
-        delete this.listeners[namespace][event];
-      }
-
-      if (Object.keys(this.listeners[namespace]).length === 0) {
-        delete this.listeners[namespace];
-      }
-    } else {
+    if (!event) {
       for (const eventKey in namespacedListeners) {
         if (Object.prototype.hasOwnProperty.call(namespacedListeners, eventKey)) {
-          for (const activeListener of namespacedListeners[eventKey]) {
-            this.socket.off(eventKey, activeListener);
-          }
+          this.offNamespaced(namespace, eventKey);
         }
       }
 
+      delete this.listeners[namespace];
+      return;
+    }
+
+    if (listener) {
+      for (let i = 0; i < namespacedListeners[event].length; i++) {
+        if (namespacedListeners[event][i] === listener) {
+          this.socket.off(event, namespacedListeners[event][i]);
+          namespacedListeners[event].splice(i, 1);
+          if (namespacedListeners[event].length === 0) {
+            delete this.listeners[namespace][event];
+          }
+          break;
+        }
+      }
+    } else {
+      for (const activeListener of namespacedListeners[event]) {
+        this.socket.off(event, activeListener);
+      }
+
+      delete this.listeners[namespace][event];
+    }
+
+    if (Object.keys(namespacedListeners).length === 0) {
       delete this.listeners[namespace];
     }
   }
