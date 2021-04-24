@@ -1,10 +1,25 @@
 import type GameSocketType from './GameSocket';
 
 const mockSocket = {
+  connect: jest
+    .fn(() => {
+      mockSocket.connected = true;
+      mockSocket.disconnected = false;
+    })
+    .mockName('connect'),
+  disconnect: jest
+    .fn(() => {
+      mockSocket.connected = false;
+      mockSocket.disconnected = true;
+    })
+    .mockName('disconnect'),
   on: jest.fn().mockName('on'),
   off: jest.fn().mockName('off'),
   onAny: jest.fn().mockName('onAny'),
   offAny: jest.fn().mockName('offAny'),
+
+  connected: false,
+  disconnected: true,
 };
 
 const onConnectionError = jest.fn();
@@ -22,6 +37,8 @@ describe('GameSocket', () => {
     jest.resetModules();
 
     GameSocket = require('./GameSocket').default;
+    mockSocket.connected = false;
+    mockSocket.disconnected = true;
   });
 
   it('initializes a socket with a reconnect handler', () => {
@@ -270,6 +287,112 @@ describe('GameSocket', () => {
 
       expect(GameSocket['listeners']).toHaveProperty('test-ns2.test_event');
       expect(GameSocket['listeners']['test-ns2']['test_event']).toContain(listener4);
+    });
+  });
+
+  describe('attach', () => {
+    beforeEach(() => {
+      GameSocket.initializeSocket(onConnectionError, resetAttempts);
+
+      jest.clearAllMocks();
+    });
+
+    it('attaches, connecting the socket if not already connected', () => {
+      GameSocket.attach();
+      expect(mockSocket.connect).toBeCalledTimes(1);
+    });
+
+    it('attaches to a connected socket', () => {
+      GameSocket['connect']();
+      jest.clearAllMocks();
+
+      GameSocket.attach();
+      expect(mockSocket.connect).toBeCalledTimes(0);
+    });
+  });
+
+  describe('detach', () => {
+    const anyListener1 = jest.fn();
+    const anyListener2 = jest.fn();
+    const anyListener3 = jest.fn();
+
+    const listener1 = jest.fn();
+    const listener2 = jest.fn();
+    const listener3 = jest.fn();
+    const listener4 = jest.fn();
+
+    beforeEach(() => {
+      GameSocket.initializeSocket(onConnectionError, resetAttempts);
+      GameSocket['connect']();
+
+      jest.clearAllMocks();
+    });
+
+    it('detaches and disconnects from a socket with no listeners', () => {
+      GameSocket.detach('test-ns');
+
+      expect(GameSocket['anyListeners']).toEqual({});
+      expect(GameSocket['listeners']).toEqual({});
+
+      expect(mockSocket.disconnect).toBeCalledTimes(1);
+    });
+
+    it('detaches from a socket with listeners from other namespaces', () => {
+      GameSocket.onAnyNamespaced('test-ns2', anyListener3);
+      GameSocket.onNamespaced('test-ns2', 'test_event', listener4);
+
+      jest.clearAllMocks();
+
+      GameSocket.detach('test-ns');
+
+      expect(GameSocket['anyListeners']).toHaveProperty('test-ns2');
+      expect(GameSocket['anyListeners']['test-ns2']).toContain(anyListener3);
+      expect(GameSocket['listeners']).toHaveProperty('test-ns2.test_event');
+      expect(GameSocket['listeners']['test-ns2']['test_event']).toContain(listener4);
+
+      expect(mockSocket.disconnect).toBeCalledTimes(0);
+    });
+
+    it('detaches and removes listeners from a socket with listeners from the detaching namespace and other namespaces', () => {
+      GameSocket.onAnyNamespaced('test-ns', anyListener1);
+      GameSocket.onAnyNamespaced('test-ns', anyListener2);
+      GameSocket.onNamespaced('test-ns', 'test_event', listener1);
+      GameSocket.onNamespaced('test-ns', 'test_event', listener2);
+      GameSocket.onNamespaced('test-ns', 'test_event2', listener3);
+
+      GameSocket.onAnyNamespaced('test-ns2', anyListener3);
+      GameSocket.onNamespaced('test-ns2', 'test_event', listener4);
+
+      jest.clearAllMocks();
+
+      GameSocket.detach('test-ns');
+
+      expect(GameSocket['anyListeners']).not.toHaveProperty('test-ns');
+      expect(GameSocket['listeners']).not.toHaveProperty('test-ns');
+
+      expect(GameSocket['anyListeners']).toHaveProperty('test-ns2');
+      expect(GameSocket['anyListeners']['test-ns2']).toContain(anyListener3);
+      expect(GameSocket['listeners']).toHaveProperty('test-ns2.test_event');
+      expect(GameSocket['listeners']['test-ns2']['test_event']).toContain(listener4);
+
+      expect(mockSocket.disconnect).toBeCalledTimes(0);
+    });
+
+    it('detaches, removes listeners, and disconnects from a socket with only listeners from the detaching namespace', () => {
+      GameSocket.onAnyNamespaced('test-ns', anyListener1);
+      GameSocket.onAnyNamespaced('test-ns', anyListener2);
+      GameSocket.onNamespaced('test-ns', 'test_event', listener1);
+      GameSocket.onNamespaced('test-ns', 'test_event', listener2);
+      GameSocket.onNamespaced('test-ns', 'test_event2', listener3);
+
+      jest.clearAllMocks();
+
+      GameSocket.detach('test-ns');
+
+      expect(GameSocket['anyListeners']).toEqual({});
+      expect(GameSocket['listeners']).toEqual({});
+
+      expect(mockSocket.disconnect).toBeCalledTimes(1);
     });
   });
 });

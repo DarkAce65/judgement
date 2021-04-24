@@ -36,7 +36,7 @@ class GameSocket {
     return socket;
   }
 
-  static connect(): Socket {
+  private static connect(): Socket {
     if (this.socket === null) {
       throw new Error('Socket not initialized');
     } else if (this.socket.disconnected) {
@@ -47,9 +47,22 @@ class GameSocket {
     return this.socket;
   }
 
-  static disconnect(): void {
+  private static disconnect(): void {
     this.resetConnectionAttempts?.();
     this.socket?.disconnect();
+  }
+
+  static attach(): Socket {
+    return this.connect();
+  }
+
+  static detach(namespace: string): void {
+    this.offAnyNamespaced(namespace);
+    this.offNamespaced(namespace);
+
+    if (Object.keys(this.anyListeners).length === 0 && Object.keys(this.listeners).length === 0) {
+      this.disconnect();
+    }
   }
 
   static onAnyNamespaced(
@@ -172,11 +185,6 @@ class GameSocket {
     if (Object.keys(namespacedListeners).length === 0) {
       delete this.listeners[namespace];
     }
-  }
-
-  static offAllNamespaced(namespace: string) {
-    this.offAnyNamespaced(namespace);
-    this.offNamespaced(namespace);
   }
 }
 
