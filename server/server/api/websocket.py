@@ -2,16 +2,18 @@ import functools
 import inspect
 from typing import Any, Callable, TypeVar, cast
 
-from socketio.exceptions import ConnectionRefusedError
+from socketio.exceptions import (  # pylint: disable=redefined-builtin
+    ConnectionRefusedError,
+)
 
 from server.data import connection_manager, player_manager, socket_messager
 from server.data.player import Player
 from server.sio_app import sio
 
-F = TypeVar("F", bound=Callable[..., Any])
+Fn = TypeVar("Fn", bound=Callable[..., Any])
 
 
-def require_player(socket_handler: F) -> F:
+def require_player(socket_handler: Fn) -> Fn:
     @functools.wraps(socket_handler)
     async def wrapper(client_id: str, *args: Any, **kwargs: Any) -> Any:
         session = await sio.get_session(client_id)
@@ -35,7 +37,7 @@ def require_player(socket_handler: F) -> F:
 
         return await socket_handler(client_id, *args, **kwargs)
 
-    return cast(F, wrapper)
+    return cast(Fn, wrapper)
 
 
 @sio.on("connect")

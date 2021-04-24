@@ -22,9 +22,10 @@ exclude = '''
 
 [tool.pylint.messages_control]
 disable = [
-  "missing-module-docstring",
   "missing-class-docstring",
   "missing-function-docstring",
+  "missing-module-docstring",
+  "too-few-public-methods",
   "unsubscriptable-object"
 ]
 extension-pkg-whitelist = ["pydantic"]
