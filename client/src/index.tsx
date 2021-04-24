@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { Button, message } from 'antd';
 import { Provider } from 'react-redux';
+import { Socket } from 'socket.io-client';
 
 import App from './components/App';
 import { getPlayerName, setPlayerName } from './data/playerSlice';
@@ -16,13 +17,13 @@ const initializeGameSocket = () => {
   const { dispatch, getState } = store;
   const playerName = getPlayerName(getState());
 
-  const errorMessage = (
+  const makeErrorMessage = (socket: Socket) => (
     <>
       <span>Error connecting to server</span>
       <Button
         type="link"
         onClick={() => {
-          GameSocket.connect();
+          socket.connect();
         }}
       >
         Retry
@@ -42,9 +43,9 @@ const initializeGameSocket = () => {
           })
           .catch();
       } else {
-        GameSocket.disconnect();
+        socket.disconnect();
         message.error({
-          content: errorMessage,
+          content: makeErrorMessage(socket),
           duration: 0,
           key: 'socketError',
         });
