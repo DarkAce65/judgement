@@ -65,7 +65,7 @@ class GameSocket {
       this.anyListeners[namespace] = [];
     }
 
-    this.socket!.onAny(listener);
+    this.socket.onAny(listener);
     this.anyListeners[namespace].push(listener);
   }
 
@@ -114,14 +114,14 @@ class GameSocket {
       throw new Error('Socket not initialized');
     }
 
+    this.socket.on(event, listener);
+
     if (!this.listeners[namespace]) {
       this.listeners[namespace] = {};
     }
     if (!this.listeners[namespace][event]) {
       this.listeners[namespace][event] = [];
     }
-
-    this.socket!.on(event, listener);
     this.listeners[namespace][event].push(listener);
   }
 
@@ -136,12 +136,15 @@ class GameSocket {
     }
 
     const namespacedListeners = this.listeners[namespace];
-
     if (!namespacedListeners) {
       return;
     }
 
     if (event) {
+      if (!namespacedListeners[event]) {
+        return;
+      }
+
       if (listener) {
         for (let i = 0; i < namespacedListeners[event].length; i++) {
           if (namespacedListeners[event][i] === listener) {
@@ -159,6 +162,10 @@ class GameSocket {
         }
 
         delete this.listeners[namespace][event];
+      }
+
+      if (Object.keys(this.listeners[namespace]).length === 0) {
+        delete this.listeners[namespace];
       }
     } else {
       for (const eventKey in namespacedListeners) {
