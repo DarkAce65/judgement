@@ -19,16 +19,16 @@ const Room = ({ roomId }: Props) => {
   const [players, setPlayers] = useState<string[]>([]);
 
   useMountEffect(() => {
-    const socket = GameSocket.connect();
+    const { socket, namespace } = GameSocket.attach();
 
     socket.emit('join_room', roomId);
 
-    GameSocket.onNamespaced(Room.name, 'players', (data: PlayersMessage) => {
+    GameSocket.onNamespaced(namespace, 'players', (data: PlayersMessage) => {
       setPlayers(data.players);
     });
 
     return () => {
-      GameSocket.offAllNamespaced(Room.name);
+      GameSocket.detach(namespace);
     };
   });
 

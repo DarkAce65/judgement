@@ -1,4 +1,5 @@
 import { Socket } from 'socket.io-client';
+import { v4 as uuid } from 'uuid';
 
 import { buildSocket } from '../api/client';
 import getCookie from '../utils/getCookie';
@@ -52,8 +53,8 @@ class GameSocket {
     this.socket?.disconnect();
   }
 
-  static attach(): Socket {
-    return this.connect();
+  static attach(): { socket: Socket; namespace: string } {
+    return { socket: this.connect(), namespace: uuid() };
   }
 
   static detach(namespace: string): void {
