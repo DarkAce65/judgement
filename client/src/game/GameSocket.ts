@@ -85,6 +85,8 @@ class GameSocket {
   ): void {
     if (this.socket === null) {
       throw new Error('Socket not initialized');
+    } else if (!this.attachedNamespaces.has(namespace)) {
+      throw new Error('Unknown namespace - have you called GameSocket.attach()?');
     }
 
     if (!this.anyListeners[namespace]) {
@@ -102,6 +104,8 @@ class GameSocket {
   ): void {
     if (this.socket === null) {
       throw new Error('Socket not initialized');
+    } else if (!this.attachedNamespaces.has(namespace)) {
+      throw new Error('Unknown namespace - have you called GameSocket.attach()?');
     }
 
     const namespacedListeners = this.anyListeners[namespace];
@@ -137,6 +141,8 @@ class GameSocket {
   ) {
     if (this.socket === null) {
       throw new Error('Socket not initialized');
+    } else if (!this.attachedNamespaces.has(namespace)) {
+      throw new Error('Unknown namespace - have you called GameSocket.attach()?');
     }
 
     this.socket.on(event, listener);
@@ -158,6 +164,8 @@ class GameSocket {
   ) {
     if (this.socket === null) {
       throw new Error('Socket not initialized');
+    } else if (!this.attachedNamespaces.has(namespace)) {
+      throw new Error('Unknown namespace - have you called GameSocket.attach()?');
     }
 
     const namespacedListeners = this.listeners[namespace];
