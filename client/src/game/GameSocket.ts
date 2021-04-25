@@ -5,7 +5,9 @@ import { buildSocket } from '../api/client';
 import getCookie from '../utils/getCookie';
 
 class GameSocket {
-  static socket: Socket | null = null;
+  private static socket: Socket | null = null;
+
+  private static attachedNamespaces: Set<string> = new Set();
 
   private static resetConnectionAttempts?: () => void;
 
@@ -25,6 +27,7 @@ class GameSocket {
       autoConnect: false,
     });
     this.socket = socket;
+    this.attachedNamespaces = new Set();
 
     if (onConnectionError) {
       socket.on('connect_error', (error: Error) => onConnectionError(error, socket));
@@ -54,14 +57,23 @@ class GameSocket {
   }
 
   static attach(): { socket: Socket; namespace: string } {
-    return { socket: this.connect(), namespace: uuid() };
+    const namespace = uuid();
+
+    this.attachedNamespaces.add(namespace);
+
+    return { socket: this.connect(), namespace };
   }
 
   static detach(namespace: string): void {
     this.offAnyNamespaced(namespace);
     this.offNamespaced(namespace);
+    this.attachedNamespaces.delete(namespace);
 
-    if (Object.keys(this.anyListeners).length === 0 && Object.keys(this.listeners).length === 0) {
+    if (
+      this.attachedNamespaces.size === 0 &&
+      Object.keys(this.anyListeners).length === 0 &&
+      Object.keys(this.listeners).length === 0
+    ) {
       this.disconnect();
     }
   }
