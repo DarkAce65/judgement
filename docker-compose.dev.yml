@@ -10,7 +10,7 @@ services:
     volumes:
       - ./client:/client
       - ./server:/server
-      - /server/model_generator/node_modules/
+      - generator_node_modules:/server/model_generator/node_modules/
 
   client:
     build: ./client
@@ -23,7 +23,7 @@ services:
       - 3000:3000
     volumes:
       - ./client:/client
-      - /client/node_modules/
+      - client_node_modules:/client/node_modules/
 
   redis:
     build: ./redis
@@ -58,3 +58,7 @@ services:
 secrets:
   redis_password:
     file: .REDIS_PASSWORD
+
+volumes:
+  generator_node_modules:
+  client_node_modules:
