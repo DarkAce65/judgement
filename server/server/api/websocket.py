@@ -59,6 +59,12 @@ async def handle_join_room(client_id: str, room_id: str) -> None:
     await socket_messager.emit_players(room_id)
 
 
+@sio.on("leave_room")
+@require_player
+async def handle_leave_room(client_id: str, room_id: str) -> None:
+    connection_manager.remove_player_client_from_room(client_id, room_id)
+
+
 @sio.on("disconnect")
 async def disconnect(client_id: str) -> None:
     connection_manager.disconnect_player_client(client_id)

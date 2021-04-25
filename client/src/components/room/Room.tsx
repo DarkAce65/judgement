@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { PageHeader, Typography } from 'antd';
+import { PageHeader, Space, Typography } from 'antd';
 import { useHistory } from 'react-router-dom';
 
 import { PlayersMessage } from '../../../generated_types/websocket';
@@ -8,6 +8,8 @@ import GameSocket from '../../game/GameSocket';
 import useGameSocket from '../../game/useGameSocket';
 import getCookie from '../../utils/getCookie';
 import PlayerNameInput from '../PlayerNameInput';
+
+import LeaveRoomButton from './LeaveRoomButton';
 
 interface Props {
   roomId: string;
@@ -48,7 +50,10 @@ const Room = ({ roomId }: Props) => {
       {players.map((player, index) => (
         <Typography.Paragraph key={index}>{player}</Typography.Paragraph>
       ))}
-      <PlayerNameInput />
+      <Space direction="vertical" style={{ width: '100%' }}>
+        <PlayerNameInput />
+        <LeaveRoomButton roomId={roomId} />
+      </Space>
     </PageHeader>
   );
 };
