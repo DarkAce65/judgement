@@ -1,12 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { PageHeader, Typography } from 'antd';
 import { useHistory } from 'react-router-dom';
 
 import { PlayersMessage } from '../../../generated_types/websocket';
 import GameSocket from '../../game/GameSocket';
+import useGameSocket from '../../game/useGameSocket';
 import getCookie from '../../utils/getCookie';
-import useMountEffect from '../../utils/useMountEffect';
 import PlayerNameInput from '../PlayerNameInput';
 
 interface Props {
@@ -17,20 +17,25 @@ const Room = ({ roomId }: Props) => {
   const history = useHistory();
 
   const [players, setPlayers] = useState<string[]>([]);
+  const { socket, namespace } = useGameSocket();
 
-  useMountEffect(() => {
-    const { socket, namespace } = GameSocket.attach();
+  useEffect(() => {
+    if (socket === null) {
+      return;
+    }
 
     socket.emit('join_room', roomId);
+  }, [roomId, socket]);
+
+  useEffect(() => {
+    if (namespace === null) {
+      return;
+    }
 
     GameSocket.onNamespaced(namespace, 'players', (data: PlayersMessage) => {
       setPlayers(data.players);
     });
-
-    return () => {
-      GameSocket.detach(namespace);
-    };
-  });
+  }, [namespace]);
 
   return (
     <PageHeader
