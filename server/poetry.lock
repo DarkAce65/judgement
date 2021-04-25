@@ -8,11 +8,11 @@ python-versions = "*"
 
 [[package]]
 name = "astroid"
-version = "2.5.3"
+version = "2.5.5"
 description = "An abstract syntax tree for Python with inference support."
 category = "dev"
 optional = false
-python-versions = ">=3.6"
+python-versions = "~=3.6"
 
 [package.dependencies]
 lazy-object-proxy = ">=1.4.0"
@@ -226,9 +226,9 @@ pydantic = "*"
 
 [package.source]
 type = "git"
-url = "https://github.com/phillipdupuis/pydantic-to-typescript.git"
-reference = "5ffc2a1"
-resolved_reference = "5ffc2a1f30e27839d1c3e6a2da1dce108d51f86c"
+url = "https://github.com/DarkAce65/pydantic-to-typescript.git"
+reference = "3c6aa14"
+resolved_reference = "3c6aa142eb6488a77189ba9871f33a71474d6dd5"
 
 [[package]]
 name = "pyhumps"
@@ -240,21 +240,18 @@ python-versions = "*"
 
 [[package]]
 name = "pylint"
-version = "2.7.4"
+version = "2.8.0"
 description = "python code static checker"
 category = "dev"
 optional = false
 python-versions = "~=3.6"
 
 [package.dependencies]
-astroid = ">=2.5.2,<2.7"
+astroid = ">=2.5.4,<2.7"
 colorama = {version = "*", markers = "sys_platform == \"win32\""}
 isort = ">=4.2.5,<6"
 mccabe = ">=0.6,<0.7"
 toml = ">=0.7.1"
-
-[package.extras]
-docs = ["sphinx (==3.5.1)", "python-docs-theme (==2020.12)"]
 
 [[package]]
 name = "python-dotenv"
@@ -436,7 +433,7 @@ generator = ["pydantic-to-typescript", "watchgod"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "8c3873a84309e20a25099293eb46269707ed0443a61f563291176fbaa6aee569"
+content-hash = "090ec5271f6ebae403af92be0d0e2837645c480d9baf46764c6a45390c9e8165"
 
 [metadata.files]
 appdirs = [
@@ -444,8 +441,8 @@ appdirs = [
     {file = "appdirs-1.4.4.tar.gz", hash = "sha256:7d5d0167b2b1ba821647616af46a749d1c653740dd0d2415100fe26e27afdf41"},
 ]
 astroid = [
-    {file = "astroid-2.5.3-py3-none-any.whl", hash = "sha256:bea3f32799fbb8581f58431c12591bc20ce11cbc90ad82e2ea5717d94f2080d5"},
-    {file = "astroid-2.5.3.tar.gz", hash = "sha256:ad63b8552c70939568966811a088ef0bc880f99a24a00834abd0e3681b514f91"},
+    {file = "astroid-2.5.5-py3-none-any.whl", hash = "sha256:b8823e7af8044b97b4b0c1bad06b980e4ce5519fee6d3d77ea5333a2b2d61d9a"},
+    {file = "astroid-2.5.5.tar.gz", hash = "sha256:0f156ea0feec7fb78fd035d041a047b37f2aae9345d7f7960670bcd961182f77"},
 ]
 bidict = [
     {file = "bidict-0.21.2-py2.py3-none-any.whl", hash = "sha256:929d056e8d0d9b17ceda20ba5b24ac388e2a4d39802b87f9f4d3f45ecba070bf"},
@@ -668,8 +665,8 @@ pyhumps = [
     {file = "pyhumps-1.6.1.tar.gz", hash = "sha256:01612603c5ad73a407299d806d30708a3935052276fdd93776953bccc0724e0a"},
 ]
 pylint = [
-    {file = "pylint-2.7.4-py3-none-any.whl", hash = "sha256:209d712ec870a0182df034ae19f347e725c1e615b2269519ab58a35b3fcbbe7a"},
-    {file = "pylint-2.7.4.tar.gz", hash = "sha256:bd38914c7731cdc518634a8d3c5585951302b6e2b6de60fbb3f7a0220e21eeee"},
+    {file = "pylint-2.8.0-py3-none-any.whl", hash = "sha256:a01cd675eccf6e25b3bdb42be184eb46aaf89187d612ba0fb5f93328ed6b0fd5"},
+    {file = "pylint-2.8.0.tar.gz", hash = "sha256:082a6d461b54f90eea49ca90fff4ee8b6e45e8029e5dbd72f6107ef84f3779c0"},
 ]
 python-dotenv = [
     {file = "python-dotenv-0.17.0.tar.gz", hash = "sha256:471b782da0af10da1a80341e8438fca5fadeba2881c54360d5fd8d03d03a4f4a"},
