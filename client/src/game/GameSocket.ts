@@ -1,8 +1,8 @@
+import Cookies from 'js-cookie';
 import { Socket } from 'socket.io-client';
 import { v4 as uuid } from 'uuid';
 
 import { buildSocket } from '../api/client';
-import getCookie from '../utils/getCookie';
 
 class GameSocket {
   private static socket: Socket | null = null;
@@ -23,7 +23,7 @@ class GameSocket {
     resetConnectionAttempts?: () => void
   ): Socket {
     const socket = buildSocket({
-      auth: (auth) => auth({ player_id: getCookie('player_id') }),
+      auth: (auth) => auth({ player_id: Cookies.get('player_id') }),
       autoConnect: false,
     });
     this.socket = socket;

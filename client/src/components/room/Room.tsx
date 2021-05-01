@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 
 import { PageHeader, Space, Typography } from 'antd';
+import Cookies from 'js-cookie';
 import { useHistory } from 'react-router-dom';
 
 import { PlayersMessage } from '../../../generated_types/websocket';
 import GameSocket from '../../game/GameSocket';
 import useGameSocket from '../../game/useGameSocket';
-import getCookie from '../../utils/getCookie';
 import PlayerNameInput from '../PlayerNameInput';
 
 import LeaveRoomButton from './LeaveRoomButton';
@@ -46,7 +46,7 @@ const Room = ({ roomId }: Props) => {
         history.push('/');
       }}
     >
-      <Typography.Paragraph>{getCookie('player_id')}</Typography.Paragraph>
+      <Typography.Paragraph>{Cookies.get('player_id')}</Typography.Paragraph>
       {players.map((player, index) => (
         <Typography.Paragraph key={index}>{player}</Typography.Paragraph>
       ))}
