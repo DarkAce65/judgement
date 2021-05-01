@@ -9,7 +9,7 @@ import { Socket } from 'socket.io-client';
 import App from './components/App';
 import { getPlayerName, setPlayerName } from './data/playerSlice';
 import store from './data/store';
-import GameSocket from './game/GameSocket';
+import GameSocket, { isConnectionError } from './game/GameSocket';
 
 import './index.less';
 
@@ -28,14 +28,14 @@ const makeErrorMessage = (socket: Socket) => (
 );
 
 const initializeGameSocket = () => {
-  const { dispatch, getState } = store;
-  const playerName = getPlayerName(getState());
-
   let socketRetries = 0;
   GameSocket.initializeSocket(
-    (error, socket) => {
-      if (socketRetries < 3 && error.message === 'unknown_player_id') {
-        dispatch(setPlayerName(playerName || ''))
+    (socket, error) => {
+      if (socketRetries < 3 && isConnectionError(error)) {
+        const { dispatch, getState } = store;
+        const playerName = getPlayerName(getState());
+
+        dispatch(setPlayerName(playerName))
           .then(unwrapResult)
           .then(() => {
             socket.connect();

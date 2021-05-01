@@ -13,12 +13,11 @@ const initialState: PlayerState = {
   playerName: localStorage.getItem('playerName'),
 };
 
-export const setPlayerName = createAsyncThunk<string, string, { state: RootState }>(
+export const setPlayerName = createAsyncThunk<string | null, string | null, { state: RootState }>(
   'player/setPlayerName',
   async (playerName) => {
-    const body: EnsurePlayerRequest = { playerName };
+    const body: EnsurePlayerRequest = { playerName: playerName || undefined };
     await fetchAPI('/player', { method: 'PUT', body: JSON.stringify(body) });
-    localStorage.setItem('playerName', playerName);
 
     return playerName;
   }
@@ -29,9 +28,18 @@ export const playerSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(setPlayerName.fulfilled, (state, action: PayloadAction<string>) => {
-      state.playerName = action.payload;
-    });
+    builder.addCase(
+      setPlayerName.fulfilled,
+      (state, { payload: playerName }: PayloadAction<string | null>) => {
+        if (playerName) {
+          localStorage.setItem('playerName', playerName);
+        } else {
+          localStorage.removeItem('playerName');
+        }
+
+        state.playerName = playerName;
+      }
+    );
   },
 });
 

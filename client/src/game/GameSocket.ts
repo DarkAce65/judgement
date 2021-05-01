@@ -4,6 +4,13 @@ import { v4 as uuid } from 'uuid';
 
 import { buildSocket } from '../api/client';
 
+interface ConnectionError extends Error {
+  message: 'unknown_player_id';
+}
+
+export const isConnectionError = (error: Error): error is ConnectionError =>
+  error.message === 'unknown_player_id';
+
 class GameSocket {
   private static socket: Socket | null = null;
 
@@ -19,7 +26,7 @@ class GameSocket {
   } = {};
 
   static initializeSocket(
-    onConnectionError?: (error: Error, socket: Socket) => void,
+    onConnectionError?: (socket: Socket, error: Error) => void,
     resetConnectionAttempts?: () => void
   ): Socket {
     const socket = buildSocket({
@@ -30,7 +37,7 @@ class GameSocket {
     this.attachedNamespaces = new Set();
 
     if (onConnectionError) {
-      socket.on('connect_error', (error: Error) => onConnectionError(error, socket));
+      socket.on('connect_error', (error: Error) => onConnectionError(socket, error));
     }
     if (resetConnectionAttempts) {
       this.resetConnectionAttempts = resetConnectionAttempts;

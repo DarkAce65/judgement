@@ -11,13 +11,7 @@ const RoomContainer = () => {
   const { roomId } = useParams<{ roomId: string }>();
 
   const { status, response } = useFetch(
-    [
-      `/rooms/${roomId}/exists`,
-      {
-        method: 'HEAD',
-        additionalSuccessStatusCodes: [404],
-      },
-    ],
+    [`/rooms/${roomId}/exists`, { method: 'HEAD', additionalSuccessStatusCodes: [404] }],
     { fetchOnMount: true }
   );
 
