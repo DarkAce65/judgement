@@ -2,26 +2,25 @@ import { useCallback, useState } from 'react';
 
 import { ArrowRightOutlined } from '@ant-design/icons';
 import { unwrapResult } from '@reduxjs/toolkit';
-import { Button, Input, message } from 'antd';
+import { Button, Form, Input, message } from 'antd';
 
-import { ensurePlayer, getPlayerName } from '../data/playerSlice';
+import { ensurePlayer, getEnsurePlayerFetchStatus, getPlayerName } from '../data/playerSlice';
 import { useAppDispatch, useAppSelector } from '../data/reduxHooks';
 
 const PlayerNameInput = () => {
   const dispatch = useAppDispatch();
 
   const playerName = useAppSelector(getPlayerName);
+  const ensurePlayerFetchStatus = useAppSelector(getEnsurePlayerFetchStatus);
   const [stagedPlayerName, setStagedPlayerName] = useState(() => playerName || '');
-  const [loading, setLoading] = useState(false);
 
-  const isValid = stagedPlayerName.length > 0 && playerName !== stagedPlayerName;
+  const isValid = stagedPlayerName.length >= 1;
+  const canUpdate = playerName !== stagedPlayerName && isValid;
 
   const handlePlayerNameChange = useCallback(() => {
-    if (!isValid) {
+    if (!canUpdate) {
       return;
     }
-
-    setLoading(true);
 
     dispatch(ensurePlayer(stagedPlayerName))
       .then(unwrapResult)
@@ -30,30 +29,33 @@ const PlayerNameInput = () => {
       })
       .catch(() => {
         message.error('Failed to set name');
-      })
-      .finally(() => {
-        setLoading(false);
       });
-  }, [dispatch, isValid, stagedPlayerName]);
+  }, [dispatch, canUpdate, stagedPlayerName]);
 
   return (
-    <Input.Group compact={true} size="large" style={{ display: 'flex' }}>
-      <Input
-        value={stagedPlayerName}
-        onChange={({ target: { value } }) => {
-          setStagedPlayerName(value);
-        }}
-        onPressEnter={handlePlayerNameChange}
-      />
-      <Button
-        icon={<ArrowRightOutlined />}
-        size="large"
-        loading={loading ? { delay: 100 } : false}
-        disabled={!isValid}
-        onClick={handlePlayerNameChange}
-        style={{ flexShrink: 0 }}
-      />
-    </Input.Group>
+    <Form.Item
+      validateStatus={isValid ? 'success' : 'error'}
+      help={!isValid && 'Name must be at least one character'}
+    >
+      <Input.Group compact={true} size="large" style={{ display: 'flex' }}>
+        <Input
+          value={stagedPlayerName}
+          placeholder="Enter your name"
+          onChange={({ target: { value } }) => {
+            setStagedPlayerName(value);
+          }}
+          onPressEnter={handlePlayerNameChange}
+        />
+        <Button
+          icon={<ArrowRightOutlined />}
+          size="large"
+          loading={ensurePlayerFetchStatus === 'pending'}
+          disabled={!canUpdate}
+          onClick={handlePlayerNameChange}
+          style={{ flexShrink: 0 }}
+        />
+      </Input.Group>
+    </Form.Item>
   );
 };
 
