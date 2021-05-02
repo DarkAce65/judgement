@@ -3,6 +3,7 @@ import { Button, Result, Spin } from 'antd';
 import { useHistory, useParams } from 'react-router-dom';
 
 import useFetch from '../../api/useFetch';
+import withPlayerName from '../SetPlayerNamePage';
 
 import Room from './Room';
 
@@ -55,4 +56,4 @@ const RoomContainer = () => {
   );
 };
 
-export default RoomContainer;
+export default withPlayerName(RoomContainer);
