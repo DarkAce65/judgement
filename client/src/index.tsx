@@ -7,7 +7,7 @@ import { Provider } from 'react-redux';
 import { Socket } from 'socket.io-client';
 
 import App from './components/App';
-import { getPlayerName, setPlayerName } from './data/playerSlice';
+import { ensurePlayer, getPlayerName } from './data/playerSlice';
 import store from './data/store';
 import GameSocket, { isConnectionError } from './game/GameSocket';
 
@@ -35,7 +35,7 @@ const initializeGameSocket = () => {
         const { dispatch, getState } = store;
         const playerName = getPlayerName(getState());
 
-        dispatch(setPlayerName(playerName))
+        dispatch(ensurePlayer(playerName))
           .then(unwrapResult)
           .then(() => {
             socket.connect();

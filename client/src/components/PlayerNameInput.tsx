@@ -4,7 +4,7 @@ import { ArrowRightOutlined } from '@ant-design/icons';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { Button, Input, message } from 'antd';
 
-import { getPlayerName, setPlayerName } from '../data/playerSlice';
+import { ensurePlayer, getPlayerName } from '../data/playerSlice';
 import { useAppDispatch, useAppSelector } from '../data/reduxHooks';
 
 const PlayerNameInput = () => {
@@ -23,7 +23,7 @@ const PlayerNameInput = () => {
 
     setLoading(true);
 
-    dispatch(setPlayerName(stagedPlayerName))
+    dispatch(ensurePlayer(stagedPlayerName))
       .then(unwrapResult)
       .then(() => {
         message.success('Updated name');
