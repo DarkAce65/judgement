@@ -1,4 +1,4 @@
-import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { PayloadAction, createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 
 import { EnsurePlayerRequest } from '../../generated_types/requests';
 import { RoomResponse } from '../../generated_types/responses';
@@ -14,6 +14,10 @@ interface RoomState {
 const initialState: RoomState = {
   roomId: null,
 };
+
+const getRoomState = (state: RootState): RoomState => state.room;
+
+export const getRoomId = createSelector([getRoomState], (state): string | null => state.roomId);
 
 export const createRoom = createAsyncThunk<string, void, { state: RootState }>(
   'room/createRoom',
@@ -56,7 +60,5 @@ export const roomSlice = createSlice({
     });
   },
 });
-
-export const getRoomId = (state: RootState): string | null => state.room.roomId;
 
 export default roomSlice.reducer;

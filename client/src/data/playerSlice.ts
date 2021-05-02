@@ -1,17 +1,32 @@
-import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { PayloadAction, createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 
 import { EnsurePlayerRequest } from '../../generated_types/requests';
+import { FetchStatus } from '../api/FetchStatus';
 import { fetchAPI } from '../api/client';
 
 import type { RootState } from './store';
 
 interface PlayerState {
+  ensurePlayerStatus: FetchStatus;
   playerName: string | null;
 }
 
 const initialState: PlayerState = {
+  ensurePlayerStatus: 'uninitialized',
   playerName: localStorage.getItem('playerName'),
 };
+
+const getPlayerState = (state: RootState): PlayerState => state.player;
+
+export const getEnsurePlayerFetchStatus = createSelector(
+  [getPlayerState],
+  (state): FetchStatus => state.ensurePlayerStatus
+);
+
+export const getPlayerName = createSelector(
+  [getPlayerState],
+  (state): string | null => state.playerName
+);
 
 export const ensurePlayer = createAsyncThunk<string | null, string | null, { state: RootState }>(
   'player/ensurePlayer',
@@ -20,7 +35,8 @@ export const ensurePlayer = createAsyncThunk<string | null, string | null, { sta
     await fetchAPI('/player', { method: 'PUT', body: JSON.stringify(body) });
 
     return playerName;
-  }
+  },
+  { condition: (playerName, { getState }) => getEnsurePlayerFetchStatus(getState()) !== 'pending' }
 );
 
 export const playerSlice = createSlice({
@@ -28,21 +44,27 @@ export const playerSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(
-      ensurePlayer.fulfilled,
-      (state, { payload: playerName }: PayloadAction<string | null>) => {
-        if (playerName) {
-          localStorage.setItem('playerName', playerName);
-        } else {
-          localStorage.removeItem('playerName');
-        }
+    builder
+      .addCase(ensurePlayer.pending, (state) => {
+        state.ensurePlayerStatus = 'pending';
+      })
+      .addCase(
+        ensurePlayer.fulfilled,
+        (state, { payload: playerName }: PayloadAction<string | null>) => {
+          if (playerName) {
+            localStorage.setItem('playerName', playerName);
+          } else {
+            localStorage.removeItem('playerName');
+          }
 
-        state.playerName = playerName;
-      }
-    );
+          state.playerName = playerName;
+          state.ensurePlayerStatus = 'succeeded';
+        }
+      )
+      .addCase(ensurePlayer.rejected, (state) => {
+        state.ensurePlayerStatus = 'failed';
+      });
   },
 });
-
-export const getPlayerName = (state: RootState): string | null => state.player.playerName;
 
 export default playerSlice.reducer;
