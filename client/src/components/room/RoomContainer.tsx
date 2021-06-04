@@ -1,27 +1,27 @@
-import { LoadingOutlined } from '@ant-design/icons';
-import { Button, Result, Spin } from 'antd';
-import { useHistory, useParams } from 'react-router-dom';
+import { Button, Result } from 'antd';
+import { useHistory, useLocation, useParams } from 'react-router-dom';
 
 import useFetch from '../../api/useFetch';
-import withPlayerName from '../SetPlayerNamePage';
+import ErrorPage from '../ErrorPage';
+import LoadingPage from '../LoadingPage';
+import { LocationState } from '../routerState';
 
 import Room from './Room';
 
 const RoomContainer = () => {
   const history = useHistory();
+  const location = useLocation<LocationState>();
   const { roomId } = useParams<{ roomId: string }>();
 
   const { status, response } = useFetch(
     [`/rooms/${roomId}/exists`, { method: 'HEAD', additionalSuccessStatusCodes: [404] }],
-    { fetchOnMount: true }
+    { fetchOnMount: true, skip: location.state && location.state.createdGame }
   );
 
-  if (status === 'uninitialized' || status === 'pending') {
-    return (
-      <div style={{ textAlign: 'center', padding: 100 }}>
-        <Spin size="large" indicator={<LoadingOutlined />} />
-      </div>
-    );
+  if (location.state && location.state.createdGame) {
+    return <Room roomId={roomId} />;
+  } else if (status === 'uninitialized' || status === 'pending') {
+    return <LoadingPage />;
   } else if (status === 'succeeded' && response) {
     switch (response.status) {
       case 204:
@@ -42,18 +42,7 @@ const RoomContainer = () => {
     }
   }
 
-  return (
-    <Result
-      status="error"
-      title="Error"
-      subTitle="An error occurred, please refresh the page or try again later."
-      extra={
-        <Button type="primary" onClick={() => history.push('/')}>
-          Go Home
-        </Button>
-      }
-    />
-  );
+  return <ErrorPage />;
 };
 
-export default withPlayerName(RoomContainer);
+export default RoomContainer;

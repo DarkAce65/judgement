@@ -9,6 +9,7 @@ import { PLAYER_ID_COOKIE } from '../../constants';
 import GameSocket from '../../game/GameSocket';
 import useGameSocket from '../../game/useGameSocket';
 import PlayerNameInput from '../PlayerNameInput';
+import withPlayerName from '../SetPlayerNamePage';
 
 import LeaveRoomButton from './LeaveRoomButton';
 
@@ -59,4 +60,4 @@ const Room = ({ roomId }: Props) => {
   );
 };
 
-export default Room;
+export default withPlayerName(Room);
