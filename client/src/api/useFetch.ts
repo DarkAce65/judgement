@@ -8,6 +8,7 @@ import { fetchAPI } from './client';
 interface FetchOptions {
   fetchOnMount?: boolean;
   fetchOnArgsChange?: boolean;
+  skip?: boolean;
 }
 
 interface FetchResponse {
@@ -21,7 +22,7 @@ interface FetchResponse {
 
 const useFetch = (
   fetchArgs: Parameters<typeof fetchAPI>,
-  { fetchOnMount = false, fetchOnArgsChange = false }: FetchOptions = {}
+  { fetchOnMount = false, fetchOnArgsChange = false, skip = false }: FetchOptions = {}
 ): FetchResponse => {
   const [status, setStatus] = useState<FetchStatus>('uninitialized');
   const [response, setResponse] = useState<Response | null>(null);
@@ -48,6 +49,10 @@ const useFetch = (
   }, [fetchArgs]);
 
   useEffect(() => {
+    if (skip) {
+      return;
+    }
+
     const isFirstRun = firstRun.current;
     const isSame = previousArgs.current.every((arg, index) => isEqual(arg, fetchArgs[index]));
 
@@ -57,7 +62,7 @@ const useFetch = (
     if ((fetchOnMount && isFirstRun) || (fetchOnArgsChange && !isSame)) {
       triggerFetch();
     }
-  }, [fetchArgs, fetchOnArgsChange, fetchOnMount, triggerFetch]);
+  }, [skip, fetchArgs, fetchOnArgsChange, fetchOnMount, triggerFetch]);
 
   return { status, response, error, triggerFetch };
 };
