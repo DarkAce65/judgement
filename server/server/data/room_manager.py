@@ -20,17 +20,13 @@ def get_room(room_id: str) -> Room:
     return rooms[room_id]
 
 
-def create_room(host_id: str) -> Room:
-    player = player_manager.get_player(host_id)
-
+def create_room() -> Room:
     room_id = Room.generate_id()
     while room_id in rooms:
         room_id = Room.generate_id()
 
-    room = Room(room_id, host_id)
+    room = Room(room_id)
     rooms[room_id] = room
-
-    player.joined_room_ids.add(room_id)
 
     return room
 

@@ -18,13 +18,8 @@ async def get_all_rooms() -> dict[str, Any]:
 
 
 @router.post("/create", response_model=RoomResponse)
-async def create_room(
-    request: EnsurePlayerRequest,
-    response: Response,
-    player_id: Optional[str] = Cookie(None, alias="player_id"),
-) -> dict[str, str]:
-    player = await ensure_player_and_set_cookie(response, player_id, request.player_name)
-    room = room_manager.create_room(player.player_id)
+async def create_room() -> dict[str, str]:
+    room = room_manager.create_room()
 
     return {"room_id": room.room_id}
 

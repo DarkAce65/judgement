@@ -13,10 +13,10 @@ class Room:
     created_at: int
     updated_at: int
 
-    def __init__(self, room_id: str, host_id: str) -> None:
+    def __init__(self, room_id: str) -> None:
         self.room_id = room_id
 
-        self.player_ids = set([host_id])
+        self.player_ids = set()
 
         self.__update()
         self.created_at = self.updated_at
