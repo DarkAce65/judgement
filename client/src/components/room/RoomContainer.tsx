@@ -24,7 +24,7 @@ const RoomContainer = () => {
     );
   } else if (status === 'succeeded' && response) {
     switch (response.status) {
-      case 200:
+      case 204:
         return <Room roomId={roomId} />;
       case 404:
         return (

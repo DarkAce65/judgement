@@ -21,14 +21,8 @@ export const getRoomId = createSelector([getRoomState], (state): string | null =
 
 export const createRoom = createAsyncThunk<string, void, { state: RootState }>(
   'room/createRoom',
-  async (_, { getState }) => {
-    const playerName = getPlayerName(getState());
-
-    const body: EnsurePlayerRequest = { playerName: playerName || undefined };
-    const response = await fetchAPI('/rooms/create', {
-      method: 'POST',
-      body: JSON.stringify(body),
-    });
+  async () => {
+    const response = await fetchAPI('/rooms/create', { method: 'POST' });
     const { roomId }: RoomResponse = await response.json();
 
     return roomId;
