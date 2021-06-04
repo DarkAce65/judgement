@@ -1,7 +1,7 @@
 from typing import Any, Optional
 
 from fastapi import APIRouter, Cookie, HTTPException, Path, Response
-from starlette.status import HTTP_204_NO_CONTENT
+from starlette.status import HTTP_200_OK, HTTP_204_NO_CONTENT
 
 from server.data import room_manager
 from server.models.requests import EnsurePlayerRequest
@@ -13,18 +13,19 @@ router = APIRouter(prefix="/rooms", tags=["rooms"])
 
 
 @router.get("", response_model=RoomsResponse)
-async def get_all_rooms() -> dict[str, Any]:
-    return {"rooms": [vars(room) for room in room_manager.get_all_rooms()]}
+async def get_all_rooms() -> RoomsResponse:
+    rooms = [RoomResponse(room_id=room.room_id) for room in room_manager.get_all_rooms()]
+    return RoomsResponse(rooms=rooms)
 
 
 @router.post("/create", response_model=RoomResponse)
-async def create_room() -> dict[str, str]:
+async def create_room() -> RoomResponse:
     room = room_manager.create_room()
 
-    return {"room_id": room.room_id}
+    return RoomResponse(room_id=room.room_id)
 
 
-@router.head("/{room_id}/exists")
+@router.head("/{room_id}/exists", status_code=HTTP_204_NO_CONTENT)
 async def does_room_exist(room_id: str = Path(..., alias="room_id")) -> None:
     if not room_manager.room_exists(room_id):
         raise HTTPException(status_code=404)
