@@ -4,19 +4,17 @@ from pathlib import Path, PurePath
 
 from pydantic2ts import generate_typescript_defs
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="[%(asctime)s] %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-)
-logging.getLogger("pydantic2ts").propagate = False
-logger = logging.getLogger(__name__)
-
+from model_generator.color_logs import configure_logger
 
 MODEL_MODULES = ["requests", "responses", "websocket"]
 
+logger = logging.getLogger(__name__)
+
 
 if __name__ == "__main__":
+    configure_logger(logger)
+    logger.setLevel(logging.INFO)
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--module", action="append", dest="modules")
     parser.add_argument("--out_dir", required=True)
@@ -34,7 +32,7 @@ if __name__ == "__main__":
     for module_name in module_names:
         out_filename = (out_dir / module_name).with_suffix(".ts")
         generate_typescript_defs(
-            f"server.models.{module_name}", out_filename, json2ts_path
+            f"server.models.{module_name}", out_filename, json2ts_cmd=json2ts_path
         )
 
         logger.info(
