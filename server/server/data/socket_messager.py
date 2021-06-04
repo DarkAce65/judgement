@@ -8,6 +8,6 @@ async def emit_players(room_id: str) -> None:
 
     await sio.emit(
         "players",
-        PlayersMessage(players=[player.name for player in players_in_room]).dict(),
+        PlayersMessage(players=[player.name or "" for player in players_in_room]).dict(),
         to=room_id,
     )
