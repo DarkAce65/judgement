@@ -38,7 +38,6 @@ module.exports = {
     'no-multiple-empty-lines': ['warn', { max: 1 }],
     'no-duplicate-imports': 'warn',
     'no-shadow': 'error',
-    'no-unused-vars': 'warn',
     'no-var': 'error',
     'object-shorthand': 'warn',
     'one-var': ['warn', 'never'],
