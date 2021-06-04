@@ -28,7 +28,7 @@ export const getPlayerName = createSelector(
   (state): string | null => state.playerName
 );
 
-export const ensurePlayer = createAsyncThunk<string | null, string | null, { state: RootState }>(
+export const ensurePlayer = createAsyncThunk<string, string, { state: RootState }>(
   'player/ensurePlayer',
   async (playerName) => {
     const body: EnsurePlayerRequest = { playerName: playerName || undefined };
@@ -36,7 +36,7 @@ export const ensurePlayer = createAsyncThunk<string | null, string | null, { sta
 
     return playerName;
   },
-  { condition: (playerName, { getState }) => getEnsurePlayerFetchStatus(getState()) !== 'pending' }
+  { condition: (_, { getState }) => getEnsurePlayerFetchStatus(getState()) !== 'pending' }
 );
 
 export const playerSlice = createSlice({

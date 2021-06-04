@@ -3,16 +3,14 @@ import { useCallback, useState } from 'react';
 import { ArrowRightOutlined } from '@ant-design/icons';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { Button, Input, message } from 'antd';
+import { useHistory } from 'react-router';
 
 import { useAppDispatch } from '../data/reduxHooks';
 import { joinRoom } from '../data/roomSlice';
 
-interface Props {
-  onJoin?: (roomId: string) => void;
-}
-
-const JoinRoomInput = ({ onJoin }: Props) => {
+const JoinRoomInput = () => {
   const dispatch = useAppDispatch();
+  const history = useHistory();
 
   const [roomId, setRoomId] = useState('');
 
@@ -24,14 +22,12 @@ const JoinRoomInput = ({ onJoin }: Props) => {
     dispatch(joinRoom(roomId))
       .then(unwrapResult)
       .then(() => {
-        if (onJoin) {
-          onJoin(roomId);
-        }
+        history.push(`/room/${roomId}`);
       })
       .catch(() => {
         message.error(`Room ${roomId} not found`);
       });
-  }, [dispatch, onJoin, roomId]);
+  }, [dispatch, history, roomId]);
 
   return (
     <Input.Group compact={true} size="large" style={{ display: 'flex' }}>

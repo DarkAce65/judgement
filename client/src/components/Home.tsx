@@ -1,7 +1,4 @@
-import { useCallback } from 'react';
-
 import { Divider, PageHeader } from 'antd';
-import { RouteComponentProps } from 'react-router-dom';
 import styled from 'styled-components';
 
 import CreateRoomButton from './CreateRoomButton';
@@ -14,22 +11,13 @@ const CenteredBlock = styled.div`
   text-align: center;
 `;
 
-interface Props extends RouteComponentProps {}
-
-const Home = ({ history }: Props) => {
-  const navigateToRoom = useCallback(
-    (roomId: string) => {
-      history.push(`/room/${roomId}`);
-    },
-    [history]
-  );
-
+const Home = () => {
   return (
     <PageHeader title="Home">
       <CenteredBlock>
-        <CreateRoomButton onCreate={navigateToRoom} />
+        <CreateRoomButton />
         <Divider style={{ textTransform: 'lowercase', fontVariant: 'small-caps' }}>Or</Divider>
-        <JoinRoomInput onJoin={navigateToRoom} />
+        <JoinRoomInput />
       </CenteredBlock>
     </PageHeader>
   );

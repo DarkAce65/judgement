@@ -35,7 +35,7 @@ const initializeGameSocket = () => {
         const { dispatch, getState } = store;
         const playerName = getPlayerName(getState());
 
-        dispatch(ensurePlayer(playerName))
+        dispatch(ensurePlayer(playerName!))
           .then(unwrapResult)
           .then(() => {
             socket.connect();
