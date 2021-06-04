@@ -3,6 +3,7 @@ import { Socket } from 'socket.io-client';
 import { v4 as uuid } from 'uuid';
 
 import { buildSocket } from '../api/client';
+import { PLAYER_ID_COOKIE } from '../constants';
 
 interface ConnectionError extends Error {
   message: 'unknown_player_id';
@@ -30,7 +31,7 @@ class GameSocket {
     resetConnectionAttempts?: () => void
   ): Socket {
     const socket = buildSocket({
-      auth: (auth) => auth({ player_id: Cookies.get('player_id') }),
+      auth: (auth) => auth({ player_id: Cookies.get(PLAYER_ID_COOKIE) }),
       autoConnect: false,
     });
     this.socket = socket;

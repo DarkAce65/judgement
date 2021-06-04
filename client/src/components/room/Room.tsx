@@ -5,6 +5,7 @@ import Cookies from 'js-cookie';
 import { useHistory } from 'react-router-dom';
 
 import { PlayersMessage } from '../../../generated_types/websocket';
+import { PLAYER_ID_COOKIE } from '../../constants';
 import GameSocket from '../../game/GameSocket';
 import useGameSocket from '../../game/useGameSocket';
 import PlayerNameInput from '../PlayerNameInput';
@@ -46,7 +47,7 @@ const Room = ({ roomId }: Props) => {
         history.push('/');
       }}
     >
-      <Typography.Paragraph>{Cookies.get('player_id')}</Typography.Paragraph>
+      <Typography.Paragraph>{Cookies.get(PLAYER_ID_COOKIE)}</Typography.Paragraph>
       {players.map((player, index) => (
         <Typography.Paragraph key={index}>{player}</Typography.Paragraph>
       ))}
