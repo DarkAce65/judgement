@@ -4,10 +4,9 @@ import { unwrapResult } from '@reduxjs/toolkit';
 import { Button, message } from 'antd';
 import { useHistory } from 'react-router';
 
+import { LocationState } from '../constants';
 import { useAppDispatch } from '../data/reduxHooks';
 import { createRoom } from '../data/roomSlice';
-
-import { LocationState } from './routerState';
 
 const CreateRoomButton = () => {
   const dispatch = useAppDispatch();
@@ -17,7 +16,7 @@ const CreateRoomButton = () => {
     dispatch(createRoom())
       .then(unwrapResult)
       .then((roomId) => {
-        history.push(`/room/${roomId}`, { createdGame: true });
+        history.push(`/room/${roomId}`, { gameExists: true });
       })
       .catch(() => {
         message.error('Failed to create a new room');

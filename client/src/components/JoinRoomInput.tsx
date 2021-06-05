@@ -5,12 +5,13 @@ import { unwrapResult } from '@reduxjs/toolkit';
 import { Button, Input, message } from 'antd';
 import { useHistory } from 'react-router';
 
+import { LocationState } from '../constants';
 import { useAppDispatch } from '../data/reduxHooks';
 import { joinRoom } from '../data/roomSlice';
 
 const JoinRoomInput = () => {
   const dispatch = useAppDispatch();
-  const history = useHistory();
+  const history = useHistory<LocationState>();
 
   const [roomId, setRoomId] = useState('');
 
@@ -22,7 +23,7 @@ const JoinRoomInput = () => {
     dispatch(joinRoom(roomId))
       .then(unwrapResult)
       .then(() => {
-        history.push(`/room/${roomId}`);
+        history.push(`/room/${roomId}`, { gameExists: true });
       })
       .catch(() => {
         message.error(`Room ${roomId} not found`);
