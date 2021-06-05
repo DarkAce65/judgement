@@ -48,7 +48,6 @@ async def connect(client_id: str, _environ: dict, auth: dict) -> None:
         raise ConnectionRefusedError("unknown_player_id")
 
     connection_manager.connect_player_client(player_id, client_id)
-
     await sio.save_session(client_id, {"player_id": player_id})
 
 
@@ -63,6 +62,7 @@ async def handle_join_room(client_id: str, room_id: str) -> None:
 @require_player
 async def handle_leave_room(client_id: str, room_id: str) -> None:
     connection_manager.remove_player_client_from_room(client_id, room_id)
+    await socket_messager.emit_players(room_id)
 
 
 @sio.on("disconnect")
