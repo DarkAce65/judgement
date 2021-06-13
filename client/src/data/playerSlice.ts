@@ -2,7 +2,7 @@ import { PayloadAction, createAsyncThunk, createSelector, createSlice } from '@r
 
 import { EnsurePlayerRequest } from '../../generated_types/requests';
 import { FetchStatus } from '../api/FetchStatus';
-import { fetchAPI } from '../api/client';
+import { fetchAPI, makeJSONBodyWithContentType } from '../api/client';
 
 import type { RootState } from './store';
 
@@ -32,7 +32,7 @@ export const ensurePlayer = createAsyncThunk<string, string, { state: RootState 
   'player/ensurePlayer',
   async (playerName) => {
     const body: EnsurePlayerRequest = { playerName: playerName || undefined };
-    await fetchAPI('/player', { method: 'PUT', body: JSON.stringify(body) });
+    await fetchAPI('/player', { method: 'PUT', ...makeJSONBodyWithContentType(body) });
 
     return playerName;
   },

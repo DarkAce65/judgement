@@ -2,7 +2,7 @@ import { PayloadAction, createAsyncThunk, createSelector, createSlice } from '@r
 
 import { EnsurePlayerRequest } from '../../generated_types/requests';
 import { RoomResponse } from '../../generated_types/responses';
-import { fetchAPI } from '../api/client';
+import { fetchAPI, makeJSONBodyWithContentType } from '../api/client';
 
 import { getPlayerName } from './playerSlice';
 import type { RootState } from './store';
@@ -35,7 +35,10 @@ export const joinRoom = createAsyncThunk<string, string, { state: RootState }>(
     const playerName = getPlayerName(getState());
 
     const body: EnsurePlayerRequest = { playerName: playerName || undefined };
-    await fetchAPI(`/rooms/${roomId}/join`, { method: 'POST', body: JSON.stringify(body) });
+    await fetchAPI(`/rooms/${roomId}/join`, {
+      method: 'POST',
+      ...makeJSONBodyWithContentType(body),
+    });
 
     return roomId;
   }

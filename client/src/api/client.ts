@@ -41,6 +41,11 @@ export const buildRequestPath = (path: string): string => {
   return API_BASE;
 };
 
+export const makeJSONBodyWithContentType = (body: unknown) => ({
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(body),
+});
+
 export const fetchAPI = (
   path: string,
   init?: RequestInit & { additionalSuccessStatusCodes?: number[] }
