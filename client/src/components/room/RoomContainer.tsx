@@ -1,8 +1,8 @@
 import { Button, Result } from 'antd';
-import { useHistory, useLocation, useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 
 import useFetch from '../../api/useFetch';
-import { LocationState } from '../../constants';
+import useLocationStatePropertyOnce from '../../utils/useLocationStatePropertyOnce';
 import ErrorPage from '../ErrorPage';
 import LoadingPage from '../LoadingPage';
 
@@ -10,15 +10,16 @@ import Room from './Room';
 
 const RoomContainer = () => {
   const history = useHistory();
-  const location = useLocation<LocationState>();
   const { roomId } = useParams<{ roomId: string }>();
+
+  const gameExists = useLocationStatePropertyOnce('gameExists');
 
   const { status, response } = useFetch(
     [`/rooms/${roomId}/exists`, { method: 'HEAD', additionalSuccessStatusCodes: [404] }],
-    { fetchOnMount: true, skip: location.state && location.state.gameExists }
+    { fetchOnMount: true, skip: gameExists }
   );
 
-  if (location.state && location.state.gameExists) {
+  if (gameExists) {
     return <Room roomId={roomId} />;
   } else if (status === 'uninitialized' || status === 'pending') {
     return <LoadingPage />;
