@@ -1,7 +1,7 @@
-from typing import Any, Optional
+from typing import Optional
 
 from fastapi import APIRouter, Cookie, HTTPException, Path, Response
-from starlette.status import HTTP_200_OK, HTTP_204_NO_CONTENT
+from starlette.status import HTTP_204_NO_CONTENT
 
 from server.data import room_manager
 from server.models.requests import EnsurePlayerRequest
