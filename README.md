@@ -1,6 +1,6 @@
 # Judgement
 
-A dockerized, full-stack website to play the card game ["Judgement"](https://en.wikipedia.org/wiki/Kachufool). Uses [`react-scripts`](https://create-react-app.dev/) for the frontend and [`FastAPI`](https://fastapi.tiangolo.com/) and [`redis`](https://redis.io/) on the backend. Deployed with an [`nginx`](https://www.nginx.com/) proxy server and [`uvicorn`](https://www.uvicorn.org/).
+A dockerized, full-stack website to play the card game ["Judgement"](https://en.wikipedia.org/wiki/Kachufool). Uses [`react-scripts`](https://create-react-app.dev/) for the frontend and [`FastAPI`](https://fastapi.tiangolo.com/) and [`redis`](https://redis.io/) on the backend. Deployed with an [`nginx`](https://www.nginx.com/) reverse proxy server and [`uvicorn`](https://www.uvicorn.org/).
 
 ## Running
 
