@@ -299,6 +299,56 @@ class TestBiMultiDict(TestCase):
         self.assertIsNone(mapping.get_key("value2"))
         self.assertIsNone(mapping.get_key("value3"))
 
+    def test_del_keys(self) -> None:
+        mapping = bimultidict(
+            [("key1", "value1"), ("key1", "value2"), ("key2", "value3")]
+        )
+
+        del mapping["key1"]
+
+        self.assertEqual(len(mapping.keys()), 1)
+        self.assertEqual(len(mapping), 1)
+        self.assertEqual(len(mapping.values()), 1)
+
+        self.assertNotIn("key1", mapping)
+        self.assertIn("key2", mapping)
+        self.assertNotIn("key3", mapping)
+
+        self.assertFalse(mapping.contains_pair("key1", "value1"))
+        self.assertFalse(mapping.contains_pair("key1", "value2"))
+        self.assertTrue(mapping.contains_pair("key2", "value3"))
+
+        self.assertIsNone(mapping.get("key1"))
+        self.assertSetEqual(mapping["key2"], set(["value3"]))
+        self.assertSetEqual(mapping.get("key2"), set(["value3"]))
+        self.assertIsNone(mapping.get("key3"))
+
+        self.assertIsNone(mapping.get_key("value1"))
+        self.assertIsNone(mapping.get_key("value2"))
+        self.assertEqual(mapping.get_key("value3"), "key2")
+
+        del mapping["key2"]
+
+        self.assertEqual(len(mapping.keys()), 0)
+        self.assertEqual(len(mapping), 0)
+        self.assertEqual(len(mapping.values()), 0)
+
+        self.assertNotIn("key1", mapping)
+        self.assertNotIn("key2", mapping)
+        self.assertNotIn("key3", mapping)
+
+        self.assertFalse(mapping.contains_pair("key1", "value1"))
+        self.assertFalse(mapping.contains_pair("key1", "value2"))
+        self.assertFalse(mapping.contains_pair("key2", "value3"))
+
+        self.assertIsNone(mapping.get("key1"))
+        self.assertIsNone(mapping.get("key2"))
+        self.assertIsNone(mapping.get("key3"))
+
+        self.assertIsNone(mapping.get_key("value1"))
+        self.assertIsNone(mapping.get_key("value2"))
+        self.assertIsNone(mapping.get_key("value3"))
+
     def test_set_items(self) -> None:
         mapping = bimultidict(
             [("key1", "value1"), ("key1", "value2"), ("key2", "value3")]
@@ -416,6 +466,7 @@ class TestBiMultiDict(TestCase):
             KeyError, "does not exist in this mapping", mapping.remove, "key3", "value4"
         )
 
+        del mapping["key3"]
         mapping.remove_all("key3")
 
         self.assertEqual(len(mapping.keys()), 2)

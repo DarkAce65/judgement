@@ -42,8 +42,8 @@ class bimultidict(MutableMapping[KT, set[VT]]):
     def __setitem__(self, key: KT, values: set[VT]) -> None:
         return self.set_values(key, values)
 
-    def __delitem__(self, _: KT) -> None:
-        raise NotImplementedError()
+    def __delitem__(self, key: KT) -> None:
+        self.remove_all(key)
 
     def __repr__(self) -> str:
         clsname = self.__class__.__name__
