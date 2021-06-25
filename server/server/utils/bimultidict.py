@@ -37,7 +37,7 @@ class bimultidict(MutableMapping[KT, set[VT]]):
         return self._forward_mapping.__contains__(obj)
 
     def __getitem__(self, key: KT) -> set[VT]:
-        return self.get_values(key) or set()
+        return self._forward_mapping[key]
 
     def __setitem__(self, key: KT, values: set[VT]) -> None:
         return self.set_values(key, values)
@@ -58,6 +58,14 @@ class bimultidict(MutableMapping[KT, set[VT]]):
     def values(self) -> AbstractSet[VT]:  # type: ignore  # https://github.com/python/typeshed/issues/4435
         return self._inverse_mapping.keys()
 
+    def contains_pair(self, key: KT, value: VT) -> bool:
+        return (
+            key in self._forward_mapping
+            and (value in self._inverse_mapping)
+            and value in self._forward_mapping[key]
+            and self._inverse_mapping[value] == key
+        )
+
     @overload
     def get(self, key: KT) -> Optional[set[VT]]:
         ...
@@ -67,21 +75,13 @@ class bimultidict(MutableMapping[KT, set[VT]]):
         ...
 
     def get(self, key: KT, default: Any = None) -> Union[set[VT], Any]:
-        raise NotImplementedError("Use get_values instead")
+        if key in self._forward_mapping:
+            return self._forward_mapping.get(key)
 
-    def contains_pair(self, key: KT, value: VT) -> bool:
-        return (
-            key in self._forward_mapping
-            and (value in self._inverse_mapping)
-            and value in self._forward_mapping[key]
-            and self._inverse_mapping[value] == key
-        )
+        return default
 
     def get_key(self, value: VT) -> Optional[KT]:
         return self._inverse_mapping.get(value)
-
-    def get_values(self, key: KT) -> Optional[set[VT]]:
-        return self._forward_mapping.get(key)
 
     def set_values(self, key: KT, values: set[VT]) -> None:
         self.remove_all(key)

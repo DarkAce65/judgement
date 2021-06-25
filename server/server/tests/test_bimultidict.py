@@ -29,10 +29,10 @@ class TestBiMultiDict(TestCase):
         self.assertTrue(mapping.contains_pair("key2", "value3"))
 
         self.assertSetEqual(mapping["key1"], set(["value1", "value2"]))
-        self.assertSetEqual(mapping.get_values("key1"), set(["value1", "value2"]))
+        self.assertSetEqual(mapping.get("key1"), set(["value1", "value2"]))
         self.assertSetEqual(mapping["key2"], set(["value3"]))
-        self.assertSetEqual(mapping.get_values("key2"), set(["value3"]))
-        self.assertIsNone(mapping.get_values("key3"))
+        self.assertSetEqual(mapping.get("key2"), set(["value3"]))
+        self.assertIsNone(mapping.get("key3"))
 
         self.assertEqual(mapping.get_key("value1"), "key1")
         self.assertEqual(mapping.get_key("value2"), "key1")
@@ -58,10 +58,10 @@ class TestBiMultiDict(TestCase):
         self.assertTrue(mapping.contains_pair("key2", "value3"))
 
         self.assertSetEqual(mapping["key1"], set(["value1", "value2"]))
-        self.assertSetEqual(mapping.get_values("key1"), set(["value1", "value2"]))
+        self.assertSetEqual(mapping.get("key1"), set(["value1", "value2"]))
         self.assertSetEqual(mapping["key2"], set(["value3"]))
-        self.assertSetEqual(mapping.get_values("key2"), set(["value3"]))
-        self.assertIsNone(mapping.get_values("key3"))
+        self.assertSetEqual(mapping.get("key2"), set(["value3"]))
+        self.assertIsNone(mapping.get("key3"))
 
         self.assertEqual(mapping.get_key("value1"), "key1")
         self.assertEqual(mapping.get_key("value2"), "key1")
@@ -88,11 +88,11 @@ class TestBiMultiDict(TestCase):
         self.assertTrue(mapping.contains_pair("key3", "value4"))
 
         self.assertSetEqual(mapping["key1"], set(["value1", "value2"]))
-        self.assertSetEqual(mapping.get_values("key1"), set(["value1", "value2"]))
+        self.assertSetEqual(mapping.get("key1"), set(["value1", "value2"]))
         self.assertSetEqual(mapping["key2"], set(["value3"]))
-        self.assertSetEqual(mapping.get_values("key2"), set(["value3"]))
+        self.assertSetEqual(mapping.get("key2"), set(["value3"]))
         self.assertSetEqual(mapping["key3"], set(["value4"]))
-        self.assertSetEqual(mapping.get_values("key3"), set(["value4"]))
+        self.assertSetEqual(mapping.get("key3"), set(["value4"]))
 
         self.assertEqual(mapping.get_key("value1"), "key1")
         self.assertEqual(mapping.get_key("value2"), "key1")
@@ -120,10 +120,10 @@ class TestBiMultiDict(TestCase):
         self.assertTrue(mapping.contains_pair("key2", "value4"))
 
         self.assertSetEqual(mapping["key1"], set(["value1", "value2"]))
-        self.assertSetEqual(mapping.get_values("key1"), set(["value1", "value2"]))
+        self.assertSetEqual(mapping.get("key1"), set(["value1", "value2"]))
         self.assertSetEqual(mapping["key2"], set(["value3", "value4"]))
-        self.assertSetEqual(mapping.get_values("key2"), set(["value3", "value4"]))
-        self.assertIsNone(mapping.get_values("key3"))
+        self.assertSetEqual(mapping.get("key2"), set(["value3", "value4"]))
+        self.assertIsNone(mapping.get("key3"))
 
         self.assertEqual(mapping.get_key("value1"), "key1")
         self.assertEqual(mapping.get_key("value2"), "key1")
@@ -156,11 +156,11 @@ class TestBiMultiDict(TestCase):
         self.assertTrue(mapping.contains_pair("key3", "value4"))
 
         self.assertSetEqual(mapping["key1"], set(["value1", "value2"]))
-        self.assertSetEqual(mapping.get_values("key1"), set(["value1", "value2"]))
+        self.assertSetEqual(mapping.get("key1"), set(["value1", "value2"]))
         self.assertSetEqual(mapping["key2"], set(["value3"]))
-        self.assertSetEqual(mapping.get_values("key2"), set(["value3"]))
+        self.assertSetEqual(mapping.get("key2"), set(["value3"]))
         self.assertSetEqual(mapping["key3"], set(["value4"]))
-        self.assertSetEqual(mapping.get_values("key3"), set(["value4"]))
+        self.assertSetEqual(mapping.get("key3"), set(["value4"]))
 
         self.assertEqual(mapping.get_key("value1"), "key1")
         self.assertEqual(mapping.get_key("value2"), "key1")
@@ -188,10 +188,10 @@ class TestBiMultiDict(TestCase):
         self.assertTrue(mapping.contains_pair("key3", "value3"))
 
         self.assertSetEqual(mapping["key1"], set(["value1", "value2"]))
-        self.assertSetEqual(mapping.get_values("key1"), set(["value1", "value2"]))
-        self.assertIsNone(mapping.get_values("key2"))
+        self.assertSetEqual(mapping.get("key1"), set(["value1", "value2"]))
+        self.assertIsNone(mapping.get("key2"))
         self.assertSetEqual(mapping["key3"], set(["value3"]))
-        self.assertSetEqual(mapping.get_values("key3"), set(["value3"]))
+        self.assertSetEqual(mapping.get("key3"), set(["value3"]))
 
         self.assertEqual(mapping.get_key("value1"), "key1")
         self.assertEqual(mapping.get_key("value2"), "key1")
@@ -217,10 +217,10 @@ class TestBiMultiDict(TestCase):
         self.assertTrue(mapping.contains_pair("key2", "value3"))
 
         self.assertSetEqual(mapping["key1"], set(["value2"]))
-        self.assertSetEqual(mapping.get_values("key1"), set(["value2"]))
+        self.assertSetEqual(mapping.get("key1"), set(["value2"]))
         self.assertSetEqual(mapping["key2"], set(["value3"]))
-        self.assertSetEqual(mapping.get_values("key2"), set(["value3"]))
-        self.assertIsNone(mapping.get_values("key3"))
+        self.assertSetEqual(mapping.get("key2"), set(["value3"]))
+        self.assertIsNone(mapping.get("key3"))
 
         self.assertIsNone(mapping.get_key("value1"))
         self.assertEqual(mapping.get_key("value2"), "key1")
@@ -241,9 +241,9 @@ class TestBiMultiDict(TestCase):
         self.assertFalse(mapping.contains_pair("key2", "value3"))
 
         self.assertSetEqual(mapping["key1"], set(["value2"]))
-        self.assertSetEqual(mapping.get_values("key1"), set(["value2"]))
-        self.assertIsNone(mapping.get_values("key2"))
-        self.assertIsNone(mapping.get_values("key3"))
+        self.assertSetEqual(mapping.get("key1"), set(["value2"]))
+        self.assertIsNone(mapping.get("key2"))
+        self.assertIsNone(mapping.get("key3"))
 
         self.assertIsNone(mapping.get_key("value1"))
         self.assertEqual(mapping.get_key("value2"), "key1")
@@ -268,10 +268,10 @@ class TestBiMultiDict(TestCase):
         self.assertFalse(mapping.contains_pair("key1", "value2"))
         self.assertTrue(mapping.contains_pair("key2", "value3"))
 
-        self.assertIsNone(mapping.get_values("key1"))
+        self.assertIsNone(mapping.get("key1"))
         self.assertSetEqual(mapping["key2"], set(["value3"]))
-        self.assertSetEqual(mapping.get_values("key2"), set(["value3"]))
-        self.assertIsNone(mapping.get_values("key3"))
+        self.assertSetEqual(mapping.get("key2"), set(["value3"]))
+        self.assertIsNone(mapping.get("key3"))
 
         self.assertIsNone(mapping.get_key("value1"))
         self.assertIsNone(mapping.get_key("value2"))
@@ -291,9 +291,9 @@ class TestBiMultiDict(TestCase):
         self.assertFalse(mapping.contains_pair("key1", "value2"))
         self.assertFalse(mapping.contains_pair("key2", "value3"))
 
-        self.assertIsNone(mapping.get_values("key1"))
-        self.assertIsNone(mapping.get_values("key2"))
-        self.assertIsNone(mapping.get_values("key3"))
+        self.assertIsNone(mapping.get("key1"))
+        self.assertIsNone(mapping.get("key2"))
+        self.assertIsNone(mapping.get("key3"))
 
         self.assertIsNone(mapping.get_key("value1"))
         self.assertIsNone(mapping.get_key("value2"))
@@ -321,11 +321,11 @@ class TestBiMultiDict(TestCase):
         self.assertTrue(mapping.contains_pair("key3", "value5"))
 
         self.assertSetEqual(mapping["key1"], set(["value1", "value2"]))
-        self.assertSetEqual(mapping.get_values("key1"), set(["value1", "value2"]))
+        self.assertSetEqual(mapping.get("key1"), set(["value1", "value2"]))
         self.assertSetEqual(mapping["key2"], set(["value3"]))
-        self.assertSetEqual(mapping.get_values("key2"), set(["value3"]))
+        self.assertSetEqual(mapping.get("key2"), set(["value3"]))
         self.assertSetEqual(mapping["key3"], set(["value4", "value5"]))
-        self.assertSetEqual(mapping.get_values("key3"), set(["value4", "value5"]))
+        self.assertSetEqual(mapping.get("key3"), set(["value4", "value5"]))
 
         self.assertEqual(mapping.get_key("value1"), "key1")
         self.assertEqual(mapping.get_key("value2"), "key1")
@@ -355,10 +355,10 @@ class TestBiMultiDict(TestCase):
         self.assertTrue(mapping.contains_pair("key1", "value5"))
 
         self.assertSetEqual(mapping["key1"], set(["value4", "value5"]))
-        self.assertSetEqual(mapping.get_values("key1"), set(["value4", "value5"]))
+        self.assertSetEqual(mapping.get("key1"), set(["value4", "value5"]))
         self.assertSetEqual(mapping["key2"], set(["value3"]))
-        self.assertSetEqual(mapping.get_values("key2"), set(["value3"]))
-        self.assertIsNone(mapping.get_values("key3"))
+        self.assertSetEqual(mapping.get("key2"), set(["value3"]))
+        self.assertIsNone(mapping.get("key3"))
 
         self.assertIsNone(mapping.get_key("value1"))
         self.assertIsNone(mapping.get_key("value2"))
@@ -388,22 +388,14 @@ class TestBiMultiDict(TestCase):
         self.assertTrue(mapping.contains_pair("key1", "value4"))
 
         self.assertSetEqual(mapping["key1"], set(["value2", "value3", "value4"]))
-        self.assertSetEqual(
-            mapping.get_values("key1"), set(["value2", "value3", "value4"])
-        )
-        self.assertIsNone(mapping.get_values("key2"))
-        self.assertIsNone(mapping.get_values("key3"))
+        self.assertSetEqual(mapping.get("key1"), set(["value2", "value3", "value4"]))
+        self.assertIsNone(mapping.get("key2"))
+        self.assertIsNone(mapping.get("key3"))
 
         self.assertIsNone(mapping.get_key("value1"))
         self.assertEqual(mapping.get_key("value2"), "key1")
         self.assertEqual(mapping.get_key("value3"), "key1")
         self.assertEqual(mapping.get_key("value4"), "key1")
-
-    def test_raises_not_implemented_error(self) -> None:
-        mapping = bimultidict()
-        self.assertRaisesRegex(
-            NotImplementedError, "Use get_values instead", mapping.get, "key1"
-        )
 
     def test_removing_non_existent_mappings(self) -> None:
         mapping = bimultidict(
@@ -439,10 +431,10 @@ class TestBiMultiDict(TestCase):
         self.assertTrue(mapping.contains_pair("key2", "value3"))
 
         self.assertSetEqual(mapping["key1"], set(["value1", "value2"]))
-        self.assertSetEqual(mapping.get_values("key1"), set(["value1", "value2"]))
+        self.assertSetEqual(mapping.get("key1"), set(["value1", "value2"]))
         self.assertSetEqual(mapping["key2"], set(["value3"]))
-        self.assertSetEqual(mapping.get_values("key2"), set(["value3"]))
-        self.assertIsNone(mapping.get_values("key3"))
+        self.assertSetEqual(mapping.get("key2"), set(["value3"]))
+        self.assertIsNone(mapping.get("key3"))
 
         self.assertEqual(mapping.get_key("value1"), "key1")
         self.assertEqual(mapping.get_key("value2"), "key1")
