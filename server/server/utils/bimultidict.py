@@ -43,7 +43,7 @@ class bimultidict(MutableMapping[KT, set[VT]]):
         return self.set_values(key, values)
 
     def __delitem__(self, key: KT) -> None:
-        self.remove_all(key)
+        self.remove_all_values_for_key(key)
 
     def __repr__(self) -> str:
         clsname = self.__class__.__name__
@@ -84,7 +84,9 @@ class bimultidict(MutableMapping[KT, set[VT]]):
         return self._inverse_mapping.get(value)
 
     def set_values(self, key: KT, values: set[VT]) -> None:
-        self.remove_all(key)
+        if key in self._forward_mapping:
+            self.remove_all_values_for_key(key)
+
         self.put_all([(key, value) for value in values])
 
     def put(self, key: KT, value: VT) -> None:
@@ -103,9 +105,11 @@ class bimultidict(MutableMapping[KT, set[VT]]):
             key, value = mapping
             self.put(key, value)
 
-    def remove(self, key: KT, value: VT) -> VT:
-        if not self.contains_pair(key, value):
-            raise KeyError(f"({key}, {value}) does not exist in this mapping")
+    def remove_value(self, value: VT) -> KT:
+        if value not in self._inverse_mapping:
+            raise KeyError(f"{value} does not exist in this mapping")
+
+        key = self._inverse_mapping[value]
 
         if len(self._forward_mapping[key]) == 1:
             del self._forward_mapping[key]
@@ -113,14 +117,13 @@ class bimultidict(MutableMapping[KT, set[VT]]):
             self._forward_mapping[key].remove(value)
         del self._inverse_mapping[value]
 
-        return value
+        return key
 
-    def remove_all(self, key: KT) -> set[VT]:
+    def remove_all_values_for_key(self, key: KT) -> set[VT]:
+        if key not in self._forward_mapping:
+            raise KeyError(f"{key} does not exist in this mapping")
+
         values = self._forward_mapping[key]
-
-        for value in values:
-            if not self.contains_pair(key, value):
-                raise KeyError(f"({key}, {value}) does not exist in this mapping")
 
         for value in values:
             del self._inverse_mapping[value]
