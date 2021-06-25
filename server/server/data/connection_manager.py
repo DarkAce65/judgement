@@ -57,8 +57,7 @@ def remove_player_client_from_room(client_id: str, room_id: str) -> None:
 
     for c_id in client_ids_for_player:
         if room_client_mapping.contains_value(c_id):
-            room_client_mapping.remove_value(c_id)
-            old_room_id = room_client_mapping.get_key(c_id)
+            old_room_id = room_client_mapping.remove_value(c_id)
             sio.leave_room(c_id, old_room_id)
             sio.leave_room(c_id, f"{old_room_id}/{player_id}")
 
