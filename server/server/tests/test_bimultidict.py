@@ -38,6 +38,21 @@ class TestBiMultiDict(TestCase):
         self.assertEqual(mapping.get_key("value2"), "key1")
         self.assertEqual(mapping.get_key("value3"), "key2")
 
+    def test_contains(self) -> None:
+        mapping = bimultidict(
+            [("key1", "value1"), ("key1", "value2"), ("key2", "value3")]
+        )
+
+        self.assertTrue(mapping.contains_key("key1"))
+        self.assertTrue(mapping.contains_key("key2"))
+        self.assertFalse(mapping.contains_key("key3"))
+        self.assertFalse(mapping.contains_key("value1"))
+
+        self.assertTrue(mapping.contains_value("value1"))
+        self.assertTrue(mapping.contains_value("value2"))
+        self.assertFalse(mapping.contains_value("value4"))
+        self.assertFalse(mapping.contains_value("key1"))
+
     def test_add_items(self) -> None:
         mapping = bimultidict()
 

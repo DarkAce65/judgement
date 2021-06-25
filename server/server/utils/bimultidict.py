@@ -58,10 +58,16 @@ class bimultidict(MutableMapping[KT, set[VT]]):
     def values(self) -> AbstractSet[VT]:  # type: ignore  # https://github.com/python/typeshed/issues/4435
         return self._inverse_mapping.keys()
 
+    def contains_key(self, key: KT) -> bool:
+        return self._forward_mapping.__contains__(key)
+
+    def contains_value(self, value: VT) -> bool:
+        return self._inverse_mapping.__contains__(value)
+
     def contains_pair(self, key: KT, value: VT) -> bool:
         return (
-            key in self._forward_mapping
-            and (value in self._inverse_mapping)
+            self.contains_key(key)
+            and self.contains_value(value)
             and value in self._forward_mapping[key]
             and self._inverse_mapping[value] == key
         )
