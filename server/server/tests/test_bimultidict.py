@@ -202,7 +202,7 @@ class TestBiMultiDict(TestCase):
             [("key1", "value1"), ("key1", "value2"), ("key2", "value3")]
         )
 
-        mapping.remove_value("value1")
+        self.assertEqual(mapping.remove_value("value1"), "key1")
 
         self.assertEqual(len(mapping.keys()), 2)
         self.assertEqual(len(mapping), 2)
@@ -226,7 +226,7 @@ class TestBiMultiDict(TestCase):
         self.assertEqual(mapping.get_key("value2"), "key1")
         self.assertEqual(mapping.get_key("value3"), "key2")
 
-        mapping.remove_value("value3")
+        self.assertEqual(mapping.remove_value("value3"), "key2")
 
         self.assertEqual(len(mapping.keys()), 1)
         self.assertEqual(len(mapping), 1)
@@ -254,7 +254,9 @@ class TestBiMultiDict(TestCase):
             [("key1", "value1"), ("key1", "value2"), ("key2", "value3")]
         )
 
-        mapping.remove_all_values_for_key("key1")
+        self.assertSetEqual(
+            mapping.remove_all_values_for_key("key1"), set(["value1", "value2"])
+        )
 
         self.assertEqual(len(mapping.keys()), 1)
         self.assertEqual(len(mapping), 1)
@@ -277,7 +279,7 @@ class TestBiMultiDict(TestCase):
         self.assertIsNone(mapping.get_key("value2"))
         self.assertEqual(mapping.get_key("value3"), "key2")
 
-        mapping.remove_all_values_for_key("key2")
+        self.assertSetEqual(mapping.remove_all_values_for_key("key2"), set(["value3"]))
 
         self.assertEqual(len(mapping.keys()), 0)
         self.assertEqual(len(mapping), 0)
