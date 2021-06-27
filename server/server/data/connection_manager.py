@@ -1,8 +1,26 @@
+from typing import Optional
+
 from server.data import room_manager
 from server.sio_app import sio
 
 from . import player_manager, socket_messager
-from .db import db_connection, insert_client_mapping, set_client_room
+from .db import db_connection
+
+
+def insert_client_mapping(client_id: str, player_id: str, room_id: str = None) -> None:
+    cur = db_connection.cursor()
+    cur.execute(
+        "INSERT INTO client_player_room VALUES (?, ?, ?)",
+        (client_id, player_id, room_id),
+    )
+
+
+def set_client_room(client_id: str, room_id: Optional[str]) -> None:
+    cur = db_connection.cursor()
+    cur.execute(
+        "UPDATE client_player_room SET room_id=? WHERE client_id = ?",
+        (room_id, client_id),
+    )
 
 
 def get_player_id_for_client(client_id: str) -> str:

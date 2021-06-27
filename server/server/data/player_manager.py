@@ -1,24 +1,56 @@
-from collections.abc import Iterable
-from typing import Optional, Tuple
+import uuid
+from typing import Collection, Optional, Tuple
 
+from .db import db_connection
 from .player import Player
-
-players: dict[str, Player] = {}
 
 
 def player_exists(player_id: str) -> bool:
-    return player_id in players
+    cur = db_connection.cursor()
+    cur.execute("SELECT 1 FROM players WHERE id = ?", (player_id,))
+
+    return cur.fetchone() is not None
 
 
 def get_player(player_id: str) -> Player:
-    if not player_exists(player_id):
+    cur = db_connection.cursor()
+    cur.execute("SELECT name FROM players WHERE id = ?", (player_id,))
+    result = cur.fetchone()
+
+    if result is None:
         raise ValueError(f"Invalid player id: {player_id}")
 
-    return players[player_id]
+    (player_name,) = result
+
+    return Player(player_id, player_name)
 
 
-def get_players(player_ids: Iterable[str]) -> dict[str, Player]:
-    return {player_id: get_player(player_id) for player_id in player_ids}
+def get_players(player_ids: Collection[str]) -> dict[str, Player]:
+    cur = db_connection.cursor()
+    params = ", ".join(["?"] * len(player_ids))
+    cur.execute(f"SELECT id, name FROM players WHERE id IN ({params})", (*player_ids,))
+
+    players: dict[str, Player] = {}
+    for (player_id, player_name) in cur.fetchall():
+        players[player_id] = Player(player_id, player_name)
+
+    return players
+
+
+def create_player(player_name: Optional[str]) -> Player:
+    player = Player(str(uuid.uuid4()), player_name)
+
+    cur = db_connection.cursor()
+    cur.execute(
+        "INSERT INTO players (id, name) VALUES (?, ?)", (player.player_id, player.name)
+    )
+
+    return player
+
+
+def set_player_name(player_id: str, player_name: Optional[str]) -> None:
+    cur = db_connection.cursor()
+    cur.execute("UPDATE players SET name=? WHERE id = ?", (player_name, player_id))
 
 
 def ensure_player_with_name(
@@ -26,13 +58,12 @@ def ensure_player_with_name(
 ) -> Tuple[Player, bool]:
     should_propagate_name_change = False
     if player_id is None or not player_exists(player_id):
-        player = Player(player_name)
-        players[player.player_id] = player
+        player = create_player(player_name)
     else:
         player = get_player(player_id)
         if player.name != player_name:
+            set_player_name(player_id, player_name)
+            player = get_player(player_id)
             should_propagate_name_change = True
-
-        player.name = player_name
 
     return (player, should_propagate_name_change)
