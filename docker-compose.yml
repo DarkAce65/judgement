@@ -27,6 +27,19 @@ services:
     networks:
       - db
 
+  database:
+    build: ./database
+    restart: on-failure
+    secrets:
+      - postgres_password
+    env_file: .env
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    ports:
+      - 5432:5432
+    networks:
+      - db
+
   server:
     depends_on:
       - redis
@@ -36,9 +49,11 @@ services:
     restart: on-failure
     secrets:
       - redis_password
+      - postgres_password
     env_file: .env
     environment:
       REDIS_PASSWORD_FILE: /run/secrets/redis_password
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
     networks:
       - proxy
       - db
@@ -50,3 +65,5 @@ networks:
 secrets:
   redis_password:
     file: .REDIS_PASSWORD
+  postgres_password:
+    file: .POSTGRES_PASSWORD
