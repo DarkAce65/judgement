@@ -18,8 +18,8 @@
 /client/.husky
 /client/generated_types
 
-/redis
+/database
 
 /server/model_generator/node_modules
 
-.REDIS_PASSWORD
+.POSTGRES_PASSWORD
