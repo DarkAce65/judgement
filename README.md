@@ -1,12 +1,12 @@
 # Judgement
 
-A dockerized, full-stack website to play the card game ["Judgement"](https://en.wikipedia.org/wiki/Kachufool). Uses [`react-scripts`](https://create-react-app.dev/) for the frontend and [`FastAPI`](https://fastapi.tiangolo.com/) and [`redis`](https://redis.io/) on the backend. Deployed with an [`nginx`](https://www.nginx.com/) reverse proxy server and [`uvicorn`](https://www.uvicorn.org/).
+A dockerized, full-stack website to play the card game ["Judgement"](https://en.wikipedia.org/wiki/Kachufool). Uses [`react-scripts`](https://create-react-app.dev/) for the frontend and [`FastAPI`](https://fastapi.tiangolo.com/) and [`PostgreSQL`](https://www.postgresql.org/) on the backend. Deployed with an [`nginx`](https://www.nginx.com/) reverse proxy server and [`uvicorn`](https://www.uvicorn.org/).
 
 ## Running
 
 - Requires `docker` and `docker-compose`
 - Requires the following files to be made at the project root:
-  - `.REDIS_PASSWORD` - should contain a password for the redis database on the first line
+  - `.POSTGRES_PASSWORD` - should contain a password for the postgres database on the first line
 
 ### Dev
 
@@ -17,7 +17,7 @@ Supports live reloading of both the backend and the frontend.
 - Frontend accessible at http://localhost:3000
 - Backend accessible at http://localhost:8000
   - VSCode debugger attachable at http://localhost:5678
-- Redis database accessible at http://localhost:6379
+- Postgres database accessible at http://localhost:5432
 
 ### Production
 
