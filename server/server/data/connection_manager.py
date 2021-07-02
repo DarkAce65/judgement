@@ -10,7 +10,7 @@ from .db import db_connection
 def insert_client_mapping(client_id: str, player_id: str, room_id: str = None) -> None:
     cur = db_connection.cursor()
     cur.execute(
-        "INSERT INTO client_player_room VALUES (?, ?, ?)",
+        "INSERT INTO client_player_room VALUES (%s, %s, %s)",
         (client_id, player_id, room_id),
     )
 
@@ -18,7 +18,7 @@ def insert_client_mapping(client_id: str, player_id: str, room_id: str = None) -
 def set_client_room(client_id: str, room_id: Optional[str]) -> None:
     cur = db_connection.cursor()
     cur.execute(
-        "UPDATE client_player_room SET room_id=? WHERE client_id = ?",
+        "UPDATE client_player_room SET room_id=%s WHERE client_id = %s",
         (room_id, client_id),
     )
 
@@ -26,7 +26,7 @@ def set_client_room(client_id: str, room_id: Optional[str]) -> None:
 def get_player_id_for_client(client_id: str) -> str:
     cur = db_connection.cursor()
     cur.execute(
-        "SELECT player_id FROM client_player_room WHERE client_id = ?", (client_id,)
+        "SELECT player_id FROM client_player_room WHERE client_id = %s", (client_id,)
     )
 
     (player_id,) = cur.fetchone()
@@ -42,7 +42,7 @@ def get_client_ids_for_player(player_id: str) -> set[str]:
 
     cur = db_connection.cursor()
     cur.execute(
-        "SELECT client_id FROM client_player_room WHERE player_id = ?", (player_id,)
+        "SELECT client_id FROM client_player_room WHERE player_id = %s", (player_id,)
     )
     return {client_id for (client_id,) in cur.fetchall()}
 
@@ -50,7 +50,8 @@ def get_client_ids_for_player(player_id: str) -> set[str]:
 def get_client_ids_for_players(player_ids: set[str]) -> set[str]:
     cur = db_connection.cursor()
     cur.execute(
-        "SELECT client_id FROM client_player_room WHERE player_id IN ?", (player_ids,)
+        "SELECT client_id FROM client_player_room WHERE player_id = ANY(%s)",
+        (list(player_ids),),
     )
     return {client_id for (client_id,) in cur.fetchall()}
 
@@ -64,7 +65,7 @@ async def propagate_name_change(player_id: str) -> None:
     cur = db_connection.cursor()
     cur.execute(
         "SELECT DISTINCT room_id FROM client_player_room "
-        "WHERE player_id = ? AND room_id IS NOT NULL",
+        "WHERE player_id = %s AND room_id IS NOT NULL",
         (player_id,),
     )
     room_ids = {room_id for (room_id,) in cur.fetchall()}
@@ -79,7 +80,7 @@ def add_player_client_to_room(client_id: str, room_id: str) -> None:
     cur = db_connection.cursor()
     cur.execute(
         "SELECT room_id FROM client_player_room "
-        "WHERE client_id = ? AND room_id IS NOT NULL",
+        "WHERE client_id = %s AND room_id IS NOT NULL",
         (client_id,),
     )
     old_room_id = cur.fetchone()
@@ -99,7 +100,7 @@ def remove_player_client_from_room(client_id: str, room_id: str) -> None:
 
     cur = db_connection.cursor()
     cur.execute(
-        "SELECT client_id FROM client_player_room WHERE room_id = ? AND player_id = ?",
+        "SELECT client_id FROM client_player_room WHERE room_id = %s AND player_id = %s",
         (room_id, player_id),
     )
     for (c_id,) in cur.fetchall():
@@ -108,7 +109,7 @@ def remove_player_client_from_room(client_id: str, room_id: str) -> None:
 
     cur.execute(
         "UPDATE client_player_room SET room_id=NULL "
-        "WHERE room_id = ? AND player_id = ?",
+        "WHERE room_id = %s AND player_id = %s",
         (room_id, player_id),
     )
 
@@ -117,4 +118,4 @@ def remove_player_client_from_room(client_id: str, room_id: str) -> None:
 
 def disconnect_player_client(client_id: str) -> None:
     cur = db_connection.cursor()
-    cur.execute("DELETE FROM client_player_room WHERE client_id = ?", (client_id,))
+    cur.execute("DELETE FROM client_player_room WHERE client_id = %s", (client_id,))

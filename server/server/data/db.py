@@ -1,31 +1,22 @@
-import sqlite3
+import os
 
-db_connection = sqlite3.connect(":memory:")
-db_connection.isolation_level = None
+import psycopg2
 
+if "POSTGRES_PASSWORD_FILE" in os.environ:
+    postgres_password_file = os.environ.get("POSTGRES_PASSWORD_FILE")
+    if postgres_password_file is None:
+        raise Exception("Missing path to postgres password secret")
 
-def init_db() -> None:
-    cur = db_connection.cursor()
-    cur.execute("CREATE TABLE players(id TEXT PRIMARY KEY NOT NULL, name TEXT)")
-    cur.execute("CREATE TABLE rooms(id TEXT PRIMARY KEY NOT NULL)")
-    cur.execute(
-        "CREATE TABLE room_players("
-        "  room_id TEXT NOT NULL, "
-        "  player_id TEXT NOT NULL, "
-        "  UNIQUE(room_id, player_id), "
-        "  FOREIGN KEY(room_id) REFERENCES rooms(id), "
-        "  FOREIGN KEY(player_id) REFERENCES players(id)"
-        ")"
+    with open(postgres_password_file) as f:
+        postgres_password = f.readline().strip()
+        db_connection = psycopg2.connect(
+            host="database",
+            database=os.environ.get("POSTGRES_DB"),
+            user="postgres",
+            password=postgres_password,
+        )
+else:
+    db_connection = psycopg2.connect(
+        host="database", database=os.environ.get("POSTGRES_DB"), user="postgres"
     )
-    cur.execute(
-        "CREATE TABLE client_player_room("
-        "  client_id TEXT PRIMARY KEY NOT NULL, "
-        "  player_id TEXT NOT NULL, "
-        "  room_id TEXT, "
-        "  FOREIGN KEY(player_id) REFERENCES players(id), "
-        "  FOREIGN KEY(room_id) REFERENCES rooms(id)"
-        ")"
-    )
-
-
-init_db()
+db_connection.autocommit = True

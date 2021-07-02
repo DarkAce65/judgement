@@ -13,6 +13,8 @@ RUN apk add --no-cache \
   git \
   libc-dev \
   make \
+  musl-dev \
+  postgresql-dev \
   yarn \
   && (curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -) \
   && chmod -R +x "$POETRY_HOME/bin"

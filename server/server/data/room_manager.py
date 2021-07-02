@@ -28,7 +28,7 @@ def get_all_rooms() -> list[Room]:
 
 def room_exists(room_id: str) -> bool:
     cur = db_connection.cursor()
-    cur.execute("SELECT 1 FROM rooms WHERE id = ?", (room_id,))
+    cur.execute("SELECT 1 FROM rooms WHERE id = %s", (room_id,))
 
     return cur.fetchone() is not None
 
@@ -38,7 +38,7 @@ def get_room(room_id: str) -> Room:
         raise ValueError(f"Invalid room id: {room_id}")
 
     cur = db_connection.cursor()
-    cur.execute("SELECT player_id FROM room_players WHERE room_id = ?", (room_id,))
+    cur.execute("SELECT player_id FROM room_players WHERE room_id = %s", (room_id,))
 
     return Room(room_id, {player_id for (player_id,) in cur.fetchall()})
 
@@ -47,20 +47,20 @@ def create_room() -> Room:
     cur = db_connection.cursor()
 
     room_id = generate_id()
-    cur.execute("SELECT 1 FROM rooms WHERE id = ?", (room_id,))
+    cur.execute("SELECT 1 FROM rooms WHERE id = %s", (room_id,))
     while cur.fetchone() is not None:
         room_id = generate_id()
-        cur.execute("SELECT 1 FROM rooms WHERE id = ?", (room_id,))
+        cur.execute("SELECT 1 FROM rooms WHERE id = %s", (room_id,))
 
     room = Room(room_id)
-    cur.execute("INSERT INTO rooms VALUES (?)", (room.room_id,))
+    cur.execute("INSERT INTO rooms VALUES (%s)", (room.room_id,))
 
     return room
 
 
 def get_players_in_room(room_id: str) -> dict[str, Player]:
     cur = db_connection.cursor()
-    cur.execute("SELECT player_id FROM room_players WHERE room_id = ?", (room_id,))
+    cur.execute("SELECT player_id FROM room_players WHERE room_id = %s", (room_id,))
 
     player_ids = {player_id for (player_id,) in cur.fetchall()}
     return player_manager.get_players(player_ids)
@@ -71,7 +71,10 @@ def add_player_to_room(player_id: str, room_id: str) -> Room:
         raise ValueError(f"Invalid player id ({player_id}) or room id ({room_id})")
 
     cur = db_connection.cursor()
-    cur.execute("INSERT OR IGNORE INTO room_players VALUES (?, ?)", (room_id, player_id))
+    cur.execute(
+        "INSERT INTO room_players VALUES (%s, %s) ON CONFLICT DO NOTHING",
+        (room_id, player_id),
+    )
 
     return get_room(room_id)
 
@@ -82,12 +85,12 @@ def drop_player_from_room(player_id: str, room_id: str) -> bool:
 
     cur = db_connection.cursor()
     cur.execute(
-        "DELETE FROM room_players WHERE room_id = ? AND player_id = ?",
+        "DELETE FROM room_players WHERE room_id = %s AND player_id = %s",
         (room_id, player_id),
     )
 
-    cur.execute("SELECT 1 FROM room_players WHERE room_id = ? LIMIT 1", (room_id,))
+    cur.execute("SELECT 1 FROM room_players WHERE room_id = %s LIMIT 1", (room_id,))
     if cur.fetchone() is None:
-        cur.execute("DELETE FROM rooms WHERE id = ?", (room_id,))
+        cur.execute("DELETE FROM rooms WHERE id = %s", (room_id,))
 
     return True
