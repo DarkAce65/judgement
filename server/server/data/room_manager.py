@@ -18,21 +18,6 @@ def room_exists(room_id: str) -> bool:
     return cur.fetchone() is not None
 
 
-def get_all_rooms() -> list[Room]:
-    rooms: dict[str, Room] = {}
-
-    cur = db_connection.cursor()
-    cur.execute("SELECT id FROM rooms")
-    for (room_id,) in cur.fetchall():
-        rooms[room_id] = Room(room_id)
-
-    cur.execute("SELECT room_id, player_id FROM room_players")
-    for (room_id, player_id) in cur.fetchall():
-        rooms[room_id].player_ids.add(player_id)
-
-    return list(rooms.values())
-
-
 def get_room(room_id: str) -> Room:
     if not room_exists(room_id):
         raise ValueError(f"Invalid room id: {room_id}")
