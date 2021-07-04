@@ -14,8 +14,8 @@ COLORS = {
 
 
 class ColoredFormatter(logging.Formatter):
-    def __init__(self, msg: str, use_color: bool = True, **kwargs: Any) -> None:
-        logging.Formatter.__init__(self, msg, **kwargs)
+    def __init__(self, fmt: str, use_color: bool = True, **kwargs: Any) -> None:
+        logging.Formatter.__init__(self, fmt, **kwargs)
         self.use_color = use_color
 
     def format(self, record: logging.LogRecord) -> str:
@@ -24,12 +24,3 @@ class ColoredFormatter(logging.Formatter):
             levelname_color = COLOR_SEQ % (30 + COLORS[levelname]) + levelname + RESET_SEQ
             record.levelname = levelname_color
         return logging.Formatter.format(self, record)
-
-
-def configure_logger(logger: logging.Logger) -> None:
-    formatter = ColoredFormatter(
-        "[%(asctime)s] [%(levelname)s] %(message)s", datefmt="%H:%M:%S"
-    )
-    console = logging.StreamHandler()
-    console.setFormatter(formatter)
-    logger.addHandler(console)

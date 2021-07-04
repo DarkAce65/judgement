@@ -1,10 +1,10 @@
 import argparse
+import json
 import logging
+import logging.config
 from pathlib import Path, PurePath
 
 from pydantic2ts import generate_typescript_defs
-
-from model_generator.color_logs import configure_logger
 
 MODEL_MODULES = ["requests", "responses", "websocket"]
 
@@ -12,8 +12,8 @@ logger = logging.getLogger(__name__)
 
 
 if __name__ == "__main__":
-    configure_logger(logger)
-    logger.setLevel(logging.INFO)
+    with open("logging.config.json") as config:
+        logging.config.dictConfig(json.load(config))
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--module", action="append", dest="modules")

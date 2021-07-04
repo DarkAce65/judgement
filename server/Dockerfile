@@ -36,7 +36,7 @@ RUN poetry install --no-dev --no-interaction
 FROM base_server as debug
 RUN poetry install --no-dev -E debug --no-interaction
 COPY . .
-CMD ["sh", "-c", "poetry run python -m debugpy --listen 0.0.0.0:5678 -m uvicorn main:app --host 0.0.0.0 --port $API_PORT --use-colors --reload --reload-dir server"]
+CMD ["sh", "-c", "poetry run python -m debugpy --listen 0.0.0.0:5678 -m uvicorn main:app --host 0.0.0.0 --port $API_PORT --use-colors --log-config logging.config.json --reload --reload-dir server"]
 
 # Production container
 FROM base_server as production

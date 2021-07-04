@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "disable_existing_loggers": false,
+  "formatters": {
+    "standard": {
+      "()": "colored_formatter.ColoredFormatter",
+      "fmt": "%(asctime)s [%(levelname)s] %(message)s",
+      "datefmt": "%H:%M:%S"
+    },
+    "uvicorn_access": {
+      "()": "uvicorn.logging.AccessFormatter",
+      "fmt": "%(asctime)s [%(levelname)s] %(client_addr)s - \"%(request_line)s\" %(status_code)s",
+      "datefmt": "%H:%M:%S",
+      "use_colors": true
+    }
+  },
+  "handlers": {
+    "default": {
+      "level": "INFO",
+      "formatter": "standard",
+      "class": "logging.StreamHandler"
+    },
+    "uvicorn_access": {
+      "level": "INFO",
+      "formatter": "uvicorn_access",
+      "class": "logging.StreamHandler"
+    }
+  },
+  "loggers": {
+    "": {
+      "handlers": ["default"],
+      "level": "INFO",
+      "propagate": false
+    },
+    "pydantic2ts": { "level": "WARNING" },
+    "uvicorn.access": {
+      "handlers": ["uvicorn_access"],
+      "level": "INFO",
+      "propagate": false
+    },
+    "uvicorn.error": {
+      "handlers": ["default"],
+      "level": "INFO",
+      "propagate": false
+    }
+  }
+}

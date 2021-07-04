@@ -1,5 +1,7 @@
 import argparse
+import json
 import logging
+import logging.config
 import subprocess
 from pathlib import Path, PurePath
 from subprocess import CalledProcessError
@@ -8,7 +10,6 @@ from typing import Optional
 from watchgod import watch
 from watchgod.watcher import RegExpWatcher
 
-from model_generator.color_logs import configure_logger
 from model_generator.model_generator import MODEL_MODULES
 
 logger = logging.getLogger(__name__)
@@ -37,8 +38,8 @@ def run_generator(
 
 
 if __name__ == "__main__":
-    configure_logger(logger)
-    logger.setLevel(logging.INFO)
+    with open("logging.config.json") as config:
+        logging.config.dictConfig(json.load(config))
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--out_dir", required=True)
