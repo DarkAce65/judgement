@@ -1,7 +1,7 @@
 import { PayloadAction, createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 
 import { EnsurePlayerRequest } from '../../generated_types/requests';
-import { RoomResponse } from '../../generated_types/responses';
+import { RoomIdResponse } from '../../generated_types/responses';
 import { fetchAPI, makeJSONBodyWithContentType } from '../api/client';
 
 import { getPlayerName } from './playerSlice';
@@ -23,7 +23,7 @@ export const createRoom = createAsyncThunk<string, void, { state: RootState }>(
   'room/createRoom',
   async () => {
     const response = await fetchAPI('/rooms/create', { method: 'POST' });
-    const { roomId }: RoomResponse = await response.json();
+    const { roomId }: RoomIdResponse = await response.json();
 
     return roomId;
   }

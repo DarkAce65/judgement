@@ -5,24 +5,18 @@ from starlette.status import HTTP_204_NO_CONTENT
 
 from server.data import room_manager
 from server.models.requests import EnsurePlayerRequest
-from server.models.responses import RoomResponse, RoomsResponse
+from server.models.responses import RoomIdResponse
 
 from .player import ensure_player_and_set_cookie
 
 router = APIRouter(prefix="/rooms", tags=["rooms"])
 
 
-@router.get("", response_model=RoomsResponse)
-async def get_all_rooms() -> RoomsResponse:
-    rooms = [RoomResponse(room_id=room.room_id) for room in room_manager.get_all_rooms()]
-    return RoomsResponse(rooms=rooms)
+@router.post("/create", response_model=RoomIdResponse)
+async def create_room() -> RoomIdResponse:
+    room_id = room_manager.create_room()
 
-
-@router.post("/create", response_model=RoomResponse)
-async def create_room() -> RoomResponse:
-    room = room_manager.create_room()
-
-    return RoomResponse(room_id=room.room_id)
+    return RoomIdResponse(room_id=room_id)
 
 
 @router.head("/{room_id}/exists", status_code=HTTP_204_NO_CONTENT)
