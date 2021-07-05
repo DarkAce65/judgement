@@ -5,7 +5,7 @@ from starlette.status import HTTP_204_NO_CONTENT
 
 from server.data import room_manager
 from server.models.requests import EnsurePlayerRequest
-from server.models.responses import RoomIdResponse
+from server.models.responses import RoomIdResponse, RoomResponse
 
 from .player import ensure_player_and_set_cookie
 
@@ -23,6 +23,12 @@ async def create_room() -> RoomIdResponse:
 async def does_room_exist(room_id: str = Path(..., alias="room_id")) -> None:
     if not room_manager.room_exists(room_id):
         raise HTTPException(status_code=404)
+
+
+@router.get("/{room_id}", response_model=RoomResponse)
+async def get_room(room_id: str = Path(..., alias="room_id")) -> RoomResponse:
+    room = room_manager.get_room(room_id)
+    return RoomResponse.from_room(room)
 
 
 @router.post("/{room_id}/join", status_code=HTTP_204_NO_CONTENT)
