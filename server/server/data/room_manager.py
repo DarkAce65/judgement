@@ -5,7 +5,7 @@ from typing import Optional
 from . import ROOM_ID_LENGTH, player_manager
 from .db import db_connection
 from .player import Player
-from .room import Room
+from .room import Room, RoomState
 
 
 def generate_id() -> str:
@@ -20,13 +20,19 @@ def room_exists(room_id: str) -> bool:
 
 
 def get_room(room_id: str) -> Room:
-    if not room_exists(room_id):
+    cur = db_connection.cursor()
+    cur.execute("SELECT id, room_state FROM rooms WHERE id = %s", (room_id,))
+    result: Optional[tuple[str, int]] = cur.fetchone()
+
+    if result is None:
         raise ValueError(f"Invalid room id: {room_id}")
 
-    cur = db_connection.cursor()
+    room_id, room_state = result
     cur.execute("SELECT player_id FROM room_players WHERE room_id = %s", (room_id,))
+    results: list[tuple[str]] = cur.fetchall()
+    player_ids = {player_id for (player_id,) in results}
 
-    return Room(room_id, {player_id for (player_id,) in cur.fetchall()})
+    return Room(room_id, RoomState(room_state), player_ids)
 
 
 def create_room() -> str:
@@ -36,9 +42,14 @@ def create_room() -> str:
     while room_exists(room_id):
         room_id = generate_id()
 
-    cur.execute("INSERT INTO rooms VALUES (%s)", (room_id,))
+    room = Room.new(room_id)
 
-    return room_id
+    cur.execute(
+        "INSERT INTO rooms (id, room_state) VALUES (%s, %s)",
+        (room.room_id, room.room_state),
+    )
+
+    return room.room_id
 
 
 def get_player_ids_in_room(room_id: str) -> set[str]:
