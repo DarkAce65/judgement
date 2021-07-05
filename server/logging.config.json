@@ -16,14 +16,15 @@
   },
   "handlers": {
     "default": {
+      "class": "logging.StreamHandler",
       "level": "INFO",
-      "formatter": "standard",
-      "class": "logging.StreamHandler"
+      "formatter": "standard"
     },
     "uvicorn_access": {
+      "class": "logging.StreamHandler",
+      "stream": "ext://sys.stdout",
       "level": "INFO",
-      "formatter": "uvicorn_access",
-      "class": "logging.StreamHandler"
+      "formatter": "uvicorn_access"
     }
   },
   "loggers": {
