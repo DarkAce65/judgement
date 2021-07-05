@@ -15,7 +15,7 @@ def player_exists(player_id: str) -> bool:
 def get_player(player_id: str) -> Player:
     cur = db_connection.cursor()
     cur.execute("SELECT name FROM players WHERE id = %s", (player_id,))
-    result = cur.fetchone()
+    result: Optional[tuple[str]] = cur.fetchone()
 
     if result is None:
         raise ValueError(f"Invalid player id: {player_id}")

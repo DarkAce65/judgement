@@ -29,10 +29,11 @@ def get_player_id_for_client(client_id: str) -> str:
         "SELECT player_id FROM client_player_room WHERE client_id = %s", (client_id,)
     )
 
-    (player_id,) = cur.fetchone()
-    if player_id is None:
+    result: Optional[tuple[str]] = cur.fetchone()
+    if result is None:
         raise ValueError(f"Invalid client id: {client_id}")
 
+    (player_id,) = result
     return player_id
 
 
@@ -44,7 +45,8 @@ def get_client_ids_for_player(player_id: str) -> set[str]:
     cur.execute(
         "SELECT client_id FROM client_player_room WHERE player_id = %s", (player_id,)
     )
-    return {client_id for (client_id,) in cur.fetchall()}
+    results: list[tuple[str]] = cur.fetchall()
+    return {client_id for (client_id,) in results}
 
 
 def get_client_ids_for_players(player_ids: set[str]) -> set[str]:
@@ -53,7 +55,8 @@ def get_client_ids_for_players(player_ids: set[str]) -> set[str]:
         "SELECT client_id FROM client_player_room WHERE player_id = ANY(%s)",
         (list(player_ids),),
     )
-    return {client_id for (client_id,) in cur.fetchall()}
+    results: list[tuple[str]] = cur.fetchall()
+    return {client_id for (client_id,) in results}
 
 
 def connect_player_client(player_id: str, client_id: str) -> None:
@@ -68,7 +71,8 @@ async def propagate_name_change(player_id: str) -> None:
         "WHERE player_id = %s AND room_id IS NOT NULL",
         (player_id,),
     )
-    room_ids = {room_id for (room_id,) in cur.fetchall()}
+    results: list[tuple[str]] = cur.fetchall()
+    room_ids = {room_id for (room_id,) in results}
 
     for room_id in room_ids:
         await socket_messager.emit_players(room_id)
@@ -83,8 +87,9 @@ def add_player_client_to_room(client_id: str, room_id: str) -> None:
         "WHERE client_id = %s AND room_id IS NOT NULL",
         (client_id,),
     )
-    old_room_id = cur.fetchone()
-    if old_room_id is not None:
+    result: Optional[tuple[str]] = cur.fetchone()
+    if result is not None:
+        (old_room_id,) = result
         sio.leave_room(client_id, old_room_id)
         sio.leave_room(client_id, f"{old_room_id}/{player_id}")
 
@@ -103,7 +108,8 @@ def remove_player_client_from_room(client_id: str, room_id: str) -> None:
         "SELECT client_id FROM client_player_room WHERE room_id = %s AND player_id = %s",
         (room_id, player_id),
     )
-    for (c_id,) in cur.fetchall():
+    results: list[tuple[str]] = cur.fetchall()
+    for (c_id,) in results:
         sio.leave_room(c_id, room_id)
         sio.leave_room(c_id, f"{room_id}/{player_id}")
 

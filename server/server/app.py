@@ -9,6 +9,7 @@ from .sio_app import sio
 
 app = FastAPI()
 
+
 if "CORS_ALLOWED_ORIGIN" in os.environ:
     origin = os.environ.get("CORS_ALLOWED_ORIGIN")
 

@@ -1,5 +1,6 @@
 import random
 import string
+from typing import Optional
 
 from . import ROOM_ID_LENGTH, player_manager
 from .db import db_connection
@@ -32,10 +33,8 @@ def create_room() -> str:
     cur = db_connection.cursor()
 
     room_id = generate_id()
-    cur.execute("SELECT 1 FROM rooms WHERE id = %s", (room_id,))
-    while cur.fetchone() is not None:
+    while room_exists(room_id):
         room_id = generate_id()
-        cur.execute("SELECT 1 FROM rooms WHERE id = %s", (room_id,))
 
     cur.execute("INSERT INTO rooms VALUES (%s)", (room_id,))
 
@@ -45,7 +44,8 @@ def create_room() -> str:
 def get_player_ids_in_room(room_id: str) -> set[str]:
     cur = db_connection.cursor()
     cur.execute("SELECT player_id FROM room_players WHERE room_id = %s", (room_id,))
-    return {player_id for (player_id,) in cur.fetchall()}
+    results: list[tuple[str]] = cur.fetchall()
+    return {player_id for (player_id,) in results}
 
 
 def get_players_in_room(room_id: str) -> dict[str, Player]:
