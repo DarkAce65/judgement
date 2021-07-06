@@ -1,6 +1,6 @@
 import functools
 import inspect
-from typing import Any, Callable, TypeVar, cast
+from typing import Any, Awaitable, Callable, TypeVar, cast
 
 from socketio.exceptions import (  # pylint: disable=redefined-builtin
     ConnectionRefusedError,
@@ -10,21 +10,23 @@ from server.data import connection_manager, player_manager, socket_messager
 from server.data.player import Player
 from server.sio_app import sio
 
-Fn = TypeVar("Fn", bound=Callable[..., Any])
+Fn = TypeVar("Fn", bound=Callable[..., Awaitable[None]])
 
 
 def require_player(socket_handler: Fn) -> Fn:
     @functools.wraps(socket_handler)
-    async def wrapper(client_id: str, *args: Any, **kwargs: Any) -> Any:
+    async def wrapper(client_id: str, *args: Any, **kwargs: Any) -> None:
         session = await sio.get_session(client_id)
         player_id = session["player_id"]
 
         try:
-            player = None if player_id is None else player_manager.get_player(player_id)
+            player_exists = (
+                False if player_id is None else player_manager.player_exists(player_id)
+            )
         except ValueError:
-            player = None
+            player_exists = False
 
-        if player is None:
+        if not player_exists:
             await sio.disconnect(client_id)
             return
 
@@ -32,10 +34,10 @@ def require_player(socket_handler: Fn) -> Fn:
             socket_handler
         ).annotations.items():
             if annotation == Player:
-                kwargs[argname] = player
+                kwargs[argname] = player_manager.get_player(player_id)
                 break
 
-        return await socket_handler(client_id, *args, **kwargs)
+        await socket_handler(client_id, *args, **kwargs)
 
     return cast(Fn, wrapper)
 
