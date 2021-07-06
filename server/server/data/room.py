@@ -1,10 +1,10 @@
-from enum import IntEnum, unique
+from enum import Enum, unique
 
 
 @unique
-class RoomState(IntEnum):
-    LOBBY = 1
-    GAME = 2
+class RoomState(str, Enum):
+    LOBBY = "LOBBY"
+    GAME = "GAME"
 
 
 class Room:
