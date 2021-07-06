@@ -39,7 +39,7 @@ class Game(Generic[Action, Settings]):
         except ValidationError as error:
             raise GameError(
                 f"Input could not be parsed into {self._action_cls.__name__} "
-                "(input: {raw_game_input})"
+                f"(input: {raw_game_input})"
             ) from error
 
         self.process_input(player_id, parsed_action)
