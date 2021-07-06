@@ -1,4 +1,5 @@
 from enum import Enum, unique
+from typing import Optional
 
 
 @unique
@@ -16,7 +17,7 @@ class Room:
         self,
         room_id: str,
         room_state: RoomState = RoomState.LOBBY,
-        player_ids: set[str] = None,
+        player_ids: Optional[set[str]] = None,
     ) -> None:
         self.room_id = room_id
         self.room_state = room_state

@@ -7,14 +7,6 @@ from . import player_manager, socket_messager
 from .db import db_connection
 
 
-def insert_client_mapping(client_id: str, player_id: str, room_id: str = None) -> None:
-    cur = db_connection.cursor()
-    cur.execute(
-        "INSERT INTO client_player_room VALUES (%s, %s, %s)",
-        (client_id, player_id, room_id),
-    )
-
-
 def set_client_room(client_id: str, room_id: Optional[str]) -> None:
     cur = db_connection.cursor()
     cur.execute(
@@ -60,7 +52,11 @@ def get_client_ids_for_players(player_ids: set[str]) -> set[str]:
 
 
 def connect_player_client(player_id: str, client_id: str) -> None:
-    insert_client_mapping(client_id, player_id)
+    cur = db_connection.cursor()
+    cur.execute(
+        "INSERT INTO client_player_room (client_id, player_id) VALUES (%s, %s)",
+        (client_id, player_id),
+    )
     sio.enter_room(client_id, player_id)
 
 
