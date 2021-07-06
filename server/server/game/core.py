@@ -1,6 +1,6 @@
 import logging
 from abc import abstractmethod
-from enum import Enum, auto, unique
+from enum import Enum, unique
 from typing import Any, Generic, Type, TypeVar
 
 from pydantic import ValidationError
@@ -14,10 +14,10 @@ Settings = TypeVar("Settings")
 
 
 @unique
-class GameState(Enum):
-    NOT_STARTED = auto()
-    IN_PROGRESS = auto()
-    COMPLETE = auto()
+class GameState(str, Enum):
+    NOT_STARTED = "NOT_STARTED"
+    IN_PROGRESS = "IN_PROGRESS"
+    COMPLETE = "COMPLETE"
 
 
 class GameError(Exception):
