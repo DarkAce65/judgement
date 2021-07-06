@@ -1,4 +1,4 @@
-CREATE TYPE room_id CHAR(4);
+CREATE DOMAIN room_id CHAR(4);
 
 CREATE TABLE players(id TEXT PRIMARY KEY NOT NULL, name TEXT);
 
