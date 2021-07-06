@@ -15,7 +15,6 @@ router = APIRouter(prefix="/rooms", tags=["rooms"])
 @router.post("/create", response_model=RoomIdResponse)
 async def create_room() -> RoomIdResponse:
     room_id = room_manager.create_room()
-
     return RoomIdResponse(room_id=room_id)
 
 

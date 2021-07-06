@@ -6,7 +6,11 @@ from pathlib import Path, PurePath
 
 from pydantic2ts import generate_typescript_defs
 
-MODEL_MODULES = ["requests", "responses", "websocket"]
+MODEL_MODULES = [
+    "server.models.requests",
+    "server.models.responses",
+    "server.models.websocket",
+]
 
 logger = logging.getLogger(__name__)
 
@@ -30,11 +34,8 @@ if __name__ == "__main__":
     json2ts_path = PurePath(current_dir / "node_modules/.bin/json2ts")
 
     for module_name in module_names:
-        out_filename = (out_dir / module_name).with_suffix(".ts")
-        generate_typescript_defs(
-            f"server.models.{module_name}", out_filename, json2ts_cmd=json2ts_path
-        )
+        base_name = module_name.rsplit(".", maxsplit=1)[-1]
+        out_filename = (out_dir / base_name).with_suffix(".ts")
+        generate_typescript_defs(module_name, out_filename, json2ts_cmd=json2ts_path)
 
-        logger.info(
-            "Wrote interfaces for server.models.%s to %s", module_name, out_filename
-        )
+        logger.info("Wrote interfaces for %s to %s", module_name, out_filename)
