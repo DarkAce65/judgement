@@ -10,6 +10,7 @@ MODEL_MODULES = [
     "server.models.requests",
     "server.models.responses",
     "server.models.websocket",
+    "server.game.judgement",
 ]
 
 logger = logging.getLogger(__name__)
