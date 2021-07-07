@@ -20,17 +20,20 @@ class JudgementSettings(CamelModel):
     pass
 
 
-class JudgementGame(Game[JudgementAction, JudgementSettings]):
-    def __init__(self) -> None:
-        super().__init__(JudgementAction, JudgementSettings())
-
-    def process_input(self, player_id: str, game_input: JudgementAction) -> None:
-        logger.info("%s, %s", player_id, game_input)
-
-
 class JudgementGameState(GameState[JudgementAction, JudgementSettings]):
     settings: JudgementSettings
 
     @staticmethod
     def from_game(game: Game[JudgementAction, JudgementSettings]) -> "JudgementGameState":
         return JudgementGameState(game_phase=game.game_phase, settings=game.settings)
+
+
+class JudgementGame(Game[JudgementAction, JudgementSettings]):
+    def __init__(self) -> None:
+        super().__init__(JudgementAction, JudgementSettings())
+
+    def get_player_message(self) -> JudgementGameState:
+        return JudgementGameState.from_game(self)
+
+    def process_input(self, player_id: str, game_input: JudgementAction) -> None:
+        logger.info("%s, %s", player_id, game_input)

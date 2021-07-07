@@ -25,6 +25,16 @@ class GameError(Exception):
     pass
 
 
+class GameState(GenericCamelModel, Generic[Action, Settings]):
+    game_phase: GamePhase
+    settings: Settings
+
+    @staticmethod
+    @abstractmethod
+    def from_game(game: "Game[Action, Settings]") -> "GameState[Action, Settings]":
+        ...
+
+
 class Game(Generic[Action, Settings]):
     _action_cls: Type[Action]
 
@@ -36,6 +46,10 @@ class Game(Generic[Action, Settings]):
 
         self.game_phase = GamePhase.NOT_STARTED
         self.settings = settings
+
+    @abstractmethod
+    def get_player_message(self) -> GameState[Action, Settings]:
+        ...
 
     def process_raw_input(self, player_id: str, raw_game_input: dict[str, Any]) -> None:
         try:
@@ -50,14 +64,4 @@ class Game(Generic[Action, Settings]):
 
     @abstractmethod
     def process_input(self, player_id: str, game_input: Action) -> None:
-        ...
-
-
-class GameState(GenericCamelModel, Generic[Action, Settings]):
-    game_phase: GamePhase
-    settings: Settings
-
-    @staticmethod
-    @abstractmethod
-    def from_game(game: Game[Action, Settings]) -> "GameState[Action, Settings]":
         ...
