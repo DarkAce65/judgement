@@ -52,6 +52,11 @@ def create_room() -> str:
     return room.room_id
 
 
+def delete_room(room_id: str) -> None:
+    cur = db_connection.cursor()
+    cur.execute("DELETE FROM rooms WHERE id = %s", (room_id,))
+
+
 def get_player_ids_in_room(room_id: str) -> set[str]:
     cur = db_connection.cursor()
     cur.execute("SELECT player_id FROM room_players WHERE room_id = %s", (room_id,))
@@ -87,4 +92,4 @@ def drop_player_from_room(player_id: str, room_id: str) -> None:
 
     cur.execute("SELECT 1 FROM room_players WHERE room_id = %s LIMIT 1", (room_id,))
     if cur.fetchone() is None:
-        cur.execute("DELETE FROM rooms WHERE id = %s", (room_id,))
+        delete_room(room_id)
