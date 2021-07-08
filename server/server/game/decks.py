@@ -32,10 +32,10 @@ class Decks:
 
         while shuffle_index > 0:
             rand_index = random.randint(0, shuffle_index)
-            shuffle_index -= 1
             temp = self.cards[shuffle_index]
             self.cards[shuffle_index] = self.cards[rand_index]
             self.cards[rand_index] = temp
+            shuffle_index -= 1
 
     def sort(self) -> None:
         self.cards = deque(sorted(self.cards))
