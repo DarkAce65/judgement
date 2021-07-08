@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-import random
 from collections import Counter, deque
 from collections.abc import Iterable, Sequence
+from random import Random
 from typing import Counter as CounterType
 
 from .card import Card, Suit
@@ -27,11 +27,11 @@ class Decks:
 
         self._drawn_card_counts = Counter([])
 
-    def shuffle(self) -> None:
+    def shuffle(self, rand: Random = Random()) -> None:
         shuffle_index = len(self.cards) - 1
 
         while shuffle_index > 0:
-            rand_index = random.randint(0, shuffle_index)
+            rand_index = rand.randint(0, shuffle_index)
             temp = self.cards[shuffle_index]
             self.cards[shuffle_index] = self.cards[rand_index]
             self.cards[rand_index] = temp

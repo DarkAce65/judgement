@@ -1,5 +1,6 @@
 import statistics
 from collections import Counter
+from random import Random
 from typing import Counter as CounterType
 from unittest.case import TestCase
 
@@ -33,6 +34,21 @@ class TestDecks(TestCase):
         self.assertListEqual(
             [str(card) for card in deck.draw(8)],
             ["D7", "D8", "D9", "D10", "DJ", "DQ", "DK", "SA"],
+        )
+
+    def test_draw_from_shuffled_deck(self) -> None:
+        rand = Random(9999)
+        deck = Decks()
+        deck.shuffle(rand=rand)
+
+        self.assertListEqual([str(card) for card in deck.draw()], ["S10"])
+        self.assertListEqual([str(card) for card in deck.draw()], ["D2"])
+        self.assertListEqual(
+            [str(card) for card in deck.draw(4)], ["DQ", "H4", "SJ", "C3"]
+        )
+        self.assertListEqual(
+            [str(card) for card in deck.draw(8)],
+            ["C9", "S8", "H7", "C4", "D3", "CQ", "S4", "SQ"],
         )
 
     def test_shuffle(self) -> None:
