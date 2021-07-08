@@ -1,6 +1,6 @@
 from unittest.case import TestCase
 
-from server.models.card import Card, Suit
+from server.game.card import Card, Suit
 
 
 class TestCards(TestCase):
