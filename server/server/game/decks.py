@@ -11,7 +11,7 @@ NUM_CARDS_IN_DECK = 52
 
 
 class Decks:
-    cards: deque[str]
+    cards: deque[Card]
     num_decks: int
 
     _drawn_card_counts: CounterType[str]
@@ -23,7 +23,7 @@ class Decks:
         for _ in range(num_decks):
             for suit in Suit:
                 for number in range(1, 14):
-                    self.cards.append(Card.to_str(suit, number))
+                    self.cards.append(Card(suit=suit, rank=number))
 
         self._drawn_card_counts = Counter([])
 
@@ -38,7 +38,7 @@ class Decks:
             shuffle_index -= 1
 
     def sort(self) -> None:
-        self.cards = deque(sorted(self.cards))
+        self.cards = deque(sorted(self.cards, key=str))
 
     def draw(self, count: int = 1) -> deque[Card]:
         if len(self.cards) < count:
@@ -46,23 +46,23 @@ class Decks:
                 f"Not enough cards left in the deck to draw - cards in deck: {len(self.cards)}"
             )
 
-        drawn_cards: list[str] = []
+        drawn_cards: deque[Card] = deque()
         for _ in range(count):
             drawn_cards.append(self.cards.popleft())
 
-        self._drawn_card_counts.update(drawn_cards)
+        self._drawn_card_counts.update(map(str, drawn_cards))
 
-        return deque(map(Card.from_str, drawn_cards))
+        return drawn_cards
 
     def replace_bottom(self, cards: Sequence[Card]) -> None:
         self._compute_card_counts(cards)
 
-        self.cards.extend(map(str, cards))
+        self.cards.extend(cards)
 
     def replace(self, cards: Sequence[Card]) -> None:
         self._compute_card_counts(cards)
 
-        self.cards.extendleft(map(str, reversed(cards)))
+        self.cards.extendleft(reversed(cards))
 
     def _compute_card_counts(
         self, new_cards: Iterable[Card], validate: bool = True

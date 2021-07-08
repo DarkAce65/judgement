@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from enum import Enum, unique
 
+from pydantic import BaseModel, validator
+
 
 @unique
 class Suit(Enum):
@@ -11,16 +13,20 @@ class Suit(Enum):
     CLUBS = "C"
 
 
-class Card:
+class Card(BaseModel):
     suit: Suit
     rank: int
 
-    def __init__(self, suit: Suit, rank: int) -> None:
+    class Config:
+        frozen = True
+
+    @classmethod
+    @validator("rank")
+    def rank_must_be_valid(cls, rank: int) -> int:
         if rank < 1 or rank > 13:
             raise ValueError("Card rank is out of bounds", rank)
 
-        self.suit = suit
-        self.rank = rank
+        return rank
 
     @staticmethod
     def from_str(card_string: str) -> Card:
@@ -44,7 +50,7 @@ class Card:
         except ValueError as ex:
             raise ValueError("Invalid rank for Card", rank_str) from ex
 
-        return Card(Suit(suit_str), rank)
+        return Card(suit=Suit(suit_str), rank=rank)
 
     @staticmethod
     def to_str(suit: Suit, rank: int) -> str:
