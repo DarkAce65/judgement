@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from enum import Enum, unique
 
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, Field
 
 
 @unique
@@ -15,18 +15,10 @@ class Suit(Enum):
 
 class Card(BaseModel):
     suit: Suit
-    rank: int
+    rank: int = Field(..., ge=1, le=13)
 
     class Config:
         frozen = True
-
-    @classmethod
-    @validator("rank")
-    def rank_must_be_valid(cls, rank: int) -> int:
-        if rank < 1 or rank > 13:
-            raise ValueError("Card rank is out of bounds", rank)
-
-        return rank
 
     @staticmethod
     def from_str(card_string: str) -> Card:

@@ -1,5 +1,7 @@
 from unittest.case import TestCase
 
+from pydantic import ValidationError
+
 from server.game.card import Card, Suit
 
 
@@ -28,3 +30,33 @@ class TestCards(TestCase):
 
         eight_of_hearts = Card(suit=Suit.HEARTS, rank=8)
         self.assertEqual(str(eight_of_hearts), "H8")
+
+    def test_fails_to_create_invalid_card(self) -> None:
+        self.assertRaisesRegex(ValueError, "Invalid string", Card.from_str, "S")
+        self.assertRaisesRegex(ValueError, "not a valid Suit", Card.from_str, "Z5")
+        self.assertRaisesRegex(
+            ValidationError,
+            "ensure this value is greater than or equal to 1",
+            Card.from_str,
+            "S0",
+        )
+        self.assertRaisesRegex(
+            ValidationError,
+            "ensure this value is less than or equal to 13",
+            Card.from_str,
+            "S14",
+        )
+        self.assertRaisesRegex(
+            ValidationError,
+            "ensure this value is greater than or equal to 1",
+            Card,
+            suit=Suit.SPADES,
+            rank=0,
+        )
+        self.assertRaisesRegex(
+            ValidationError,
+            "ensure this value is less than or equal to 13",
+            Card,
+            suit=Suit.SPADES,
+            rank=14,
+        )
