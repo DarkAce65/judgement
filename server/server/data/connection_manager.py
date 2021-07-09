@@ -1,9 +1,8 @@
 from typing import Optional
 
-from server.data import room_manager
 from server.sio_app import sio
 
-from . import player_manager, socket_messager
+from . import player_manager, room_manager, socket_messager
 from .db import db_connection
 
 

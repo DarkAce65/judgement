@@ -2,10 +2,15 @@ import random
 import string
 from typing import Optional
 
+from server.game.core import Game
+from server.game.judgement import JudgementGame
+
 from . import ROOM_ID_LENGTH, player_manager
 from .db import db_connection
 from .player import Player
 from .room import Room, RoomState
+
+games: dict[str, Game] = {}
 
 
 def generate_id() -> str:
@@ -56,6 +61,8 @@ def delete_room(room_id: str) -> None:
     cur = db_connection.cursor()
     cur.execute("DELETE FROM rooms WHERE id = %s", (room_id,))
 
+    del games[room_id]
+
 
 def get_player_ids_in_room(room_id: str) -> set[str]:
     cur = db_connection.cursor()
@@ -93,3 +100,8 @@ def drop_player_from_room(player_id: str, room_id: str) -> None:
     cur.execute("SELECT 1 FROM room_players WHERE room_id = %s LIMIT 1", (room_id,))
     if cur.fetchone() is None:
         delete_room(room_id)
+
+
+def set_game(room_id: str, game_name: str) -> None:
+    if game_name == "judgement":
+        games[room_id] = JudgementGame()

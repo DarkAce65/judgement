@@ -2,7 +2,7 @@ from typing import Optional
 
 from pydantic import Field
 
-from server.models.camel_model import CamelModel
+from .camel_model import CamelModel
 
 
 class EnsurePlayerRequest(CamelModel):

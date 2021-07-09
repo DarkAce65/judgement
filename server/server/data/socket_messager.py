@@ -1,6 +1,7 @@
-from server.data import room_manager
 from server.models.websocket import PlayersMessage
 from server.sio_app import sio
+
+from . import room_manager
 
 
 async def emit_players(room_id: str) -> None:

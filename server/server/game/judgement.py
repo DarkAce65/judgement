@@ -1,10 +1,11 @@
 import logging
 from enum import Enum, unique
 
-from server.game.card import Card
-from server.game.core import Game, GameState
-from server.game.decks import Decks
 from server.models.camel_model import CamelModel
+
+from .card import Card
+from .core import Game, GameState
+from .decks import Decks
 
 logger = logging.getLogger(__name__)
 
