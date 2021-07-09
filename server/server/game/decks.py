@@ -37,9 +37,6 @@ class Decks:
             self.cards[rand_index] = temp
             shuffle_index -= 1
 
-    def sort(self) -> None:
-        self.cards = deque(sorted(self.cards, key=str))
-
     def draw(self, count: int = 1) -> deque[Card]:
         if len(self.cards) < count:
             raise ValueError(
@@ -56,12 +53,10 @@ class Decks:
 
     def replace_bottom(self, cards: Sequence[Card]) -> None:
         self._compute_card_counts(cards)
-
         self.cards.extend(cards)
 
     def replace(self, cards: Sequence[Card]) -> None:
         self._compute_card_counts(cards)
-
         self.cards.extendleft(reversed(cards))
 
     def _compute_card_counts(
