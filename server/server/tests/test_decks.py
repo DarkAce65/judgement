@@ -41,7 +41,7 @@ class TestDecks(TestCase):
         self.assertEqual(len(deck.cards), 38)
         self.assertEqual(len(set(deck.cards)), 38)
         self.assertCountEqual(
-            deck._drawn_card_counts,
+            deck._drawn_card_counts.elements(),
             [
                 "DA",
                 "D2",
@@ -77,7 +77,7 @@ class TestDecks(TestCase):
         self.assertEqual(len(deck.cards), 38)
         self.assertEqual(len(set(deck.cards)), 38)
         self.assertCountEqual(
-            deck._drawn_card_counts,
+            deck._drawn_card_counts.elements(),
             [
                 "S10",
                 "D2",
@@ -96,6 +96,142 @@ class TestDecks(TestCase):
             ],
         )
 
+    def test_draw_from_multiple_shuffled_decks(self) -> None:
+        rand = Random(9999)
+        deck = Decks(4)
+        deck.shuffle(rand=rand)
+
+        self.assertListEqual([str(card) for card in deck.draw()], ["H6"])
+        self.assertListEqual([str(card) for card in deck.draw()], ["D3"])
+        self.assertListEqual(
+            [str(card) for card in deck.draw(4)], ["C4", "H4", "C9", "SA"]
+        )
+        self.assertListEqual(
+            [str(card) for card in deck.draw(8)],
+            ["S4", "CQ", "D4", "HK", "D8", "H10", "C7", "H6"],
+        )
+        self.assertEqual(len(deck.cards), 194)
+        self.assertEqual(len(set(deck.cards)), 52)
+        self.assertCountEqual(
+            deck._drawn_card_counts.elements(),
+            [
+                "H6",
+                "D3",
+                "C4",
+                "H4",
+                "C9",
+                "SA",
+                "S4",
+                "CQ",
+                "D4",
+                "HK",
+                "D8",
+                "H10",
+                "C7",
+                "H6",
+            ],
+        )
+
+    def test_replacing_onto_multiple_shuffled_decks(self) -> None:
+        rand = Random(9999)
+        deck = Decks(4)
+        deck.shuffle(rand=rand)
+
+        drawn_cards = deck.draw(14)
+        self.assertListEqual(
+            [str(card) for card in drawn_cards],
+            [
+                "H6",
+                "D3",
+                "C4",
+                "H4",
+                "C9",
+                "SA",
+                "S4",
+                "CQ",
+                "D4",
+                "HK",
+                "D8",
+                "H10",
+                "C7",
+                "H6",
+            ],
+        )
+
+        self.assertEqual(len(deck.cards), 194)
+        self.assertEqual(len(set(deck.cards)), 52)
+        self.assertCountEqual(
+            deck._drawn_card_counts.elements(),
+            [
+                "H6",
+                "D3",
+                "C4",
+                "H4",
+                "C9",
+                "SA",
+                "S4",
+                "CQ",
+                "D4",
+                "HK",
+                "D8",
+                "H10",
+                "C7",
+                "H6",
+            ],
+        )
+
+        deck.replace(drawn_cards)
+        self.assertEqual(len(deck.cards), 208)
+        self.assertEqual(len(set(deck.cards)), 52)
+        self.assertCountEqual(deck._drawn_card_counts.elements(), [])
+        self.assertListEqual(
+            [str(card) for card in itertools.islice(deck.cards, 0, len(drawn_cards))],
+            [str(card) for card in drawn_cards],
+        )
+
+    def test_replacing_to_bottom_of_multiple_shuffled_decks(self) -> None:
+        rand = Random(9999)
+        deck = Decks(4)
+        deck.shuffle(rand=rand)
+
+        drawn_cards = deck.draw(14)
+        self.assertListEqual(
+            [str(card) for card in drawn_cards],
+            [
+                "H6",
+                "D3",
+                "C4",
+                "H4",
+                "C9",
+                "SA",
+                "S4",
+                "CQ",
+                "D4",
+                "HK",
+                "D8",
+                "H10",
+                "C7",
+                "H6",
+            ],
+        )
+        self.assertEqual(len(deck.cards), 194)
+        self.assertEqual(len(set(deck.cards)), 52)
+
+        deck.replace_bottom(drawn_cards)
+
+        self.assertEqual(len(deck.cards), 208)
+        self.assertEqual(len(set(deck.cards)), 52)
+        self.assertCountEqual(deck._drawn_card_counts.elements(), [])
+        self.assertListEqual(
+            [
+                str(card)
+                for card in itertools.islice(
+                    deck.cards, len(deck.cards) - len(drawn_cards), len(deck.cards)
+                )
+            ],
+            [str(card) for card in drawn_cards],
+        )
+
     def test_replace_onto_deck(self) -> None:
         deck = Decks()
 
@@ -105,12 +241,14 @@ class TestDecks(TestCase):
         )
         self.assertEqual(len(deck.cards), 47)
         self.assertEqual(len(set(deck.cards)), 47)
-        self.assertCountEqual(deck._drawn_card_counts, ["DA", "D2", "D3", "D4", "D5"])
+        self.assertCountEqual(
+            deck._drawn_card_counts.elements(), ["DA", "D2", "D3", "D4", "D5"]
+        )
 
         deck.replace(drawn_cards)
         self.assertEqual(len(deck.cards), 52)
         self.assertEqual(len(set(deck.cards)), 52)
-        self.assertCountEqual(deck._drawn_card_counts, [])
+        self.assertCountEqual(deck._drawn_card_counts.elements(), [])
         self.assertListEqual(
             [str(card) for card in itertools.islice(deck.cards, 0, len(drawn_cards))],
             [str(card) for card in drawn_cards],
@@ -125,16 +263,20 @@ class TestDecks(TestCase):
         )
         self.assertEqual(len(deck.cards), 47)
         self.assertEqual(len(set(deck.cards)), 47)
-        self.assertCountEqual(deck._drawn_card_counts, ["DA", "D2", "D3", "D4", "D5"])
+        self.assertCountEqual(
+            deck._drawn_card_counts.elements(), ["DA", "D2", "D3", "D4", "D5"]
+        )
 
         deck.replace_bottom(drawn_cards)
         self.assertEqual(len(deck.cards), 52)
         self.assertEqual(len(set(deck.cards)), 52)
-        self.assertCountEqual(deck._drawn_card_counts, [])
+        self.assertCountEqual(deck._drawn_card_counts.elements(), [])
         self.assertListEqual(
             [
                 str(card)
-                for card in itertools.islice(deck.cards, 52 - len(drawn_cards), 52)
+                for card in itertools.islice(
+                    deck.cards, len(deck.cards) - len(drawn_cards), len(deck.cards)
+                )
             ],
             [str(card) for card in drawn_cards],
         )
