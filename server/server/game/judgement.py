@@ -1,7 +1,9 @@
 import logging
 from enum import Enum, unique
 
+from server.game.card import Card
 from server.game.core import Game, GameState
+from server.game.decks import Decks
 from server.models.camel_model import CamelModel
 
 logger = logging.getLogger(__name__)
@@ -23,14 +25,28 @@ class JudgementSettings(CamelModel):
 class JudgementGameState(GameState[JudgementAction, JudgementSettings]):
     settings: JudgementSettings
 
+    # TODO: Convert to deque[Card] when https://github.com/samuelcolvin/pydantic/pull/2811 is merged  # pylint: disable=fixme
+    deck: list[Card]
+
     @staticmethod
     def from_game(game: Game[JudgementAction, JudgementSettings]) -> "JudgementGameState":
-        return JudgementGameState(game_phase=game.game_phase, settings=game.settings)
+        if not isinstance(game, JudgementGame):
+            raise ValueError
+
+        return JudgementGameState(
+            game_phase=game.game_phase,
+            settings=game.settings,
+            deck=list(game.decks.cards),
+        )
 
 
 class JudgementGame(Game[JudgementAction, JudgementSettings]):
+    decks: Decks
+
     def __init__(self) -> None:
         super().__init__(JudgementAction, JudgementSettings())
+
+        self.decks = Decks()
 
     def get_player_message(self) -> JudgementGameState:
         return JudgementGameState.from_game(self)

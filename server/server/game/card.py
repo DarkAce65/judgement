@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 
 
 @unique
-class Suit(Enum):
+class Suit(str, Enum):
     DIAMONDS = "D"
     SPADES = "S"
     HEARTS = "H"
