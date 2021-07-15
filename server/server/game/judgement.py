@@ -49,7 +49,7 @@ class JudgementGame(Game[JudgementAction, JudgementSettings]):
 
         self.decks = Decks()
 
-    def get_player_message(self) -> JudgementGameState:
+    def build_game_state(self) -> JudgementGameState:
         return JudgementGameState.from_game(self)
 
     def process_input(self, player_id: str, game_input: JudgementAction) -> None:

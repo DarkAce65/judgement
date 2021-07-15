@@ -48,7 +48,7 @@ class Game(Generic[Action, Settings]):
         self.settings = settings
 
     @abstractmethod
-    def get_player_message(self) -> GameState[Action, Settings]:
+    def build_game_state(self) -> GameState[Action, Settings]:
         ...
 
     def process_raw_input(self, player_id: str, raw_game_input: dict[str, Any]) -> None:
