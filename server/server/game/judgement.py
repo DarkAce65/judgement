@@ -26,18 +26,13 @@ class JudgementSettings(CamelModel):
 class JudgementGameState(GameState[JudgementAction, JudgementSettings]):
     settings: JudgementSettings
 
-    # TODO: Convert to deque[Card] when https://github.com/samuelcolvin/pydantic/pull/2811 is merged  # pylint: disable=fixme
-    deck: list[Card]
-
     @staticmethod
     def from_game(game: Game[JudgementAction, JudgementSettings]) -> "JudgementGameState":
         if not isinstance(game, JudgementGame):
             raise ValueError
 
         return JudgementGameState(
-            game_phase=game.game_phase,
-            settings=game.settings,
-            deck=list(game.decks.cards),
+            game_name=game.game_name, game_phase=game.game_phase, settings=game.settings
         )
 
 
