@@ -30,6 +30,13 @@ class GameError(Exception):
     pass
 
 
+class GamePlayer:
+    player_id: str
+
+    def __init__(self, player_id: str) -> None:
+        self.player_id = player_id
+
+
 class GameState(GenericCamelModel, Generic[Action, Settings]):
     game_name: GameName
     game_phase: GamePhase
@@ -47,15 +54,34 @@ class Game(Generic[Action, Settings]):
     game_phase: GamePhase
     settings: Settings
 
+    players: list[GamePlayer]
+
     def __init__(self, action_cls: Type[Action], settings: Settings) -> None:
         self._action_cls = action_cls
 
         self.game_phase = GamePhase.NOT_STARTED
         self.settings = settings
 
+        self.players = []
+
     @abstractmethod
     def build_game_state(self) -> GameState[Action, Settings]:
         ...
+
+    def add_player(self, player_id: str) -> None:
+        self.players.append(GamePlayer(player_id))
+
+    def remove_player(self, player_id: str) -> None:
+        for index, player in enumerate(self.players):
+            if player.player_id == player_id:
+                self.players.pop(index)
+                break
+
+    def start_game(self) -> None:
+        if self.game_phase != GamePhase.NOT_STARTED:
+            raise GameError
+
+        self.game_phase = GamePhase.IN_PROGRESS
 
     def process_raw_input(self, player_id: str, raw_game_input: dict[str, Any]) -> None:
         try:
