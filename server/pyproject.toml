@@ -61,6 +61,7 @@ isort = "^5.8.0"
 mypy = "^0.910"
 pylint = "^2.7.4"
 taskipy = "^1.6.0"
+types-psycopg2 = "^2.9.0"
 
 [tool.poetry.extras]
 debug = ["debugpy"]

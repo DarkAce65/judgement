@@ -1,21 +1,21 @@
 import uuid
-from typing import Collection, Optional, Tuple
+from typing import Collection, Optional, Tuple, cast
 
-from .db import db_connection
+from . import db
 from .player import Player
 
 
 def player_exists(player_id: str) -> bool:
-    cur = db_connection.cursor()
+    cur = db.get_cursor()
     cur.execute("SELECT 1 FROM players WHERE id = %s", (player_id,))
 
     return cur.fetchone() is not None
 
 
 def get_player(player_id: str) -> Player:
-    cur = db_connection.cursor()
+    cur = db.get_cursor()
     cur.execute("SELECT name FROM players WHERE id = %s", (player_id,))
-    result: Optional[tuple[str]] = cur.fetchone()
+    result = cast(Optional[tuple[str]], cur.fetchone())
 
     if result is None:
         raise ValueError(f"Invalid player id: {player_id}")
@@ -26,7 +26,7 @@ def get_player(player_id: str) -> Player:
 
 
 def get_players(player_ids: Collection[str]) -> dict[str, Player]:
-    cur = db_connection.cursor()
+    cur = db.get_cursor()
     cur.execute("SELECT id, name FROM players WHERE id = ANY(%s)", (list(player_ids),))
 
     players: dict[str, Player] = {}
@@ -39,7 +39,7 @@ def get_players(player_ids: Collection[str]) -> dict[str, Player]:
 def create_player(player_name: Optional[str]) -> Player:
     player = Player(str(uuid.uuid4()), player_name)
 
-    cur = db_connection.cursor()
+    cur = db.get_cursor()
     cur.execute(
         "INSERT INTO players (id, name) VALUES (%s, %s)", (player.player_id, player.name)
     )
@@ -48,7 +48,7 @@ def create_player(player_name: Optional[str]) -> Player:
 
 
 def set_player_name(player_id: str, player_name: Optional[str]) -> None:
-    cur = db_connection.cursor()
+    cur = db.get_cursor()
     cur.execute("UPDATE players SET name=%s WHERE id = %s", (player_name, player_id))
 
 
