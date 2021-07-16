@@ -3,8 +3,7 @@ from enum import Enum, unique
 
 from server.models.camel_model import CamelModel
 
-from .card import Card
-from .core import Game, GameState
+from .core import Game, GameName, GameState
 from .decks import Decks
 
 logger = logging.getLogger(__name__)
@@ -32,7 +31,9 @@ class JudgementGameState(GameState[JudgementAction, JudgementSettings]):
             raise ValueError
 
         return JudgementGameState(
-            game_name=game.game_name, game_phase=game.game_phase, settings=game.settings
+            game_name=GameName.JUDGEMENT,
+            game_phase=game.game_phase,
+            settings=game.settings,
         )
 
 

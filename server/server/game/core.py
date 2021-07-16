@@ -15,6 +15,11 @@ Settings = TypeVar("Settings", bound=BaseModel)
 
 
 @unique
+class GameName(str, Enum):
+    JUDGEMENT = "JUDGEMENT"
+
+
+@unique
 class GamePhase(str, Enum):
     NOT_STARTED = "NOT_STARTED"
     IN_PROGRESS = "IN_PROGRESS"
@@ -26,6 +31,7 @@ class GameError(Exception):
 
 
 class GameState(GenericCamelModel, Generic[Action, Settings]):
+    game_name: GameName
     game_phase: GamePhase
     settings: Settings
 
