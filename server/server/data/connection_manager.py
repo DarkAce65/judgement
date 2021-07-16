@@ -52,7 +52,7 @@ def get_client_ids_for_players(player_ids: set[str]) -> set[str]:
 def connect_player_client(player_id: str, client_id: str) -> None:
     cur = db.get_cursor()
     cur.execute(
-        "INSERT INTO client_player_room (client_id, player_id) VALUES (%s, %s)",
+        "INSERT INTO client_player_room(client_id, player_id) VALUES(%s, %s)",
         (client_id, player_id),
     )
     sio.enter_room(client_id, player_id)

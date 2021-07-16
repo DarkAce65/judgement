@@ -41,7 +41,7 @@ def create_player(player_name: Optional[str]) -> Player:
 
     cur = db.get_cursor()
     cur.execute(
-        "INSERT INTO players (id, name) VALUES (%s, %s)", (player.player_id, player.name)
+        "INSERT INTO players(id, name) VALUES(%s, %s)", (player.player_id, player.name)
     )
 
     return player

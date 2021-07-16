@@ -49,7 +49,7 @@ def create_room() -> str:
     room = Room.new(room_id)
 
     cur.execute(
-        "INSERT INTO rooms (id, room_state) VALUES (%s, %s)",
+        "INSERT INTO rooms(id, room_state) VALUES(%s, %s)",
         (room.room_id, room.room_state),
     )
 
@@ -60,7 +60,8 @@ def delete_room(room_id: str) -> None:
     cur = db.get_cursor()
     cur.execute("DELETE FROM rooms WHERE id = %s", (room_id,))
 
-    del games[room_id]
+    if room_id in games:
+        del games[room_id]
 
 
 def get_player_ids_in_room(room_id: str) -> set[str]:
@@ -81,8 +82,19 @@ def add_player_to_room(player_id: str, room_id: str) -> None:
 
     cur = db.get_cursor()
     cur.execute(
-        "INSERT INTO room_players VALUES (%s, %s) ON CONFLICT DO NOTHING",
-        (room_id, player_id),
+        "SELECT order_index FROM room_players "
+        "WHERE room_id = %s "
+        "ORDER BY order_index DESC "
+        "LIMIT 1",
+        (room_id,),
+    )
+    result = cast(Optional[tuple[int]], cur.fetchone())
+    order_index = 0 if result is None else result[0] + 1
+    cur.execute(
+        "INSERT INTO room_players(room_id, player_id, order_index) "
+        "VALUES(%s, %s, %s) "
+        "ON CONFLICT DO NOTHING",
+        (room_id, player_id, order_index),
     )
 
 

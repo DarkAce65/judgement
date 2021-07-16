@@ -10,7 +10,9 @@ CREATE TABLE rooms(
 CREATE TABLE room_players(
   room_id ROOM_ID NOT NULL,
   player_id TEXT NOT NULL,
+  order_index INT NOT NULL,
   UNIQUE(room_id, player_id),
+  UNIQUE(room_id, order_index),
   FOREIGN KEY(room_id) REFERENCES rooms(id),
   FOREIGN KEY(player_id) REFERENCES players(id)
 );
