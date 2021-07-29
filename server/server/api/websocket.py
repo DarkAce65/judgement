@@ -1,6 +1,6 @@
 import functools
 import inspect
-from typing import Any, Awaitable, Callable, TypeVar, cast
+from typing import Any, Awaitable, Callable, Optional, TypeVar, cast
 
 from socketio.exceptions import (  # pylint: disable=redefined-builtin
     ConnectionRefusedError,
@@ -56,7 +56,7 @@ def supply_room_id(socket_handler: Fn) -> Fn:
         for argname, annotation in inspect.getfullargspec(
             socket_handler
         ).annotations.items():
-            if annotation == str and argname == "room_id":
+            if annotation == Optional[str] and argname == "room_id":
                 kwargs[argname] = room_id
                 break
 
@@ -76,11 +76,19 @@ async def connect(client_id: str, _environ: dict, auth: dict) -> None:
     await sio.save_session(client_id, {"player_id": player_id})
 
 
+@sio.on("get_room")
+@supply_room_id
+async def handle_get_room(_client_id: str, room_id: Optional[str]) -> None:
+    if room_id is not None:
+        await socket_messager.emit_room(room_id)
+
+
 @sio.on("join_room")
 @require_player
 async def handle_join_room(client_id: str, room_id: str) -> None:
     connection_manager.add_player_client_to_room(client_id, room_id)
     await socket_messager.emit_players(room_id)
+    await socket_messager.emit_room(room_id)
 
 
 @sio.on("leave_room")
@@ -94,12 +102,15 @@ async def handle_leave_room(client_id: str, room_id: str) -> None:
 @require_player
 @supply_room_id
 async def handle_set_game(
-    _client_id: str, raw_message: dict[str, Any], room_id: str
+    _client_id: str, raw_message: dict[str, Any], room_id: Optional[str]
 ) -> None:
-    message = SetGameMessage(**raw_message)
-    game = room_manager.set_game(room_id, message.game_name)
+    if room_id is None:
+        raise ValueError
 
-    await sio.emit("game_state", game.build_game_state().dict(by_alias=True), to=room_id)
+    message = SetGameMessage(**raw_message)
+    room_manager.set_game(room_id, message.game_name)
+
+    await socket_messager.emit_room(room_id)
 
 
 @sio.on("disconnect")
