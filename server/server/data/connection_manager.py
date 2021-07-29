@@ -5,6 +5,20 @@ from server.sio_app import sio
 from . import db, player_manager, room_manager, socket_messager
 
 
+def get_room_id_for_client(client_id: str) -> Optional[str]:
+    cur = db.get_cursor()
+    cur.execute(
+        "SELECT room_id FROM client_player_room WHERE client_id = %s", (client_id,)
+    )
+
+    result = cast(Optional[tuple[Optional[str]]], cur.fetchone())
+    if result is None:
+        raise ValueError(f"Invalid client id: {client_id}")
+
+    (room_id,) = result
+    return room_id
+
+
 def set_client_room(client_id: str, room_id: Optional[str]) -> None:
     cur = db.get_cursor()
     cur.execute(

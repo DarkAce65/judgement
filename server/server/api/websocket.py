@@ -6,8 +6,14 @@ from socketio.exceptions import (  # pylint: disable=redefined-builtin
     ConnectionRefusedError,
 )
 
-from server.data import connection_manager, player_manager, socket_messager
+from server.data import (
+    connection_manager,
+    player_manager,
+    room_manager,
+    socket_messager,
+)
 from server.data.player import Player
+from server.models.websocket import SetGameMessage
 from server.sio_app import sio
 
 Fn = TypeVar("Fn", bound=Callable[..., Awaitable[None]])
@@ -42,6 +48,23 @@ def require_player(socket_handler: Fn) -> Fn:
     return cast(Fn, wrapper)
 
 
+def supply_room_id(socket_handler: Fn) -> Fn:
+    @functools.wraps(socket_handler)
+    async def wrapper(client_id: str, *args: Any, **kwargs: Any) -> None:
+        room_id = connection_manager.get_room_id_for_client(client_id)
+
+        for argname, annotation in inspect.getfullargspec(
+            socket_handler
+        ).annotations.items():
+            if annotation == str and argname == "room_id":
+                kwargs[argname] = room_id
+                break
+
+        await socket_handler(client_id, *args, **kwargs)
+
+    return cast(Fn, wrapper)
+
+
 @sio.on("connect")
 async def connect(client_id: str, _environ: dict, auth: dict) -> None:
     player_id = None if auth is None else auth["player_id"]
@@ -65,6 +88,18 @@ async def handle_join_room(client_id: str, room_id: str) -> None:
 async def handle_leave_room(client_id: str, room_id: str) -> None:
     connection_manager.remove_player_client_from_room(client_id, room_id)
     await socket_messager.emit_players(room_id)
+
+
+@sio.on("set_game")
+@require_player
+@supply_room_id
+async def handle_set_game(
+    _client_id: str, raw_message: dict[str, Any], room_id: str
+) -> None:
+    message = SetGameMessage(**raw_message)
+    game = room_manager.set_game(room_id, message.game_name)
+
+    await sio.emit("game_state", game.build_game_state().dict(by_alias=True), to=room_id)
 
 
 @sio.on("disconnect")

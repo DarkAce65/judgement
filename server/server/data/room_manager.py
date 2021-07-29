@@ -2,7 +2,7 @@ import random
 import string
 from typing import Optional, cast
 
-from server.game.core import Game
+from server.game.core import Game, GameName
 from server.game.judgement import JudgementGame
 
 from . import ROOM_ID_LENGTH, db, player_manager
@@ -113,6 +113,11 @@ def drop_player_from_room(player_id: str, room_id: str) -> None:
         delete_room(room_id)
 
 
-def set_game(room_id: str, game_name: str) -> None:
-    if game_name == "judgement":
+def set_game(room_id: str, game_name: GameName) -> Game:
+    if not room_exists(room_id):
+        raise ValueError(f"Invalid room id ({room_id})")
+
+    if game_name == GameName.JUDGEMENT:
         games[room_id] = JudgementGame()
+
+    return games[room_id]
