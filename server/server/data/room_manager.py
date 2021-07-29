@@ -32,11 +32,9 @@ def get_room(room_id: str) -> Room:
         raise ValueError(f"Invalid room id: {room_id}")
 
     room_id, room_state = result
-    cur.execute("SELECT player_id FROM room_players WHERE room_id = %s", (room_id,))
-    results = cast(list[tuple[str]], cur.fetchall())
-    player_ids = {player_id for (player_id,) in results}
+    players = player_manager.get_players_for_room(room_id)
 
-    return Room(room_id, RoomState(room_state), player_ids)
+    return Room(room_id, RoomState(room_state), players, games.get(room_id, None))
 
 
 def create_room() -> str:

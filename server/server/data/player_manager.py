@@ -29,9 +29,48 @@ def get_players(player_ids: Collection[str]) -> dict[str, Player]:
     cur = db.get_cursor()
     cur.execute("SELECT id, name FROM players WHERE id = ANY(%s)", (list(player_ids),))
 
+    results = cast(list[tuple[str, str]], cur.fetchall())
     players: dict[str, Player] = {}
-    for (player_id, player_name) in cur.fetchall():
+    for (player_id, player_name) in results:
         players[player_id] = Player(player_id, player_name)
+
+    return players
+
+
+def get_player_ids_for_room(room_id: str) -> list[str]:
+    cur = db.get_cursor()
+    cur.execute(
+        "SELECT players.id FROM players "
+        "INNER JOIN room_players "
+        "ON players.id = room_players.player_id "
+        "WHERE room_id = %s "
+        "ORDER BY room_players.order_index DESC",
+        (room_id,),
+    )
+
+    results = cast(list[tuple[str]], cur.fetchall())
+    player_ids: list[str] = []
+    for (player_id,) in results:
+        player_ids.append(player_id)
+
+    return player_ids
+
+
+def get_players_for_room(room_id: str) -> list[Player]:
+    cur = db.get_cursor()
+    cur.execute(
+        "SELECT players.id, players.name FROM players "
+        "INNER JOIN room_players "
+        "ON players.id = room_players.player_id "
+        "WHERE room_id = %s "
+        "ORDER BY room_players.order_index DESC",
+        (room_id,),
+    )
+
+    results = cast(list[tuple[str, str]], cur.fetchall())
+    players: list[Player] = []
+    for (player_id, player_name) in results:
+        players.append(Player(player_id, player_name))
 
     return players
 

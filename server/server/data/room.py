@@ -1,6 +1,10 @@
 from enum import Enum, unique
 from typing import Optional
 
+from server.game.core import Game
+
+from .player import Player
+
 
 @unique
 class RoomState(str, Enum):
@@ -11,17 +15,21 @@ class RoomState(str, Enum):
 class Room:
     room_id: str
     room_state: RoomState
-    player_ids: set[str]
+    players: list[Player]
+
+    game: Optional[Game]
 
     def __init__(
         self,
         room_id: str,
         room_state: RoomState = RoomState.LOBBY,
-        player_ids: Optional[set[str]] = None,
+        players: Optional[list[Player]] = None,
+        game: Optional[Game] = None,
     ) -> None:
         self.room_id = room_id
         self.room_state = room_state
-        self.player_ids = player_ids or set()
+        self.players = players or list()
+        self.game = game
 
     @staticmethod
     def new(room_id: str) -> "Room":

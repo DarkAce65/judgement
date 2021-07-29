@@ -18,5 +18,5 @@ class RoomResponse(RoomIdResponse):
         return RoomResponse(
             room_id=room.room_id,
             room_state=room.room_state,
-            player_ids=list(room.player_ids),
+            player_ids=[player.player_id for player in room.players],
         )
