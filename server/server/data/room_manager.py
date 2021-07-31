@@ -25,16 +25,18 @@ def room_exists(room_id: str) -> bool:
 
 def get_room(room_id: str) -> Room:
     cur = db.get_cursor()
-    cur.execute("SELECT id, room_state FROM rooms WHERE id = %s", (room_id,))
-    result = cast(Optional[tuple[str, int]], cur.fetchone())
+    cur.execute("SELECT id, room_state, game_name FROM rooms WHERE id = %s", (room_id,))
+    result = cast(Optional[tuple[str, str, str]], cur.fetchone())
 
     if result is None:
         raise ValueError(f"Invalid room id: {room_id}")
 
-    room_id, room_state = result
+    room_id, room_state, game_name = result
     players = player_manager.get_players_for_room(room_id)
 
-    return Room(room_id, RoomState(room_state), players, games.get(room_id, None))
+    return Room(
+        room_id, RoomState(room_state), players, game_name, games.get(room_id, None)
+    )
 
 
 def create_room() -> str:
@@ -111,11 +113,21 @@ def drop_player_from_room(player_id: str, room_id: str) -> None:
         delete_room(room_id)
 
 
-def set_game(room_id: str, game_name: GameName) -> Game:
-    if not room_exists(room_id):
+def set_game(room_id: str, game_name: GameName) -> None:
+    cur = db.get_cursor()
+    cur.execute(
+        "UPDATE rooms SET game_name=%s WHERE id = %s",
+        (game_name, room_id),
+    )
+
+    cur.execute("SELECT room_state FROM rooms WHERE id = %s", (room_id,))
+    result = cast(Optional[tuple[str]], cur.fetchone())
+    if result is None:
         raise ValueError(f"Invalid room id ({room_id})")
+    if RoomState(result[0]) != RoomState.LOBBY:
+        raise ValueError("Cannot change the game for a room which has already started")
 
-    if game_name == GameName.JUDGEMENT:
-        games[room_id] = JudgementGame()
-
-    return games[room_id]
+    cur.execute(
+        "UPDATE rooms SET game_name=%s WHERE id = %s",
+        (game_name, room_id),
+    )

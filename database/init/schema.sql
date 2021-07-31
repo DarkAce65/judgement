@@ -4,7 +4,8 @@ CREATE TABLE players(id TEXT PRIMARY KEY NOT NULL, name TEXT);
 
 CREATE TABLE rooms(
   id ROOM_ID PRIMARY KEY NOT NULL,
-  room_state VARCHAR(20) NOT NULL
+  room_state VARCHAR(20) NOT NULL,
+  game_name VARCHAR(20)
 );
 
 CREATE TABLE room_players(
