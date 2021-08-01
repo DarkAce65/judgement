@@ -20,18 +20,16 @@ const CenteredBlock = styled.div`
   text-align: center;
 `;
 
-const SetPlayerNamePage = () => {
-  return (
-    <PageHeader>
-      <CenteredBlock>
-        <PlayerNameInput />
-      </CenteredBlock>
-    </PageHeader>
-  );
-};
+const SetPlayerNamePage = () => (
+  <PageHeader>
+    <CenteredBlock>
+      <PlayerNameInput />
+    </CenteredBlock>
+  </PageHeader>
+);
 
-const withPlayerName = <P,>(WrappedComponent: ComponentType<P>) => {
-  const WithPlayerName = (props: P) => {
+const requirePlayerName = <P,>(WrappedComponent: ComponentType<P>) => {
+  const RequirePlayerName = (props: P) => {
     const dispatch = useAppDispatch();
 
     const playerName = useSelector(getPlayerName);
@@ -58,7 +56,7 @@ const withPlayerName = <P,>(WrappedComponent: ComponentType<P>) => {
     return <WrappedComponent {...props} />;
   };
 
-  return WithPlayerName;
+  return RequirePlayerName;
 };
 
-export default withPlayerName;
+export default requirePlayerName;
