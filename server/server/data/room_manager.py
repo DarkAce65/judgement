@@ -26,7 +26,7 @@ def room_exists(room_id: str) -> bool:
 def get_room(room_id: str) -> Room:
     cur = db.get_cursor()
     cur.execute("SELECT id, room_state, game_name FROM rooms WHERE id = %s", (room_id,))
-    result = cast(Optional[tuple[str, str, str]], cur.fetchone())
+    result = cast(Optional[tuple[str, str, Optional[str]]], cur.fetchone())
 
     if result is None:
         raise ValueError(f"Invalid room id: {room_id}")
@@ -34,11 +34,11 @@ def get_room(room_id: str) -> Room:
     room_id, room_state, game_name = result
     players = player_manager.get_players_for_room(room_id)
 
-    return Room(
+    return Room.from_db(
         room_id,
-        RoomState(room_state),
+        room_state,
         players,
-        GameName(game_name),
+        game_name,
         games.get(room_id, None),
     )
 
@@ -144,13 +144,18 @@ def start_game(room_id: str) -> None:
     cur = db.get_cursor()
 
     cur.execute("SELECT room_state, game_name FROM rooms WHERE id = %s", (room_id,))
-    result = cast(tuple[str, str], cur.fetchone())
-    game_name = GameName(result[1])
+    result = cast(tuple[str, Optional[str]], cur.fetchone())
+
+    if result[1] is None:
+        raise ValueError("Cannot start game - no game selected")
+
+    try:
+        game_name = GameName(result[1])
+    except ValueError as ex:
+        raise ValueError(f"Unknown game name ({result[1]})") from ex
 
     if game_name == GameName.JUDGEMENT:
         games[room_id] = JudgementGame()
-    else:
-        raise ValueError(f"Unknown game name ({game_name})")
 
     cur.execute(
         "UPDATE rooms SET room_state=%s WHERE id = %s",
