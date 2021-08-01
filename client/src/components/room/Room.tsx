@@ -8,7 +8,7 @@ import { GameName } from '../../../generated_types/judgement';
 import { PlayersMessage, RoomMessage, SetGameMessage } from '../../../generated_types/websocket';
 import { PLAYER_ID_COOKIE } from '../../constants';
 import GameSocket from '../../game/GameSocket';
-import useGameSocket from '../../game/useGameSocket';
+import withGameSocket, { WithGameSocketProps } from '../../game/withGameSocket';
 import PlayerNameInput from '../PlayerNameInput';
 import requirePlayerName from '../requirePlayerName';
 
@@ -18,25 +18,16 @@ interface Props {
   roomId: string;
 }
 
-const Room = ({ roomId }: Props) => {
+const Room = ({ roomId, socket, namespace }: Props & WithGameSocketProps) => {
   const history = useHistory();
 
   const [players, setPlayers] = useState<string[]>([]);
-  const { socket, namespace } = useGameSocket();
 
   useEffect(() => {
-    if (socket === null) {
-      return;
-    }
-
     socket.emit('join_room', roomId);
   }, [roomId, socket]);
 
   useEffect(() => {
-    if (namespace === null) {
-      return;
-    }
-
     GameSocket.onNamespaced(namespace, 'room', (data: RoomMessage) => {
       console.log(data);
     });
@@ -47,10 +38,6 @@ const Room = ({ roomId }: Props) => {
 
   const handleGameChange = useCallback(
     (gameName: GameName) => {
-      if (socket === null) {
-        return;
-      }
-
       const setGameMessage: SetGameMessage = { gameName };
       socket.emit('set_game', setGameMessage);
     },
@@ -58,10 +45,6 @@ const Room = ({ roomId }: Props) => {
   );
 
   const handleGameStart = useCallback(() => {
-    if (socket === null) {
-      return;
-    }
-
     socket.emit('start_game');
   }, [socket]);
 
@@ -90,4 +73,4 @@ const Room = ({ roomId }: Props) => {
   );
 };
 
-export default requirePlayerName(Room);
+export default requirePlayerName(withGameSocket(Room));

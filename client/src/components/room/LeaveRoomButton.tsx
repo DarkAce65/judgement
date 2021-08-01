@@ -1,26 +1,22 @@
 import { Button } from 'antd';
 import { useHistory } from 'react-router-dom';
 
-import useGameSocket from '../../game/useGameSocket';
+import withGameSocket, { WithGameSocketProps } from '../../game/withGameSocket';
 
 interface Props {
   roomId: string;
 }
 
-const LeaveRoomButton = ({ roomId }: Props) => {
+const LeaveRoomButton = ({ roomId, socket }: Props & WithGameSocketProps) => {
   const history = useHistory();
-
-  const { socket } = useGameSocket();
 
   return (
     <Button
       type="primary"
       danger={true}
       onClick={() => {
-        if (socket) {
-          socket.emit('leave_room', roomId);
-          history.push('/');
-        }
+        socket.emit('leave_room', roomId);
+        history.push('/');
       }}
     >
       Leave room
@@ -28,4 +24,4 @@ const LeaveRoomButton = ({ roomId }: Props) => {
   );
 };
 
-export default LeaveRoomButton;
+export default withGameSocket(LeaveRoomButton);
