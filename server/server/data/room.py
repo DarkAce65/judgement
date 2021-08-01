@@ -1,7 +1,7 @@
 from enum import Enum, unique
 from typing import Optional
 
-from server.game.core import Game, GameName
+from server.game.core import Game, GameName, GameState
 
 from .player import Player
 
@@ -38,3 +38,6 @@ class Room:
     @staticmethod
     def new(room_id: str) -> "Room":
         return Room(room_id)
+
+    def get_game_state(self) -> Optional[GameState]:
+        return None if self.game is None else self.game.build_game_state()

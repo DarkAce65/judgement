@@ -6,14 +6,14 @@ from . import room_manager
 
 async def emit_room(room_id: str) -> None:
     room = room_manager.get_room(room_id)
-    game_state = None if room.game is None else room.game.build_game_state()
 
     await sio.emit(
         "room",
         RoomMessage(
             state=room.room_state,
             players=[player.name or "" for player in room.players],
-            game=game_state,
+            game_name=room.game_name,
+            game=room.get_game_state(),
         ).dict(by_alias=True),
         to=room_id,
     )
