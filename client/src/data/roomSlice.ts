@@ -8,7 +8,7 @@ import {
 
 import { EnsurePlayerRequest } from '../../generated_types/requests';
 import { RoomIdResponse } from '../../generated_types/responses';
-import { RoomMessage } from '../../generated_types/websocket';
+import { PlayersMessage, RoomMessage } from '../../generated_types/websocket';
 import { fetchAPI, makeJSONBodyWithContentType } from '../api/client';
 
 import { getPlayerName } from './playerSlice';
@@ -68,6 +68,9 @@ const roomSlice = createSlice({
       state.players = payload.players;
       state.gameName = payload.gameName;
     },
+    loadPlayers(state, { payload }: PayloadAction<PlayersMessage>) {
+      state.players = payload.players;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(createRoom.fulfilled, (state, action: PayloadAction<string>) => {
@@ -80,6 +83,6 @@ const roomSlice = createSlice({
   },
 });
 
-export const { loadRoomState } = roomSlice.actions;
+export const { loadRoomState, loadPlayers } = roomSlice.actions;
 
 export default roomSlice.reducer;
