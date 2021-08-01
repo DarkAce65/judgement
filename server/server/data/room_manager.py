@@ -35,7 +35,11 @@ def get_room(room_id: str) -> Room:
     players = player_manager.get_players_for_room(room_id)
 
     return Room(
-        room_id, RoomState(room_state), players, game_name, games.get(room_id, None)
+        room_id,
+        RoomState(room_state),
+        players,
+        GameName(game_name),
+        games.get(room_id, None),
     )
 
 
