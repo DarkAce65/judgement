@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 
 import { Button, PageHeader, Select, Space, Typography } from 'antd';
 import Cookies from 'js-cookie';
@@ -7,6 +7,8 @@ import { useHistory } from 'react-router-dom';
 import { GameName } from '../../../generated_types/judgement';
 import { PlayersMessage, RoomMessage, SetGameMessage } from '../../../generated_types/websocket';
 import { PLAYER_ID_COOKIE } from '../../constants';
+import { useAppDispatch, useAppSelector } from '../../data/reduxHooks';
+import { getGameName, getPlayers, loadPlayers, loadRoomState } from '../../data/roomSlice';
 import GameSocket from '../../game/GameSocket';
 import withGameSocket, { WithGameSocketProps } from '../../game/withGameSocket';
 import PlayerNameInput from '../PlayerNameInput';
@@ -19,26 +21,28 @@ interface Props {
 }
 
 const Room = ({ roomId, socket, namespace }: Props & WithGameSocketProps) => {
+  const dispatch = useAppDispatch();
   const history = useHistory();
 
-  const [players, setPlayers] = useState<string[]>([]);
+  const gameName = useAppSelector(getGameName);
+  const players = useAppSelector(getPlayers);
 
   useEffect(() => {
     socket.emit('join_room', roomId);
   }, [roomId, socket]);
 
   useEffect(() => {
-    GameSocket.onNamespaced(namespace, 'room', (data: RoomMessage) => {
-      console.log(data);
+    GameSocket.onNamespaced(namespace, 'room', (roomMessage: RoomMessage) => {
+      dispatch(loadRoomState(roomMessage));
     });
-    GameSocket.onNamespaced(namespace, 'players', (data: PlayersMessage) => {
-      setPlayers(data.players);
+    GameSocket.onNamespaced(namespace, 'players', (playersMessage: PlayersMessage) => {
+      dispatch(loadPlayers(playersMessage));
     });
-  }, [namespace]);
+  }, [dispatch, namespace]);
 
   const handleGameChange = useCallback(
-    (gameName: GameName) => {
-      const setGameMessage: SetGameMessage = { gameName };
+    (name: GameName) => {
+      const setGameMessage: SetGameMessage = { gameName: name };
       socket.emit('set_game', setGameMessage);
     },
     [socket]
@@ -56,6 +60,7 @@ const Room = ({ roomId, socket, namespace }: Props & WithGameSocketProps) => {
       }}
     >
       <Select<GameName>
+        value={gameName}
         options={[{ label: 'Judgement', value: 'JUDGEMENT' }]}
         onChange={handleGameChange}
         style={{ width: '100%', maxWidth: 250 }}
