@@ -39,7 +39,7 @@ export const ensurePlayer = createAsyncThunk<string, string, { state: RootState 
   { condition: (_, { getState }) => getEnsurePlayerFetchStatus(getState()) !== 'pending' }
 );
 
-export const playerSlice = createSlice({
+const playerSlice = createSlice({
   name: 'player',
   initialState,
   reducers: {},
