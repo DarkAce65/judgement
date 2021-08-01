@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { PageHeader, Select, Space, Typography } from 'antd';
+import { Button, PageHeader, Select, Space, Typography } from 'antd';
 import Cookies from 'js-cookie';
 import { useHistory } from 'react-router-dom';
 
 import { GameName } from '../../../generated_types/judgement';
-import { PlayersMessage, SetGameMessage } from '../../../generated_types/websocket';
+import { PlayersMessage, RoomMessage, SetGameMessage } from '../../../generated_types/websocket';
 import { PLAYER_ID_COOKIE } from '../../constants';
 import GameSocket from '../../game/GameSocket';
 import useGameSocket from '../../game/useGameSocket';
@@ -37,12 +37,15 @@ const Room = ({ roomId }: Props) => {
       return;
     }
 
+    GameSocket.onNamespaced(namespace, 'room', (data: RoomMessage) => {
+      console.log(data);
+    });
     GameSocket.onNamespaced(namespace, 'players', (data: PlayersMessage) => {
       setPlayers(data.players);
     });
   }, [namespace]);
 
-  const onGameSelectChange = useCallback(
+  const handleGameChange = useCallback(
     (gameName: GameName) => {
       if (socket === null) {
         return;
@@ -54,6 +57,14 @@ const Room = ({ roomId }: Props) => {
     [socket]
   );
 
+  const handleGameStart = useCallback(() => {
+    if (socket === null) {
+      return;
+    }
+
+    socket.emit('start_game');
+  }, [socket]);
+
   return (
     <PageHeader
       title={`hello ${roomId}`}
@@ -63,13 +74,14 @@ const Room = ({ roomId }: Props) => {
     >
       <Select<GameName>
         options={[{ label: 'Judgement', value: 'JUDGEMENT' }]}
-        onChange={onGameSelectChange}
+        onChange={handleGameChange}
         style={{ width: '100%', maxWidth: 250 }}
       />
       <Typography.Paragraph>{Cookies.get(PLAYER_ID_COOKIE)}</Typography.Paragraph>
       {players.map((player, index) => (
         <Typography.Paragraph key={index}>{player}</Typography.Paragraph>
       ))}
+      <Button onClick={handleGameStart}>Start game</Button>
       <Space direction="vertical" style={{ width: '100%' }}>
         <PlayerNameInput />
         <LeaveRoomButton roomId={roomId} />
