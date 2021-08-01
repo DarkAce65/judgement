@@ -113,6 +113,18 @@ async def handle_set_game(
     await socket_messager.emit_room(room_id)
 
 
+@sio.on("start_game")
+@require_player
+@supply_room_id
+async def handle_start_game(_client_id: str, room_id: Optional[str]) -> None:
+    if room_id is None:
+        raise ValueError
+
+    room_manager.start_game(room_id)
+
+    await socket_messager.emit_room(room_id)
+
+
 @sio.on("disconnect")
 async def disconnect(client_id: str) -> None:
     connection_manager.disconnect_player_client(client_id)

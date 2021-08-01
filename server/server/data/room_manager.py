@@ -135,3 +135,24 @@ def set_game(room_id: str, game_name: GameName) -> None:
         "UPDATE rooms SET game_name=%s WHERE id = %s",
         (game_name, room_id),
     )
+
+
+def start_game(room_id: str) -> None:
+    if not room_exists(room_id):
+        raise ValueError(f"Invalid room id ({room_id})")
+
+    cur = db.get_cursor()
+
+    cur.execute("SELECT room_state, game_name FROM rooms WHERE id = %s", (room_id,))
+    result = cast(tuple[str, str], cur.fetchone())
+    game_name = GameName(result[1])
+
+    if game_name == GameName.JUDGEMENT:
+        games[room_id] = JudgementGame()
+    else:
+        raise ValueError(f"Unknown game name ({game_name})")
+
+    cur.execute(
+        "UPDATE rooms SET room_state=%s WHERE id = %s",
+        (RoomState.GAME, room_id),
+    )

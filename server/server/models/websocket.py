@@ -9,6 +9,7 @@ from .camel_model import CamelModel
 class RoomMessage(CamelModel):
     state: RoomState
     players: list[str]
+    game_name: Optional[GameName]
     game: Optional[GameState]
 
 
