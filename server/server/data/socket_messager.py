@@ -24,6 +24,14 @@ async def emit_room(room_id: str, recipient: Optional[str] = None) -> None:
     )
 
 
+async def emit_game_state(room_id: str) -> None:
+    game = room_manager.get_game_for_room(room_id)
+    if game is None:
+        return
+
+    await sio.emit("game_state", game.build_game_state().dict(by_alias=True), to=room_id)
+
+
 async def emit_players(room_id: str) -> None:
     players_in_room = room_manager.get_players_in_room(room_id).values()
 

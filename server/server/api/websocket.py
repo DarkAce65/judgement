@@ -1,6 +1,6 @@
 import functools
 import inspect
-from typing import Any, Awaitable, Callable, Optional, TypeVar, cast
+from typing import Any, Awaitable, Callable, TypeVar, cast
 
 from socketio.exceptions import (  # pylint: disable=redefined-builtin
     ConnectionRefusedError,
@@ -13,6 +13,7 @@ from server.data import (
     socket_messager,
 )
 from server.data.player import Player
+from server.game.core import GameError
 from server.models.websocket import SetGameMessage
 from server.sio_app import sio
 
@@ -91,7 +92,6 @@ async def handle_get_room(client_id: str, room_id: str) -> None:
 @require_player
 async def handle_join_room(client_id: str, room_id: str) -> None:
     connection_manager.add_player_client_to_room(client_id, room_id)
-    await socket_messager.emit_players(room_id)
     await socket_messager.emit_room(room_id)
 
 
@@ -121,6 +121,26 @@ async def handle_start_game(_client_id: str, room_id: str) -> None:
     room_manager.start_game(room_id)
 
     await socket_messager.emit_room(room_id)
+
+
+@sio.on("game_input")
+@require_player
+@supply_room_id
+async def handle_game_input(
+    client_id: str, action: dict[str, Any], player: Player, room_id: str
+) -> None:
+    game = room_manager.get_game_for_room(room_id)
+
+    if game is None:
+        raise ValueError(f"No game for room id {room_id}")
+
+    try:
+        game.process_raw_input(player.player_id, action)
+    except GameError as ex:
+        await sio.emit("invalid_input", str(ex), to=client_id)
+        return
+
+    await sio.emit("game_state", game.build_game_state().dict(by_alias=True), to=room_id)
 
 
 @sio.on("disconnect")
