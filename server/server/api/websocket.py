@@ -45,6 +45,7 @@ def require_player(socket_handler: Fn) -> Fn:
 
         await socket_handler(client_id, *args, **kwargs)
 
+    wrapper.__signature__ = inspect.signature(socket_handler)  # type: ignore
     return cast(Fn, wrapper)
 
 
@@ -53,15 +54,19 @@ def supply_room_id(socket_handler: Fn) -> Fn:
     async def wrapper(client_id: str, *args: Any, **kwargs: Any) -> None:
         room_id = connection_manager.get_room_id_for_client(client_id)
 
+        if room_id is None:
+            raise ValueError(f"Client {client_id} not connected to a room")
+
         for argname, annotation in inspect.getfullargspec(
             socket_handler
         ).annotations.items():
-            if annotation == Optional[str] and argname == "room_id":
+            if annotation == str and argname == "room_id":
                 kwargs[argname] = room_id
                 break
 
         await socket_handler(client_id, *args, **kwargs)
 
+    wrapper.__signature__ = inspect.signature(socket_handler)  # type: ignore
     return cast(Fn, wrapper)
 
 
@@ -78,9 +83,8 @@ async def connect(client_id: str, _environ: dict, auth: dict) -> None:
 
 @sio.on("get_room")
 @supply_room_id
-async def handle_get_room(_client_id: str, room_id: Optional[str]) -> None:
-    if room_id is not None:
-        await socket_messager.emit_room(room_id)
+async def handle_get_room(client_id: str, room_id: str) -> None:
+    await socket_messager.emit_room(room_id, client_id)
 
 
 @sio.on("join_room")
@@ -102,11 +106,8 @@ async def handle_leave_room(client_id: str, room_id: str) -> None:
 @require_player
 @supply_room_id
 async def handle_set_game(
-    _client_id: str, raw_message: dict[str, Any], room_id: Optional[str]
+    _client_id: str, raw_message: dict[str, Any], room_id: str
 ) -> None:
-    if room_id is None:
-        raise ValueError
-
     message = SetGameMessage(**raw_message)
     room_manager.set_game(room_id, message.game_name)
 
@@ -116,10 +117,7 @@ async def handle_set_game(
 @sio.on("start_game")
 @require_player
 @supply_room_id
-async def handle_start_game(_client_id: str, room_id: Optional[str]) -> None:
-    if room_id is None:
-        raise ValueError
-
+async def handle_start_game(_client_id: str, room_id: str) -> None:
     room_manager.start_game(room_id)
 
     await socket_messager.emit_room(room_id)

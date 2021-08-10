@@ -1,10 +1,15 @@
+from typing import Optional
+
 from server.models.websocket import PlayersMessage, RoomMessage
 from server.sio_app import sio
 
 from . import room_manager
 
 
-async def emit_room(room_id: str) -> None:
+async def emit_room(room_id: str, recipient: Optional[str] = None) -> None:
+    if recipient is None:
+        recipient = room_id
+
     room = room_manager.get_room(room_id)
 
     await sio.emit(
@@ -15,7 +20,7 @@ async def emit_room(room_id: str) -> None:
             game_name=room.game_name,
             game=room.get_game_state(),
         ).dict(by_alias=True),
-        to=room_id,
+        to=recipient,
     )
 
 
