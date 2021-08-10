@@ -23,6 +23,10 @@ def room_exists(room_id: str) -> bool:
     return cur.fetchone() is not None
 
 
+def get_game_for_room(room_id: str) -> Optional[Game]:
+    return games.get(room_id, None)
+
+
 def get_room(room_id: str) -> Room:
     cur = db.get_cursor()
     cur.execute("SELECT id, room_state, game_name FROM rooms WHERE id = %s", (room_id,))
@@ -33,14 +37,9 @@ def get_room(room_id: str) -> Room:
 
     room_id, room_state, game_name = result
     players = player_manager.get_players_for_room(room_id)
+    game = get_game_for_room(room_id)
 
-    return Room.from_db(
-        room_id,
-        room_state,
-        players,
-        game_name,
-        games.get(room_id, None),
-    )
+    return Room.from_db(room_id, room_state, players, game_name, game)
 
 
 def create_room() -> str:
@@ -138,26 +137,19 @@ def set_game(room_id: str, game_name: GameName) -> None:
 
 
 def start_game(room_id: str) -> None:
-    if not room_exists(room_id):
-        raise ValueError(f"Invalid room id ({room_id})")
+    room = get_room(room_id)
 
-    cur = db.get_cursor()
-
-    cur.execute("SELECT room_state, game_name FROM rooms WHERE id = %s", (room_id,))
-    result = cast(tuple[str, Optional[str]], cur.fetchone())
-
-    if result[1] is None:
+    if room.game_name is None:
         raise ValueError("Cannot start game - no game selected")
 
-    try:
-        game_name = GameName(result[1])
-    except ValueError as ex:
-        raise ValueError(f"Unknown game name ({result[1]})") from ex
+    if room.game_name == GameName.JUDGEMENT:
+        game = JudgementGame()
+    else:
+        raise ValueError(f"Unrecognized game name ({room.game_name})")
 
-    if game_name == GameName.JUDGEMENT:
-        games[room_id] = JudgementGame()
+    for player in room.players:
+        game.add_player(player.player_id)
 
-    cur.execute(
-        "UPDATE rooms SET room_state=%s WHERE id = %s",
-        (RoomState.GAME, room_id),
-    )
+    games[room_id] = game
+    cur = db.get_cursor()
+    cur.execute("UPDATE rooms SET room_state=%s WHERE id = %s", (RoomState.GAME, room_id))
