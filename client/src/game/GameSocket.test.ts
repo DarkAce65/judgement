@@ -70,16 +70,22 @@ describe('GameSocket', () => {
     expect(() => {
       const listener = jest.fn();
       GameSocket.onAnyNamespaced('test-ns', listener);
-    }).toThrow();
+    }).toThrowError('Socket not initialized');
   });
 
   it('fails to add a catch-all listener with an unknown namespace', () => {
     expect(GameSocket.initializeSocket(onConnectionError, resetAttempts)).toBe(mockSocket);
 
-    expect(() => {
-      const listener = jest.fn();
-      GameSocket.onAnyNamespaced('unknown-namespace', listener);
-    }).toThrow();
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+
+    const namespace = 'unknown-namespace';
+    const listener = jest.fn();
+    GameSocket.onNamespaced(namespace, 'event', listener);
+
+    expect(consoleErrorSpy).toBeCalledWith(
+      `Unknown namespace ${namespace} - have you called GameSocket.attach()?`
+    );
+    consoleErrorSpy.mockRestore();
   });
 
   it('adds an event listener', () => {
@@ -101,16 +107,22 @@ describe('GameSocket', () => {
     expect(() => {
       const listener = jest.fn();
       GameSocket.onNamespaced('test-ns', 'test_event', listener);
-    }).toThrow();
+    }).toThrowError('Socket not initialized');
   });
 
   it('fails to add an event listener with an unknown namespace', () => {
     expect(GameSocket.initializeSocket(onConnectionError, resetAttempts)).toBe(mockSocket);
 
-    expect(() => {
-      const listener = jest.fn();
-      GameSocket.onNamespaced('unknown-namespace', 'event', listener);
-    }).toThrow();
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+
+    const namespace = 'unknown-namespace';
+    const listener = jest.fn();
+    GameSocket.onNamespaced(namespace, 'event', listener);
+
+    expect(consoleErrorSpy).toBeCalledWith(
+      `Unknown namespace ${namespace} - have you called GameSocket.attach()?`
+    );
+    consoleErrorSpy.mockRestore();
   });
 
   it('registers multiple event listeners', () => {
