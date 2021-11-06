@@ -25,6 +25,7 @@ class GameSocket {
       [event: string]: (() => void)[];
     };
   } = {};
+  private static onceListenersMapping: Map<() => void, () => void> = new Map();
 
   static initializeSocket(
     onConnectionError?: (socket: Socket, error: Error) => void,
@@ -167,6 +168,49 @@ class GameSocket {
     this.listeners[namespace][event].push(listener);
   }
 
+  static onceNamespaced(
+    namespace: string,
+    event: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    listener: (...args: any[]) => void
+  ) {
+    if (this.socket === null) {
+      throw new Error('Socket not initialized');
+    } else if (!this.attachedNamespaces.has(namespace)) {
+      console.error(`Unknown namespace ${namespace} - have you called GameSocket.attach()?`);
+      return;
+    }
+
+    const autoRemovedListener = (...args: unknown[]) => {
+      listener(...args);
+
+      const listenerToRemove = this.onceListenersMapping.get(listener);
+      this.onceListenersMapping.delete(listener);
+      for (let i = 0; i < this.listeners[namespace][event].length; i++) {
+        if (this.listeners[namespace][event][i] === listenerToRemove) {
+          this.listeners[namespace][event].splice(i, 1);
+          if (this.listeners[namespace][event].length === 0) {
+            delete this.listeners[namespace][event];
+          }
+          if (Object.keys(this.listeners[namespace]).length === 0) {
+            delete this.listeners[namespace];
+          }
+          break;
+        }
+      }
+    };
+    this.socket.once(event, autoRemovedListener);
+
+    if (!this.listeners[namespace]) {
+      this.listeners[namespace] = {};
+    }
+    if (!this.listeners[namespace][event]) {
+      this.listeners[namespace][event] = [];
+    }
+    this.listeners[namespace][event].push(autoRemovedListener);
+    this.onceListenersMapping.set(listener, autoRemovedListener);
+  }
+
   static offNamespaced(
     namespace: string,
     event?: string,
@@ -197,8 +241,14 @@ class GameSocket {
     }
 
     if (listener) {
+      let listenerToRemove = listener;
+      if (this.onceListenersMapping.has(listener)) {
+        listenerToRemove = this.onceListenersMapping.get(listener)!;
+        this.onceListenersMapping.delete(listener);
+      }
+
       for (let i = 0; i < namespacedListeners[event].length; i++) {
-        if (namespacedListeners[event][i] === listener) {
+        if (namespacedListeners[event][i] === listenerToRemove) {
           this.socket.off(event, namespacedListeners[event][i]);
           namespacedListeners[event].splice(i, 1);
           if (namespacedListeners[event].length === 0) {
