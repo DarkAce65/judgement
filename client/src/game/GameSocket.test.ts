@@ -14,6 +14,7 @@ const mockSocket = {
     })
     .mockName('disconnect'),
   on: jest.fn().mockName('on'),
+  once: jest.fn().mockName('once'),
   off: jest.fn().mockName('off'),
   onAny: jest.fn().mockName('onAny'),
   offAny: jest.fn().mockName('offAny'),
@@ -49,80 +50,129 @@ describe('GameSocket', () => {
     expect(mockSocket.on).toHaveBeenCalledWith('connect_error', expect.any(Function));
   });
 
-  it('adds a catch-all listener', () => {
-    expect(GameSocket['socket']).toBe(null);
+  describe('catch-all listeners', () => {
+    it('adds a catch-all listener', () => {
+      expect(GameSocket['socket']).toBe(null);
 
-    const listener = jest.fn();
-
-    expect(GameSocket.initializeSocket(onConnectionError, resetAttempts)).toBe(mockSocket);
-    const { namespace } = GameSocket.attach();
-    GameSocket.onAnyNamespaced(namespace, listener);
-
-    expect(GameSocket['socket']).toBe(mockSocket);
-    expect(mockSocket.onAny).toHaveBeenCalledWith(listener);
-    expect(GameSocket['anyListeners']).toHaveProperty(namespace);
-    expect(GameSocket['anyListeners'][namespace]).toContain(listener);
-  });
-
-  it('adds a catch-all listener, throwing an error if the socket is uninitialized', () => {
-    expect(GameSocket['socket']).toBe(null);
-
-    expect(() => {
       const listener = jest.fn();
-      GameSocket.onAnyNamespaced('test-ns', listener);
-    }).toThrowError('Socket not initialized');
-  });
 
-  it('fails to add a catch-all listener with an unknown namespace', () => {
-    expect(GameSocket.initializeSocket(onConnectionError, resetAttempts)).toBe(mockSocket);
+      expect(GameSocket.initializeSocket(onConnectionError, resetAttempts)).toBe(mockSocket);
+      const { namespace } = GameSocket.attach();
+      GameSocket.onAnyNamespaced(namespace, listener);
 
-    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+      expect(GameSocket['socket']).toBe(mockSocket);
+      expect(mockSocket.onAny).toHaveBeenCalledWith(listener);
+      expect(GameSocket['anyListeners']).toHaveProperty(namespace);
+      expect(GameSocket['anyListeners'][namespace]).toContain(listener);
+    });
 
-    const namespace = 'unknown-namespace';
-    const listener = jest.fn();
-    GameSocket.onNamespaced(namespace, 'event', listener);
+    it('adds a catch-all listener, throwing an error if the socket is uninitialized', () => {
+      expect(GameSocket['socket']).toBe(null);
 
-    expect(consoleErrorSpy).toBeCalledWith(
-      `Unknown namespace ${namespace} - have you called GameSocket.attach()?`
-    );
-    consoleErrorSpy.mockRestore();
-  });
+      expect(() => {
+        const listener = jest.fn();
+        GameSocket.onAnyNamespaced('test-ns', listener);
+      }).toThrowError('Socket not initialized');
+    });
 
-  it('adds an event listener', () => {
-    expect(GameSocket.initializeSocket(onConnectionError, resetAttempts)).toBe(mockSocket);
+    it('fails to add a catch-all listener with an unknown namespace', () => {
+      expect(GameSocket.initializeSocket(onConnectionError, resetAttempts)).toBe(mockSocket);
 
-    const { namespace } = GameSocket.attach();
-    const listener = jest.fn();
-    GameSocket.onNamespaced(namespace, 'test_event', listener);
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
 
-    expect(GameSocket['socket']).toBe(mockSocket);
-    expect(mockSocket.on).toHaveBeenCalledWith('test_event', listener);
-    expect(GameSocket['listeners']).toHaveProperty(`${namespace}.test_event`);
-    expect(GameSocket['listeners'][namespace]['test_event']).toContain(listener);
-  });
-
-  it('adds an event listener, throwing an error if the socket is uninitialized', () => {
-    expect(GameSocket['socket']).toBe(null);
-
-    expect(() => {
+      const namespace = 'unknown-namespace';
       const listener = jest.fn();
-      GameSocket.onNamespaced('test-ns', 'test_event', listener);
-    }).toThrowError('Socket not initialized');
+      GameSocket.onNamespaced(namespace, 'event', listener);
+
+      expect(consoleErrorSpy).toBeCalledWith(
+        `Unknown namespace ${namespace} - have you called GameSocket.attach()?`
+      );
+      consoleErrorSpy.mockRestore();
+    });
   });
 
-  it('fails to add an event listener with an unknown namespace', () => {
-    expect(GameSocket.initializeSocket(onConnectionError, resetAttempts)).toBe(mockSocket);
+  describe('standard listeners', () => {
+    it('adds an event listener', () => {
+      expect(GameSocket.initializeSocket(onConnectionError, resetAttempts)).toBe(mockSocket);
 
-    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+      const { namespace } = GameSocket.attach();
+      const listener = jest.fn();
+      GameSocket.onNamespaced(namespace, 'test_event', listener);
 
-    const namespace = 'unknown-namespace';
-    const listener = jest.fn();
-    GameSocket.onNamespaced(namespace, 'event', listener);
+      expect(GameSocket['socket']).toBe(mockSocket);
+      expect(mockSocket.on).toHaveBeenCalledWith('test_event', listener);
+      expect(GameSocket['listeners']).toHaveProperty(`${namespace}.test_event`);
+      expect(GameSocket['listeners'][namespace]['test_event']).toContain(listener);
+    });
 
-    expect(consoleErrorSpy).toBeCalledWith(
-      `Unknown namespace ${namespace} - have you called GameSocket.attach()?`
-    );
-    consoleErrorSpy.mockRestore();
+    it('adds an event listener, throwing an error if the socket is uninitialized', () => {
+      expect(GameSocket['socket']).toBe(null);
+
+      expect(() => {
+        const listener = jest.fn();
+        GameSocket.onNamespaced('test-ns', 'test_event', listener);
+      }).toThrowError('Socket not initialized');
+    });
+
+    it('fails to add an event listener with an unknown namespace', () => {
+      expect(GameSocket.initializeSocket(onConnectionError, resetAttempts)).toBe(mockSocket);
+
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+
+      const namespace = 'unknown-namespace';
+      const listener = jest.fn();
+      GameSocket.onNamespaced(namespace, 'event', listener);
+
+      expect(consoleErrorSpy).toBeCalledWith(
+        `Unknown namespace ${namespace} - have you called GameSocket.attach()?`
+      );
+      consoleErrorSpy.mockRestore();
+    });
+  });
+
+  describe('once listeners', () => {
+    it('adds a single firing event listener', () => {
+      expect(GameSocket.initializeSocket(onConnectionError, resetAttempts)).toBe(mockSocket);
+
+      const { namespace } = GameSocket.attach();
+      const listener = jest.fn();
+      GameSocket.onceNamespaced(namespace, 'test_event', listener);
+
+      expect(GameSocket['socket']).toBe(mockSocket);
+      expect(GameSocket['listeners']).toHaveProperty(`${namespace}.test_event`);
+      expect(GameSocket['onceListenersMapping'].has(listener)).toBe(true);
+      expect(GameSocket['listeners'][namespace]['test_event']).toContain(
+        GameSocket['onceListenersMapping'].get(listener)
+      );
+      expect(mockSocket.once).toHaveBeenCalledWith(
+        'test_event',
+        GameSocket['onceListenersMapping'].get(listener)
+      );
+    });
+
+    it('adds a single firing event listener, throwing an error if the socket is uninitialized', () => {
+      expect(GameSocket['socket']).toBe(null);
+
+      expect(() => {
+        const listener = jest.fn();
+        GameSocket.onceNamespaced('test-ns', 'test_event', listener);
+      }).toThrowError('Socket not initialized');
+    });
+
+    it('fails to add a single firing event listener with an unknown namespace', () => {
+      expect(GameSocket.initializeSocket(onConnectionError, resetAttempts)).toBe(mockSocket);
+
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+
+      const namespace = 'unknown-namespace';
+      const listener = jest.fn();
+      GameSocket.onceNamespaced(namespace, 'event', listener);
+
+      expect(consoleErrorSpy).toBeCalledWith(
+        `Unknown namespace ${namespace} - have you called GameSocket.attach()?`
+      );
+      consoleErrorSpy.mockRestore();
+    });
   });
 
   it('registers multiple event listeners', () => {
@@ -135,6 +185,11 @@ describe('GameSocket', () => {
     const listener3 = jest.fn();
     const listener4 = jest.fn();
 
+    const onceListener1 = jest.fn();
+    const onceListener2 = jest.fn();
+    const onceListener3 = jest.fn();
+    const onceListener4 = jest.fn();
+
     expect(GameSocket.initializeSocket(onConnectionError, resetAttempts)).toBe(mockSocket);
     const { namespace: namespace1 } = GameSocket.attach();
     const { namespace: namespace2 } = GameSocket.attach();
@@ -144,8 +199,12 @@ describe('GameSocket', () => {
     GameSocket.onNamespaced(namespace1, 'test_event', listener1);
     GameSocket.onNamespaced(namespace1, 'test_event', listener2);
     GameSocket.onNamespaced(namespace1, 'test_event2', listener3);
+    GameSocket.onceNamespaced(namespace1, 'test_event', onceListener1);
+    GameSocket.onceNamespaced(namespace1, 'test_event', onceListener2);
+    GameSocket.onceNamespaced(namespace1, 'test_event2', onceListener3);
     GameSocket.onAnyNamespaced(namespace2, anyListener3);
     GameSocket.onNamespaced(namespace2, 'test_event', listener4);
+    GameSocket.onceNamespaced(namespace2, 'test_event', onceListener4);
 
     expect(mockSocket.onAny).toHaveBeenCalledWith(anyListener1);
     expect(mockSocket.onAny).toHaveBeenCalledWith(anyListener2);
@@ -161,27 +220,51 @@ describe('GameSocket', () => {
     expect(GameSocket['listeners']).toHaveProperty(`${namespace1}.test_event`);
     expect(GameSocket['listeners'][namespace1]['test_event']).toContain(listener1);
     expect(GameSocket['listeners'][namespace1]['test_event']).toContain(listener2);
+    expect(GameSocket['onceListenersMapping'].has(onceListener1)).toBeTruthy();
+    expect(GameSocket['listeners'][namespace1]['test_event']).toContain(
+      GameSocket['onceListenersMapping'].get(onceListener1)
+    );
+    expect(GameSocket['onceListenersMapping'].has(onceListener2)).toBeTruthy();
+    expect(GameSocket['listeners'][namespace1]['test_event']).toContain(
+      GameSocket['onceListenersMapping'].get(onceListener2)
+    );
     expect(GameSocket['listeners']).toHaveProperty(`${namespace1}.test_event2`);
     expect(GameSocket['listeners'][namespace1]['test_event2']).toContain(listener3);
+    expect(GameSocket['onceListenersMapping'].has(onceListener3)).toBeTruthy();
+    expect(GameSocket['listeners'][namespace1]['test_event2']).toContain(
+      GameSocket['onceListenersMapping'].get(onceListener3)
+    );
 
     expect(GameSocket['anyListeners']).toHaveProperty(namespace2);
     expect(GameSocket['anyListeners'][namespace2]).toContain(anyListener3);
     expect(GameSocket['listeners']).toHaveProperty(`${namespace2}.test_event`);
     expect(GameSocket['listeners'][namespace2]['test_event']).toContain(listener4);
+    expect(GameSocket['onceListenersMapping'].has(onceListener4)).toBeTruthy();
+    expect(GameSocket['listeners'][namespace2]['test_event']).toContain(
+      GameSocket['onceListenersMapping'].get(onceListener4)
+    );
+
+    expect(mockSocket.once).toHaveBeenCalledWith(
+      'test_event',
+      GameSocket['onceListenersMapping'].get(onceListener1)
+    );
+    expect(mockSocket.once).toHaveBeenCalledWith(
+      'test_event',
+      GameSocket['onceListenersMapping'].get(onceListener2)
+    );
+    expect(mockSocket.once).toHaveBeenCalledWith(
+      'test_event2',
+      GameSocket['onceListenersMapping'].get(onceListener3)
+    );
+    expect(mockSocket.once).toHaveBeenCalledWith(
+      'test_event',
+      GameSocket['onceListenersMapping'].get(onceListener4)
+    );
   });
 
   describe('removing event listeners', () => {
     let namespace1: string;
     let namespace2: string;
-
-    const anyListener1 = jest.fn();
-    const anyListener2 = jest.fn();
-    const anyListener3 = jest.fn();
-
-    const listener1 = jest.fn();
-    const listener2 = jest.fn();
-    const listener3 = jest.fn();
-    const listener4 = jest.fn();
 
     beforeEach(() => {
       GameSocket.initializeSocket(onConnectionError, resetAttempts);
@@ -190,141 +273,300 @@ describe('GameSocket', () => {
       const { namespace: ns2 } = GameSocket.attach();
       namespace1 = ns1;
       namespace2 = ns2;
-
-      GameSocket.onAnyNamespaced(namespace1, anyListener1);
-      GameSocket.onAnyNamespaced(namespace1, anyListener2);
-      GameSocket.onNamespaced(namespace1, 'test_event', listener1);
-      GameSocket.onNamespaced(namespace1, 'test_event', listener2);
-      GameSocket.onNamespaced(namespace1, 'test_event2', listener3);
-
-      GameSocket.onAnyNamespaced(namespace2, anyListener3);
-      GameSocket.onNamespaced(namespace2, 'test_event', listener4);
-
-      jest.clearAllMocks();
     });
 
-    it('removes a catch-all listener', () => {
-      GameSocket.offAnyNamespaced(namespace1, anyListener1);
+    describe('catch-all listeners', () => {
+      const anyListener1 = jest.fn();
+      const anyListener2 = jest.fn();
+      const anyListener3 = jest.fn();
 
-      expect(mockSocket.offAny).toBeCalledTimes(1);
-      expect(mockSocket.offAny).toHaveBeenCalledWith(anyListener1);
-      expect(GameSocket['anyListeners']).toHaveProperty(namespace1);
-      expect(GameSocket['anyListeners'][namespace1]).not.toContain(anyListener1);
-      expect(GameSocket['anyListeners'][namespace1]).toContain(anyListener2);
+      beforeEach(() => {
+        GameSocket.onAnyNamespaced(namespace1, anyListener1);
+        GameSocket.onAnyNamespaced(namespace1, anyListener2);
+        GameSocket.onAnyNamespaced(namespace2, anyListener3);
 
-      expect(GameSocket['anyListeners']).toHaveProperty(namespace2);
-      expect(GameSocket['anyListeners'][namespace2]).toContain(anyListener3);
+        jest.clearAllMocks();
+      });
+
+      it('removes a catch-all listener', () => {
+        GameSocket.offAnyNamespaced(namespace1, anyListener1);
+
+        expect(mockSocket.offAny).toBeCalledTimes(1);
+        expect(mockSocket.offAny).toHaveBeenCalledWith(anyListener1);
+        expect(GameSocket['anyListeners']).toHaveProperty(namespace1);
+        expect(GameSocket['anyListeners'][namespace1]).not.toContain(anyListener1);
+        expect(GameSocket['anyListeners'][namespace1]).toContain(anyListener2);
+
+        expect(GameSocket['anyListeners']).toHaveProperty(namespace2);
+        expect(GameSocket['anyListeners'][namespace2]).toContain(anyListener3);
+      });
+
+      it('removes all catch-all listeners for a namespace', () => {
+        GameSocket.offAnyNamespaced(namespace1);
+
+        expect(mockSocket.offAny).toBeCalledTimes(2);
+        expect(mockSocket.offAny).toHaveBeenCalledWith(anyListener1);
+        expect(mockSocket.offAny).toHaveBeenCalledWith(anyListener2);
+        expect(GameSocket['anyListeners']).not.toHaveProperty(namespace1);
+
+        expect(GameSocket['anyListeners']).toHaveProperty(namespace2);
+        expect(GameSocket['anyListeners'][namespace2]).toContain(anyListener3);
+      });
+
+      it('removes all catch-all listeners for a namespace (individual removals)', () => {
+        GameSocket.offAnyNamespaced(namespace1, anyListener1);
+        GameSocket.offAnyNamespaced(namespace1, anyListener2);
+
+        expect(mockSocket.offAny).toBeCalledTimes(2);
+        expect(mockSocket.offAny).toHaveBeenCalledWith(anyListener1);
+        expect(mockSocket.offAny).toHaveBeenCalledWith(anyListener2);
+        expect(GameSocket['anyListeners']).not.toHaveProperty(namespace1);
+
+        expect(GameSocket['anyListeners']).toHaveProperty(namespace2);
+        expect(GameSocket['anyListeners'][namespace2]).toContain(anyListener3);
+      });
     });
 
-    it('removes all catch-all listeners for a namespace', () => {
-      GameSocket.offAnyNamespaced(namespace1);
+    describe('standard listeners', () => {
+      const listener1 = jest.fn();
+      const listener2 = jest.fn();
+      const listener3 = jest.fn();
+      const listener4 = jest.fn();
 
-      expect(mockSocket.offAny).toBeCalledTimes(2);
-      expect(mockSocket.offAny).toHaveBeenCalledWith(anyListener1);
-      expect(mockSocket.offAny).toHaveBeenCalledWith(anyListener2);
-      expect(GameSocket['anyListeners']).not.toHaveProperty(namespace1);
+      beforeEach(() => {
+        GameSocket.onNamespaced(namespace1, 'test_event', listener1);
+        GameSocket.onNamespaced(namespace1, 'test_event', listener2);
+        GameSocket.onNamespaced(namespace1, 'test_event2', listener3);
 
-      expect(GameSocket['anyListeners']).toHaveProperty(namespace2);
-      expect(GameSocket['anyListeners'][namespace2]).toContain(anyListener3);
+        GameSocket.onNamespaced(namespace2, 'test_event', listener4);
+
+        jest.clearAllMocks();
+      });
+
+      it('removes an event listener', () => {
+        GameSocket.offNamespaced(namespace1, 'test_event', listener2);
+
+        expect(mockSocket.off).toBeCalledTimes(1);
+        expect(mockSocket.off).toHaveBeenCalledWith('test_event', listener2);
+        expect(GameSocket['listeners']).toHaveProperty(`${namespace1}.test_event`);
+        expect(GameSocket['listeners'][namespace1]['test_event']).toContain(listener1);
+        expect(GameSocket['listeners'][namespace1]['test_event']).not.toContain(listener2);
+        expect(GameSocket['listeners']).toHaveProperty(`${namespace1}.test_event2`);
+        expect(GameSocket['listeners'][namespace1]['test_event2']).toContain(listener3);
+
+        expect(GameSocket['listeners']).toHaveProperty(`${namespace2}.test_event`);
+        expect(GameSocket['listeners'][namespace2]['test_event']).toContain(listener4);
+      });
+
+      it('removes all event listeners for a namespace and event', () => {
+        GameSocket.offNamespaced(namespace1, 'test_event');
+
+        expect(mockSocket.off).toBeCalledTimes(2);
+        expect(mockSocket.off).toHaveBeenCalledWith('test_event', listener1);
+        expect(mockSocket.off).toHaveBeenCalledWith('test_event', listener2);
+        expect(GameSocket['listeners']).not.toHaveProperty(`${namespace1}.test_event`);
+        expect(GameSocket['listeners']).toHaveProperty(`${namespace1}.test_event2`);
+        expect(GameSocket['listeners'][namespace1]['test_event2']).toContain(listener3);
+
+        expect(GameSocket['listeners']).toHaveProperty(`${namespace2}.test_event`);
+        expect(GameSocket['listeners'][namespace2]['test_event']).toContain(listener4);
+      });
+
+      it('removes all event listeners for a namespace and event (individual removals)', () => {
+        GameSocket.offNamespaced(namespace1, 'test_event', listener1);
+        GameSocket.offNamespaced(namespace1, 'test_event', listener2);
+
+        expect(mockSocket.off).toBeCalledTimes(2);
+        expect(mockSocket.off).toHaveBeenCalledWith('test_event', listener1);
+        expect(mockSocket.off).toHaveBeenCalledWith('test_event', listener2);
+        expect(GameSocket['listeners']).not.toHaveProperty(`${namespace1}.test_event`);
+        expect(GameSocket['listeners']).toHaveProperty(`${namespace1}.test_event2`);
+        expect(GameSocket['listeners'][namespace1]['test_event2']).toContain(listener3);
+
+        expect(GameSocket['listeners']).toHaveProperty(`${namespace2}.test_event`);
+        expect(GameSocket['listeners'][namespace2]['test_event']).toContain(listener4);
+      });
+
+      it('removes all event listeners for a namespace', () => {
+        GameSocket.offNamespaced(namespace1);
+
+        expect(mockSocket.off).toBeCalledTimes(3);
+        expect(mockSocket.off).toHaveBeenCalledWith('test_event', listener1);
+        expect(mockSocket.off).toHaveBeenCalledWith('test_event', listener2);
+        expect(mockSocket.off).toHaveBeenCalledWith('test_event2', listener3);
+        expect(GameSocket['listeners']).not.toHaveProperty(namespace1);
+
+        expect(GameSocket['listeners']).toHaveProperty(`${namespace2}.test_event`);
+        expect(GameSocket['listeners'][namespace2]['test_event']).toContain(listener4);
+      });
+
+      it('removes all event listeners for a namespace (bulk removals by event)', () => {
+        GameSocket.offNamespaced(namespace1, 'test_event');
+        GameSocket.offNamespaced(namespace1, 'test_event2');
+
+        expect(mockSocket.off).toBeCalledTimes(3);
+        expect(mockSocket.off).toHaveBeenCalledWith('test_event', listener1);
+        expect(mockSocket.off).toHaveBeenCalledWith('test_event', listener2);
+        expect(mockSocket.off).toHaveBeenCalledWith('test_event2', listener3);
+        expect(GameSocket['listeners']).not.toHaveProperty(namespace1);
+
+        expect(GameSocket['listeners']).toHaveProperty(`${namespace2}.test_event`);
+        expect(GameSocket['listeners'][namespace2]['test_event']).toContain(listener4);
+      });
+
+      it('removes all event listeners for a namespace (individual removals by event and listener)', () => {
+        GameSocket.offNamespaced(namespace1, 'test_event', listener1);
+        GameSocket.offNamespaced(namespace1, 'test_event', listener2);
+        GameSocket.offNamespaced(namespace1, 'test_event2', listener3);
+
+        expect(mockSocket.off).toBeCalledTimes(3);
+        expect(mockSocket.off).toHaveBeenCalledWith('test_event', listener1);
+        expect(mockSocket.off).toHaveBeenCalledWith('test_event', listener2);
+        expect(mockSocket.off).toHaveBeenCalledWith('test_event2', listener3);
+        expect(GameSocket['listeners']).not.toHaveProperty(namespace1);
+
+        expect(GameSocket['listeners']).toHaveProperty(`${namespace2}.test_event`);
+        expect(GameSocket['listeners'][namespace2]['test_event']).toContain(listener4);
+      });
     });
 
-    it('removes all catch-all listeners for a namespace (individual removals)', () => {
-      GameSocket.offAnyNamespaced(namespace1, anyListener1);
-      GameSocket.offAnyNamespaced(namespace1, anyListener2);
+    describe('once listeners', () => {
+      const onceListener1 = jest.fn();
+      const onceListener2 = jest.fn();
+      const onceListener3 = jest.fn();
+      const onceListener4 = jest.fn();
 
-      expect(mockSocket.offAny).toBeCalledTimes(2);
-      expect(mockSocket.offAny).toHaveBeenCalledWith(anyListener1);
-      expect(mockSocket.offAny).toHaveBeenCalledWith(anyListener2);
-      expect(GameSocket['anyListeners']).not.toHaveProperty(namespace1);
+      let onceListener1Actual: () => void;
+      let onceListener2Actual: () => void;
+      let onceListener3Actual: () => void;
+      let onceListener4Actual: () => void;
 
-      expect(GameSocket['anyListeners']).toHaveProperty(namespace2);
-      expect(GameSocket['anyListeners'][namespace2]).toContain(anyListener3);
-    });
+      beforeEach(() => {
+        GameSocket.onceNamespaced(namespace1, 'test_event', onceListener1);
+        GameSocket.onceNamespaced(namespace1, 'test_event', onceListener2);
+        GameSocket.onceNamespaced(namespace1, 'test_event2', onceListener3);
 
-    it('removes an event listener', () => {
-      GameSocket.offNamespaced(namespace1, 'test_event', listener2);
+        GameSocket.onceNamespaced(namespace2, 'test_event', onceListener4);
 
-      expect(mockSocket.off).toBeCalledTimes(1);
-      expect(mockSocket.off).toHaveBeenCalledWith('test_event', listener2);
-      expect(GameSocket['listeners']).toHaveProperty(`${namespace1}.test_event`);
-      expect(GameSocket['listeners'][namespace1]['test_event']).toContain(listener1);
-      expect(GameSocket['listeners'][namespace1]['test_event']).not.toContain(listener2);
-      expect(GameSocket['listeners']).toHaveProperty(`${namespace1}.test_event2`);
-      expect(GameSocket['listeners'][namespace1]['test_event2']).toContain(listener3);
+        onceListener1Actual = GameSocket['onceListenersMapping'].get(onceListener1)!;
+        onceListener2Actual = GameSocket['onceListenersMapping'].get(onceListener2)!;
+        onceListener3Actual = GameSocket['onceListenersMapping'].get(onceListener3)!;
+        onceListener4Actual = GameSocket['onceListenersMapping'].get(onceListener4)!;
 
-      expect(GameSocket['listeners']).toHaveProperty(`${namespace2}.test_event`);
-      expect(GameSocket['listeners'][namespace2]['test_event']).toContain(listener4);
-    });
+        jest.clearAllMocks();
+      });
 
-    it('removes all event listeners for a namespace and event', () => {
-      GameSocket.offNamespaced(namespace1, 'test_event');
+      it('removes a single firing event listener', () => {
+        GameSocket.offNamespaced(namespace1, 'test_event', onceListener2);
 
-      expect(mockSocket.off).toBeCalledTimes(2);
-      expect(mockSocket.off).toHaveBeenCalledWith('test_event', listener1);
-      expect(mockSocket.off).toHaveBeenCalledWith('test_event', listener2);
-      expect(GameSocket['listeners']).not.toHaveProperty(`${namespace1}.test_event`);
-      expect(GameSocket['listeners']).toHaveProperty(`${namespace1}.test_event2`);
-      expect(GameSocket['listeners'][namespace1]['test_event2']).toContain(listener3);
+        expect(mockSocket.off).toBeCalledTimes(1);
+        expect(mockSocket.off).toHaveBeenCalledWith('test_event', onceListener2Actual);
+        expect(GameSocket['listeners']).toHaveProperty(`${namespace1}.test_event`);
+        expect(GameSocket['listeners'][namespace1]['test_event']).toContain(onceListener1Actual);
+        expect(GameSocket['onceListenersMapping'].has(onceListener1)).toBe(true);
+        expect(GameSocket['listeners'][namespace1]['test_event']).not.toContain(
+          onceListener2Actual
+        );
+        expect(GameSocket['onceListenersMapping'].has(onceListener2)).toBe(false);
+        expect(GameSocket['listeners']).toHaveProperty(`${namespace1}.test_event2`);
+        expect(GameSocket['listeners'][namespace1]['test_event2']).toContain(onceListener3Actual);
+        expect(GameSocket['onceListenersMapping'].has(onceListener3)).toBe(true);
 
-      expect(GameSocket['listeners']).toHaveProperty(`${namespace2}.test_event`);
-      expect(GameSocket['listeners'][namespace2]['test_event']).toContain(listener4);
-    });
+        expect(GameSocket['listeners']).toHaveProperty(`${namespace2}.test_event`);
+        expect(GameSocket['listeners'][namespace2]['test_event']).toContain(onceListener4Actual);
+        expect(GameSocket['onceListenersMapping'].has(onceListener4)).toBe(true);
+      });
 
-    it('removes all event listeners for a namespace and event (individual removals)', () => {
-      GameSocket.offNamespaced(namespace1, 'test_event', listener1);
-      GameSocket.offNamespaced(namespace1, 'test_event', listener2);
+      it('removes all single firing event listeners for a namespace and event', () => {
+        GameSocket.offNamespaced(namespace1, 'test_event');
 
-      expect(mockSocket.off).toBeCalledTimes(2);
-      expect(mockSocket.off).toHaveBeenCalledWith('test_event', listener1);
-      expect(mockSocket.off).toHaveBeenCalledWith('test_event', listener2);
-      expect(GameSocket['listeners']).not.toHaveProperty(`${namespace1}.test_event`);
-      expect(GameSocket['listeners']).toHaveProperty(`${namespace1}.test_event2`);
-      expect(GameSocket['listeners'][namespace1]['test_event2']).toContain(listener3);
+        expect(mockSocket.off).toBeCalledTimes(2);
+        expect(mockSocket.off).toHaveBeenCalledWith('test_event', onceListener1Actual);
+        expect(mockSocket.off).toHaveBeenCalledWith('test_event', onceListener2Actual);
+        expect(GameSocket['listeners']).not.toHaveProperty(`${namespace1}.test_event`);
+        expect(GameSocket['onceListenersMapping'].has(onceListener1)).toBe(false);
+        expect(GameSocket['onceListenersMapping'].has(onceListener2)).toBe(false);
+        expect(GameSocket['listeners']).toHaveProperty(`${namespace1}.test_event2`);
+        expect(GameSocket['listeners'][namespace1]['test_event2']).toContain(onceListener3Actual);
+        expect(GameSocket['onceListenersMapping'].has(onceListener3)).toBe(true);
 
-      expect(GameSocket['listeners']).toHaveProperty(`${namespace2}.test_event`);
-      expect(GameSocket['listeners'][namespace2]['test_event']).toContain(listener4);
-    });
+        expect(GameSocket['listeners']).toHaveProperty(`${namespace2}.test_event`);
+        expect(GameSocket['listeners'][namespace2]['test_event']).toContain(onceListener4Actual);
+        expect(GameSocket['onceListenersMapping'].has(onceListener4)).toBe(true);
+      });
 
-    it('removes all event listeners for a namespace', () => {
-      GameSocket.offNamespaced(namespace1);
+      it('removes all single firing event listeners for a namespace and event (individual removals)', () => {
+        GameSocket.offNamespaced(namespace1, 'test_event', onceListener1);
+        GameSocket.offNamespaced(namespace1, 'test_event', onceListener2);
 
-      expect(mockSocket.off).toBeCalledTimes(3);
-      expect(mockSocket.off).toHaveBeenCalledWith('test_event', listener1);
-      expect(mockSocket.off).toHaveBeenCalledWith('test_event', listener2);
-      expect(mockSocket.off).toHaveBeenCalledWith('test_event2', listener3);
-      expect(GameSocket['listeners']).not.toHaveProperty(namespace1);
+        expect(mockSocket.off).toBeCalledTimes(2);
+        expect(mockSocket.off).toHaveBeenCalledWith('test_event', onceListener1Actual);
+        expect(mockSocket.off).toHaveBeenCalledWith('test_event', onceListener2Actual);
+        expect(GameSocket['listeners']).not.toHaveProperty(`${namespace1}.test_event`);
+        expect(GameSocket['onceListenersMapping'].has(onceListener1)).toBe(false);
+        expect(GameSocket['onceListenersMapping'].has(onceListener2)).toBe(false);
+        expect(GameSocket['listeners']).toHaveProperty(`${namespace1}.test_event2`);
+        expect(GameSocket['listeners'][namespace1]['test_event2']).toContain(onceListener3Actual);
+        expect(GameSocket['onceListenersMapping'].has(onceListener3)).toBe(true);
 
-      expect(GameSocket['listeners']).toHaveProperty(`${namespace2}.test_event`);
-      expect(GameSocket['listeners'][namespace2]['test_event']).toContain(listener4);
-    });
+        expect(GameSocket['listeners']).toHaveProperty(`${namespace2}.test_event`);
+        expect(GameSocket['listeners'][namespace2]['test_event']).toContain(onceListener4Actual);
+        expect(GameSocket['onceListenersMapping'].has(onceListener4)).toBe(true);
+      });
 
-    it('removes all event listeners for a namespace (bulk removals by event)', () => {
-      GameSocket.offNamespaced(namespace1, 'test_event');
-      GameSocket.offNamespaced(namespace1, 'test_event2');
+      it('removes all single firing event listeners for a namespace', () => {
+        GameSocket.offNamespaced(namespace1);
 
-      expect(mockSocket.off).toBeCalledTimes(3);
-      expect(mockSocket.off).toHaveBeenCalledWith('test_event', listener1);
-      expect(mockSocket.off).toHaveBeenCalledWith('test_event', listener2);
-      expect(mockSocket.off).toHaveBeenCalledWith('test_event2', listener3);
-      expect(GameSocket['listeners']).not.toHaveProperty(namespace1);
+        expect(mockSocket.off).toBeCalledTimes(3);
+        expect(mockSocket.off).toHaveBeenCalledWith('test_event', onceListener1Actual);
+        expect(mockSocket.off).toHaveBeenCalledWith('test_event', onceListener2Actual);
+        expect(mockSocket.off).toHaveBeenCalledWith('test_event2', onceListener3Actual);
+        expect(GameSocket['listeners']).not.toHaveProperty(namespace1);
+        expect(GameSocket['onceListenersMapping'].has(onceListener1)).toBe(false);
+        expect(GameSocket['onceListenersMapping'].has(onceListener2)).toBe(false);
+        expect(GameSocket['onceListenersMapping'].has(onceListener3)).toBe(false);
 
-      expect(GameSocket['listeners']).toHaveProperty(`${namespace2}.test_event`);
-      expect(GameSocket['listeners'][namespace2]['test_event']).toContain(listener4);
-    });
+        expect(GameSocket['listeners']).toHaveProperty(`${namespace2}.test_event`);
+        expect(GameSocket['listeners'][namespace2]['test_event']).toContain(onceListener4Actual);
+        expect(GameSocket['onceListenersMapping'].has(onceListener4)).toBe(true);
+      });
 
-    it('removes all event listeners for a namespace (individual removals by event and listener)', () => {
-      GameSocket.offNamespaced(namespace1, 'test_event', listener1);
-      GameSocket.offNamespaced(namespace1, 'test_event', listener2);
-      GameSocket.offNamespaced(namespace1, 'test_event2', listener3);
+      it('removes all single firing event listeners for a namespace (bulk removals by event)', () => {
+        GameSocket.offNamespaced(namespace1, 'test_event');
+        GameSocket.offNamespaced(namespace1, 'test_event2');
 
-      expect(mockSocket.off).toBeCalledTimes(3);
-      expect(mockSocket.off).toHaveBeenCalledWith('test_event', listener1);
-      expect(mockSocket.off).toHaveBeenCalledWith('test_event', listener2);
-      expect(mockSocket.off).toHaveBeenCalledWith('test_event2', listener3);
-      expect(GameSocket['listeners']).not.toHaveProperty(namespace1);
+        expect(mockSocket.off).toBeCalledTimes(3);
+        expect(mockSocket.off).toHaveBeenCalledWith('test_event', onceListener1Actual);
+        expect(mockSocket.off).toHaveBeenCalledWith('test_event', onceListener2Actual);
+        expect(mockSocket.off).toHaveBeenCalledWith('test_event2', onceListener3Actual);
+        expect(GameSocket['listeners']).not.toHaveProperty(namespace1);
+        expect(GameSocket['onceListenersMapping'].has(onceListener1)).toBe(false);
+        expect(GameSocket['onceListenersMapping'].has(onceListener2)).toBe(false);
+        expect(GameSocket['onceListenersMapping'].has(onceListener3)).toBe(false);
 
-      expect(GameSocket['listeners']).toHaveProperty(`${namespace2}.test_event`);
-      expect(GameSocket['listeners'][namespace2]['test_event']).toContain(listener4);
+        expect(GameSocket['listeners']).toHaveProperty(`${namespace2}.test_event`);
+        expect(GameSocket['listeners'][namespace2]['test_event']).toContain(onceListener4Actual);
+        expect(GameSocket['onceListenersMapping'].has(onceListener4)).toBe(true);
+      });
+
+      it('removes all single firing event listeners for a namespace (individual removals by event and listener)', () => {
+        GameSocket.offNamespaced(namespace1, 'test_event', onceListener1);
+        GameSocket.offNamespaced(namespace1, 'test_event', onceListener2);
+        GameSocket.offNamespaced(namespace1, 'test_event2', onceListener3);
+
+        expect(mockSocket.off).toBeCalledTimes(3);
+        expect(mockSocket.off).toHaveBeenCalledWith('test_event', onceListener1Actual);
+        expect(mockSocket.off).toHaveBeenCalledWith('test_event', onceListener2Actual);
+        expect(mockSocket.off).toHaveBeenCalledWith('test_event2', onceListener3Actual);
+        expect(GameSocket['listeners']).not.toHaveProperty(namespace1);
+        expect(GameSocket['onceListenersMapping'].has(onceListener1)).toBe(false);
+        expect(GameSocket['onceListenersMapping'].has(onceListener2)).toBe(false);
+        expect(GameSocket['onceListenersMapping'].has(onceListener3)).toBe(false);
+
+        expect(GameSocket['listeners']).toHaveProperty(`${namespace2}.test_event`);
+        expect(GameSocket['listeners'][namespace2]['test_event']).toContain(onceListener4Actual);
+        expect(GameSocket['onceListenersMapping'].has(onceListener4)).toBe(true);
+      });
     });
   });
 
@@ -361,6 +603,11 @@ describe('GameSocket', () => {
     const listener3 = jest.fn();
     const listener4 = jest.fn();
 
+    const onceListener1 = jest.fn();
+    const onceListener2 = jest.fn();
+    const onceListener3 = jest.fn();
+    const onceListener4 = jest.fn();
+
     beforeEach(() => {
       GameSocket.initializeSocket(onConnectionError, resetAttempts);
 
@@ -377,6 +624,7 @@ describe('GameSocket', () => {
       expect(GameSocket['attachedNamespaces']).toEqual(new Set());
       expect(GameSocket['anyListeners']).toEqual({});
       expect(GameSocket['listeners']).toEqual({});
+      expect(GameSocket['onceListenersMapping'].size).toEqual(0);
 
       expect(mockSocket.disconnect).toBeCalledTimes(1);
     });
@@ -392,6 +640,7 @@ describe('GameSocket', () => {
       expect(GameSocket['attachedNamespaces']).toEqual(new Set([namespace2]));
       expect(GameSocket['anyListeners']).toEqual({});
       expect(GameSocket['listeners']).toEqual({});
+      expect(GameSocket['onceListenersMapping'].size).toEqual(0);
 
       expect(mockSocket.disconnect).toBeCalledTimes(0);
     });
@@ -401,6 +650,7 @@ describe('GameSocket', () => {
       const { namespace: namespace2 } = GameSocket.attach();
       GameSocket.onAnyNamespaced(namespace2, anyListener3);
       GameSocket.onNamespaced(namespace2, 'test_event', listener4);
+      GameSocket.onceNamespaced(namespace2, 'test_event', onceListener4);
 
       jest.clearAllMocks();
 
@@ -411,6 +661,10 @@ describe('GameSocket', () => {
       expect(GameSocket['anyListeners'][namespace2]).toContain(anyListener3);
       expect(GameSocket['listeners']).toHaveProperty(`${namespace2}.test_event`);
       expect(GameSocket['listeners'][namespace2]['test_event']).toContain(listener4);
+      expect(GameSocket['onceListenersMapping'].has(onceListener4)).toBe(true);
+      expect(GameSocket['listeners'][namespace2]['test_event']).toContain(
+        GameSocket['onceListenersMapping'].get(onceListener4)
+      );
 
       expect(mockSocket.disconnect).toBeCalledTimes(0);
     });
@@ -422,10 +676,14 @@ describe('GameSocket', () => {
       GameSocket.onNamespaced(namespace1, 'test_event', listener1);
       GameSocket.onNamespaced(namespace1, 'test_event', listener2);
       GameSocket.onNamespaced(namespace1, 'test_event2', listener3);
+      GameSocket.onceNamespaced(namespace1, 'test_event', onceListener1);
+      GameSocket.onceNamespaced(namespace1, 'test_event', onceListener2);
+      GameSocket.onceNamespaced(namespace1, 'test_event2', onceListener3);
 
       const { namespace: namespace2 } = GameSocket.attach();
       GameSocket.onAnyNamespaced(namespace2, anyListener3);
       GameSocket.onNamespaced(namespace2, 'test_event', listener4);
+      GameSocket.onceNamespaced(namespace2, 'test_event', onceListener4);
 
       jest.clearAllMocks();
 
@@ -434,11 +692,18 @@ describe('GameSocket', () => {
       expect(GameSocket['attachedNamespaces']).toEqual(new Set([namespace2]));
       expect(GameSocket['anyListeners']).not.toHaveProperty(namespace1);
       expect(GameSocket['listeners']).not.toHaveProperty(namespace1);
+      expect(GameSocket['onceListenersMapping'].has(onceListener1)).toBe(false);
+      expect(GameSocket['onceListenersMapping'].has(onceListener2)).toBe(false);
+      expect(GameSocket['onceListenersMapping'].has(onceListener3)).toBe(false);
 
       expect(GameSocket['anyListeners']).toHaveProperty(namespace2);
       expect(GameSocket['anyListeners'][namespace2]).toContain(anyListener3);
       expect(GameSocket['listeners']).toHaveProperty(`${namespace2}.test_event`);
       expect(GameSocket['listeners'][namespace2]['test_event']).toContain(listener4);
+      expect(GameSocket['onceListenersMapping'].has(onceListener4)).toBe(true);
+      expect(GameSocket['listeners'][namespace2]['test_event']).toContain(
+        GameSocket['onceListenersMapping'].get(onceListener4)
+      );
 
       expect(mockSocket.disconnect).toBeCalledTimes(0);
     });
@@ -450,6 +715,9 @@ describe('GameSocket', () => {
       GameSocket.onNamespaced(namespace1, 'test_event', listener1);
       GameSocket.onNamespaced(namespace1, 'test_event', listener2);
       GameSocket.onNamespaced(namespace1, 'test_event2', listener3);
+      GameSocket.onceNamespaced(namespace1, 'test_event', onceListener1);
+      GameSocket.onceNamespaced(namespace1, 'test_event', onceListener2);
+      GameSocket.onceNamespaced(namespace1, 'test_event2', onceListener3);
 
       jest.clearAllMocks();
 
@@ -458,6 +726,7 @@ describe('GameSocket', () => {
       expect(GameSocket['attachedNamespaces']).toEqual(new Set());
       expect(GameSocket['anyListeners']).toEqual({});
       expect(GameSocket['listeners']).toEqual({});
+      expect(GameSocket['onceListenersMapping'].size).toEqual(0);
 
       expect(mockSocket.disconnect).toBeCalledTimes(1);
     });

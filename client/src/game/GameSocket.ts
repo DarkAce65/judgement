@@ -5,6 +5,58 @@ import { v4 as uuid } from 'uuid';
 import { buildSocket } from '../api/client';
 import { PLAYER_ID_COOKIE } from '../constants';
 
+class BiMap<K, V> {
+  private readonly map: Map<K, V>;
+  private readonly reverseMap: Map<V, K>;
+  constructor() {
+    this.map = new Map();
+    this.reverseMap = new Map();
+  }
+
+  get size(): number {
+    return this.map.size;
+  }
+
+  keys(): IterableIterator<K> {
+    return this.map.keys();
+  }
+
+  has(key: K): boolean {
+    return this.map.has(key);
+  }
+
+  hasValue(value: V): boolean {
+    return this.reverseMap.has(value);
+  }
+
+  get(key: K): V | undefined {
+    return this.map.get(key);
+  }
+
+  getKey(value: V): K | undefined {
+    return this.reverseMap.get(value);
+  }
+
+  set(key: K, value: V): void {
+    this.map.set(key, value);
+    this.reverseMap.set(value, key);
+  }
+
+  delete(key: K): void {
+    if (this.map.has(key)) {
+      this.reverseMap.delete(this.map.get(key)!);
+    }
+    this.map.delete(key);
+  }
+
+  deleteByValue(value: V): void {
+    if (this.reverseMap.has(value)) {
+      this.map.delete(this.reverseMap.get(value)!);
+    }
+    this.reverseMap.delete(value);
+  }
+}
+
 interface ConnectionError extends Error {
   message: 'unknown_player_id';
 }
@@ -25,7 +77,7 @@ class GameSocket {
       [event: string]: (() => void)[];
     };
   } = {};
-  private static onceListenersMapping: Map<() => void, () => void> = new Map();
+  private static onceListenersMapping: BiMap<() => void, () => void> = new BiMap();
 
   static initializeSocket(
     onConnectionError?: (socket: Socket, error: Error) => void,
@@ -260,6 +312,9 @@ class GameSocket {
     } else {
       for (const activeListener of namespacedListeners[event]) {
         this.socket.off(event, activeListener);
+        if (this.onceListenersMapping.hasValue(activeListener)) {
+          this.onceListenersMapping.deleteByValue(activeListener);
+        }
       }
 
       delete this.listeners[namespace][event];
