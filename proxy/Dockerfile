@@ -3,7 +3,7 @@ FROM python:3.9-alpine as model_generator
 
 ENV PYTHONUNBUFFERED=1 \
   PYTHONDONTWRITEBYTECODE=1 \
-  POETRY_VERSION=1.1.7 \
+  POETRY_VERSION=1.1.11 \
   POETRY_HOME="/opt/poetry" \
   POETRY_NO_INTERACTION=1
 
@@ -38,7 +38,7 @@ COPY server .
 RUN poetry run python -m model_generator.model_generator --out_dir /poetryuser/generated_types
 
 # Client builder stage
-FROM node:15 as client_builder
+FROM node:16 as client_builder
 
 USER node
 WORKDIR /client

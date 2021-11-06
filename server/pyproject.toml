@@ -47,12 +47,12 @@ generate_watch = "python -m model_generator.watcher --out_dir ../client/generate
 [tool.poetry.dependencies]
 python = "^3.9"
 debugpy = { version = "^1.2.1", optional = true }
-fastapi = "^0.66.0"
+fastapi = "^0.70.0"
 psycopg2 = "^2.9.1"
 pydantic-to-typescript = { git = "https://github.com/phillipdupuis/pydantic-to-typescript.git", rev = "a8f182d", optional = true }
 pyhumps = "^3.0.2"
 python-socketio = "^5.1.0"
-uvicorn = { version = "^0.14.0", extras = ["standard"] }
+uvicorn = { version = "^0.15.0", extras = ["standard"] }
 watchgod = { version = "^0.7", optional = true }
 
 [tool.poetry.dev-dependencies]
