@@ -57,6 +57,9 @@ class BiMap<K, V> {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Listener = (...args: any[]) => void;
+
 interface ConnectionError extends Error {
   message: 'unknown_player_id';
 }
@@ -71,13 +74,13 @@ class GameSocket {
 
   private static resetConnectionAttempts?: () => void;
 
-  private static anyListeners: { [namespace: string]: (() => void)[] } = {};
+  private static anyListeners: { [namespace: string]: Listener[] } = {};
   private static listeners: {
     [namespace: string]: {
-      [event: string]: (() => void)[];
+      [event: string]: Listener[];
     };
   } = {};
-  private static onceListenersMapping: BiMap<() => void, () => void> = new BiMap();
+  private static onceListenersMapping: BiMap<Listener, Listener> = new BiMap();
 
   static initializeSocket(
     onConnectionError?: (socket: Socket, error: Error) => void,
@@ -142,9 +145,8 @@ class GameSocket {
   private static removeListenerAndCleanup(
     namespace: string,
     event: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    listener: (...args: any[]) => void
-  ): (() => void) | null {
+    listener: Listener
+  ): Listener | null {
     let removedListener = null;
     for (let i = 0; i < this.listeners[namespace][event].length; i++) {
       if (this.listeners[namespace][event][i] === listener) {
@@ -162,11 +164,7 @@ class GameSocket {
     return removedListener;
   }
 
-  static onAnyNamespaced(
-    namespace: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    listener: (...args: any[]) => void
-  ): void {
+  static onAnyNamespaced(namespace: string, listener: Listener): void {
     if (this.socket === null) {
       throw new Error('Socket not initialized');
     } else if (!this.attachedNamespaces.has(namespace)) {
@@ -182,11 +180,7 @@ class GameSocket {
     this.anyListeners[namespace].push(listener);
   }
 
-  static offAnyNamespaced(
-    namespace: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    listener?: (...args: any[]) => void
-  ): void {
+  static offAnyNamespaced(namespace: string, listener?: Listener): void {
     if (this.socket === null) {
       throw new Error('Socket not initialized');
     } else if (!this.attachedNamespaces.has(namespace)) {
@@ -219,12 +213,7 @@ class GameSocket {
     }
   }
 
-  static onNamespaced(
-    namespace: string,
-    event: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    listener: (...args: any[]) => void
-  ) {
+  static onNamespaced(namespace: string, event: string, listener: Listener) {
     if (this.socket === null) {
       throw new Error('Socket not initialized');
     } else if (!this.attachedNamespaces.has(namespace)) {
@@ -243,12 +232,7 @@ class GameSocket {
     this.listeners[namespace][event].push(listener);
   }
 
-  static onceNamespaced(
-    namespace: string,
-    event: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    listener: (...args: any[]) => void
-  ) {
+  static onceNamespaced(namespace: string, event: string, listener: Listener) {
     if (this.socket === null) {
       throw new Error('Socket not initialized');
     } else if (!this.attachedNamespaces.has(namespace)) {
@@ -275,12 +259,7 @@ class GameSocket {
     this.onceListenersMapping.set(listener, autoRemovedListener);
   }
 
-  static offNamespaced(
-    namespace: string,
-    event?: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    listener?: (...args: any[]) => void
-  ) {
+  static offNamespaced(namespace: string, event?: string, listener?: Listener) {
     if (this.socket === null) {
       throw new Error('Socket not initialized');
     } else if (!this.attachedNamespaces.has(namespace)) {
