@@ -139,6 +139,29 @@ class GameSocket {
     }
   }
 
+  private static removeListenerAndCleanup(
+    namespace: string,
+    event: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    listener: (...args: any[]) => void
+  ): (() => void) | null {
+    let removedListener = null;
+    for (let i = 0; i < this.listeners[namespace][event].length; i++) {
+      if (this.listeners[namespace][event][i] === listener) {
+        removedListener = this.listeners[namespace][event].splice(i, 1)[0];
+        if (this.listeners[namespace][event].length === 0) {
+          delete this.listeners[namespace][event];
+        }
+        if (Object.keys(this.listeners[namespace]).length === 0) {
+          delete this.listeners[namespace];
+        }
+        break;
+      }
+    }
+
+    return removedListener;
+  }
+
   static onAnyNamespaced(
     namespace: string,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -236,20 +259,9 @@ class GameSocket {
     const autoRemovedListener = (...args: unknown[]) => {
       listener(...args);
 
-      const listenerToRemove = this.onceListenersMapping.get(listener);
+      const listenerToRemove = this.onceListenersMapping.get(listener)!;
       this.onceListenersMapping.delete(listener);
-      for (let i = 0; i < this.listeners[namespace][event].length; i++) {
-        if (this.listeners[namespace][event][i] === listenerToRemove) {
-          this.listeners[namespace][event].splice(i, 1);
-          if (this.listeners[namespace][event].length === 0) {
-            delete this.listeners[namespace][event];
-          }
-          if (Object.keys(this.listeners[namespace]).length === 0) {
-            delete this.listeners[namespace];
-          }
-          break;
-        }
-      }
+      this.removeListenerAndCleanup(namespace, event, listenerToRemove);
     };
     this.socket.once(event, autoRemovedListener);
 
@@ -299,15 +311,9 @@ class GameSocket {
         this.onceListenersMapping.delete(listener);
       }
 
-      for (let i = 0; i < namespacedListeners[event].length; i++) {
-        if (namespacedListeners[event][i] === listenerToRemove) {
-          this.socket.off(event, namespacedListeners[event][i]);
-          namespacedListeners[event].splice(i, 1);
-          if (namespacedListeners[event].length === 0) {
-            delete this.listeners[namespace][event];
-          }
-          break;
-        }
+      const removedListener = this.removeListenerAndCleanup(namespace, event, listenerToRemove);
+      if (removedListener !== null) {
+        this.socket.off(event, removedListener);
       }
     } else {
       for (const activeListener of namespacedListeners[event]) {
