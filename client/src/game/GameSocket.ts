@@ -309,6 +309,12 @@ class GameSocket {
       delete this.listeners[namespace];
     }
   }
+
+  static onReconnect(namespace: string, listener: Listener): void {
+    this.onceNamespaced(namespace, 'disconnect', () => {
+      this.onNamespaced(namespace, 'connect', listener);
+    });
+  }
 }
 
 export default GameSocket;

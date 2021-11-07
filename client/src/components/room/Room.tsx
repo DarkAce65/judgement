@@ -29,7 +29,10 @@ const Room = ({ roomId, socket, namespace }: Props & WithGameSocketProps) => {
 
   useEffect(() => {
     socket.emit('join_room', roomId);
-  }, [roomId, socket]);
+    GameSocket.onReconnect(namespace, () => {
+      socket.emit('join_room', roomId);
+    });
+  }, [socket, namespace, roomId]);
 
   useEffect(() => {
     GameSocket.onNamespaced(namespace, 'room', (roomMessage: RoomMessage) => {
