@@ -44,7 +44,7 @@ def get_player_ids_for_room(room_id: str) -> list[str]:
         "INNER JOIN room_players "
         "ON players.id = room_players.player_id "
         "WHERE room_id = %s "
-        "ORDER BY room_players.order_index DESC",
+        "ORDER BY room_players.order_index ASC",
         (room_id,),
     )
 
@@ -63,7 +63,7 @@ def get_players_for_room(room_id: str) -> list[Player]:
         "INNER JOIN room_players "
         "ON players.id = room_players.player_id "
         "WHERE room_id = %s "
-        "ORDER BY room_players.order_index DESC",
+        "ORDER BY room_players.order_index ASC",
         (room_id,),
     )
 
