@@ -153,3 +153,5 @@ def start_game(room_id: str) -> None:
     games[room_id] = game
     cur = db.get_cursor()
     cur.execute("UPDATE rooms SET room_state=%s WHERE id = %s", (RoomState.GAME, room_id))
+
+    game.start_game()
