@@ -140,7 +140,7 @@ async def handle_game_input(
         await sio.emit("invalid_input", str(ex), to=client_id)
         return
 
-    await sio.emit("game_state", game.build_game_state().dict(by_alias=True), to=room_id)
+    await socket_messager.emit_game_state(room_id, game)
 
 
 @sio.on("disconnect")

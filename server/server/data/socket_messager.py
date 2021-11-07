@@ -1,6 +1,12 @@
-from typing import Optional
+from typing import Optional, cast
 
-from server.models.websocket import PlayersMessage, RoomMessage
+from server.game.core import Game
+from server.models.websocket import (
+    ConcreteGameState,
+    GameStateMessage,
+    PlayersMessage,
+    RoomMessage,
+)
 from server.sio_app import sio
 
 from . import room_manager
@@ -18,18 +24,25 @@ async def emit_room(room_id: str, recipient: Optional[str] = None) -> None:
             state=room.room_state,
             players=[player.name or "" for player in room.players],
             game_name=room.game_name,
-            game=room.get_game_state(),
+            game=cast(ConcreteGameState, room.get_game_state()),
         ).dict(by_alias=True),
         to=recipient,
     )
 
 
-async def emit_game_state(room_id: str) -> None:
-    game = room_manager.get_game_for_room(room_id)
+async def emit_game_state(room_id: str, game: Optional[Game] = None) -> None:
     if game is None:
-        return
+        game = room_manager.get_game_for_room(room_id)
+        if game is None:
+            return
 
-    await sio.emit("game_state", game.build_game_state().dict(by_alias=True), to=room_id)
+    await sio.emit(
+        "game_state",
+        GameStateMessage(state=cast(ConcreteGameState, game.build_game_state())).dict(
+            by_alias=True
+        ),
+        to=room_id,
+    )
 
 
 async def emit_players(room_id: str) -> None:
