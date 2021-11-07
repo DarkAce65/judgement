@@ -4,9 +4,15 @@ import { Button, PageHeader, Select, Space, Typography } from 'antd';
 import Cookies from 'js-cookie';
 import { useHistory } from 'react-router-dom';
 
-import { GameName } from '../../../generated_types/judgement';
-import { PlayersMessage, RoomMessage, SetGameMessage } from '../../../generated_types/websocket';
+import {
+  GameName,
+  GameStateMessage,
+  PlayersMessage,
+  RoomMessage,
+  SetGameMessage,
+} from '../../../generated_types/websocket';
 import { PLAYER_ID_COOKIE } from '../../constants';
+import { loadGameState } from '../../data/gameSlice';
 import { useAppDispatch, useAppSelector } from '../../data/reduxHooks';
 import { getGameName, getPlayers, loadPlayers, loadRoomState } from '../../data/roomSlice';
 import GameSocket from '../../game/GameSocket';
@@ -40,6 +46,9 @@ const Room = ({ roomId, socket, namespace }: Props & WithGameSocketProps) => {
     });
     GameSocket.onNamespaced(namespace, 'players', (playersMessage: PlayersMessage) => {
       dispatch(loadPlayers(playersMessage));
+    });
+    GameSocket.onNamespaced(namespace, 'game_state', (gameStateMessage: GameStateMessage) => {
+      dispatch(loadGameState(gameStateMessage));
     });
   }, [dispatch, namespace]);
 
