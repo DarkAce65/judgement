@@ -44,26 +44,25 @@ const playerSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder
-      .addCase(ensurePlayer.pending, (state) => {
-        state.ensurePlayerStatus = 'pending';
-      })
-      .addCase(
-        ensurePlayer.fulfilled,
-        (state, { payload: playerName }: PayloadAction<string | null>) => {
-          if (playerName) {
-            localStorage.setItem('playerName', playerName);
-          } else {
-            localStorage.removeItem('playerName');
-          }
-
-          state.playerName = playerName;
-          state.ensurePlayerStatus = 'succeeded';
+    builder.addCase(ensurePlayer.pending, (state) => {
+      state.ensurePlayerStatus = 'pending';
+    });
+    builder.addCase(
+      ensurePlayer.fulfilled,
+      (state, { payload: playerName }: PayloadAction<string | null>) => {
+        if (playerName) {
+          localStorage.setItem('playerName', playerName);
+        } else {
+          localStorage.removeItem('playerName');
         }
-      )
-      .addCase(ensurePlayer.rejected, (state) => {
-        state.ensurePlayerStatus = 'failed';
-      });
+
+        state.playerName = playerName;
+        state.ensurePlayerStatus = 'succeeded';
+      }
+    );
+    builder.addCase(ensurePlayer.rejected, (state) => {
+      state.ensurePlayerStatus = 'failed';
+    });
   },
 });
 
