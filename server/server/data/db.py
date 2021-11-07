@@ -11,7 +11,7 @@ def get_db_connection() -> "psycopg2.connection":
         if postgres_password_file is None:
             raise Exception("Missing path to postgres password secret")
 
-        with open(postgres_password_file) as pass_file:
+        with open(postgres_password_file, encoding="utf-8") as pass_file:
             postgres_password = pass_file.readline().strip()
             conn = psycopg2.connect(
                 host="database",

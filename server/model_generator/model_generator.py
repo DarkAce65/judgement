@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 if __name__ == "__main__":
-    with open("logging.config.json") as config:
+    with open("logging.config.json", encoding="utf-8") as config:
         logging.config.dictConfig(json.load(config))
 
     parser = argparse.ArgumentParser()

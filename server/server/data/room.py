@@ -30,7 +30,7 @@ class Room:
     ) -> None:
         self.room_id = room_id
         self.room_state = room_state
-        self.players = players or list()
+        self.players = players or []
 
         self.game_name = game_name
         self.game = game
