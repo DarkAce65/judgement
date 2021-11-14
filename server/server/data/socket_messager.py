@@ -24,7 +24,7 @@ async def emit_room(room_id: str, recipient: Optional[str] = None) -> None:
             state=room.room_state,
             players=[player.name or "" for player in room.players],
             game_name=room.game_name,
-            game=cast(ConcreteGameState, room.get_game_state()),
+            game=cast(Optional[ConcreteGameState], room.get_game_state()),
         ).dict(by_alias=True),
         to=recipient,
     )
