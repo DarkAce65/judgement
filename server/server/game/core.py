@@ -20,7 +20,7 @@ class GameName(str, Enum):
 
 
 @unique
-class GamePhase(str, Enum):
+class GameStatus(str, Enum):
     NOT_STARTED = "NOT_STARTED"
     IN_PROGRESS = "IN_PROGRESS"
     COMPLETE = "COMPLETE"
@@ -39,7 +39,7 @@ class GamePlayer:
 
 class GameState(GenericCamelModel, Generic[Action, Settings]):
     game_name: GameName
-    game_phase: GamePhase
+    game_status: GameStatus
     settings: Settings
 
     @staticmethod
@@ -51,7 +51,7 @@ class GameState(GenericCamelModel, Generic[Action, Settings]):
 class Game(Generic[Action, Settings]):
     _action_cls: Type[Action]
 
-    game_phase: GamePhase
+    game_status: GameStatus
     settings: Settings
 
     players: list[GamePlayer]
@@ -59,7 +59,7 @@ class Game(Generic[Action, Settings]):
     def __init__(self, action_cls: Type[Action], settings: Settings) -> None:
         self._action_cls = action_cls
 
-        self.game_phase = GamePhase.NOT_STARTED
+        self.game_status = GameStatus.NOT_STARTED
         self.settings = settings
 
         self.players = []
@@ -78,10 +78,10 @@ class Game(Generic[Action, Settings]):
                 break
 
     def start_game(self) -> None:
-        if self.game_phase != GamePhase.NOT_STARTED:
+        if self.game_status != GameStatus.NOT_STARTED:
             raise GameError
 
-        self.game_phase = GamePhase.IN_PROGRESS
+        self.game_status = GameStatus.IN_PROGRESS
 
     def process_raw_input(self, player_id: str, raw_game_input: dict[str, Any]) -> None:
         try:

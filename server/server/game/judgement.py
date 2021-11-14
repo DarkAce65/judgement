@@ -14,6 +14,12 @@ logger = logging.getLogger(__name__)
 
 
 @unique
+class JudgementPhase(str, Enum):
+    BIDDING = "BIDDING"
+    PLAYING = "PLAYING"
+
+
+@unique
 class JudgementActionType(str, Enum):
     PLAY_CARD = "PLAY_CARD"
 
@@ -47,6 +53,8 @@ class JudgementSettings(CamelModel):
 class JudgementGameState(GameState[JudgementAction, JudgementSettings]):
     settings: JudgementSettings
 
+    phase: JudgementPhase
+
     pile: list[Card]
 
     turn: Optional[str]
@@ -59,8 +67,9 @@ class JudgementGameState(GameState[JudgementAction, JudgementSettings]):
 
         return JudgementGameState(
             game_name=GameName.JUDGEMENT,
-            game_phase=game.game_phase,
+            game_status=game.game_status,
             settings=game.settings,
+            phase=game.phase,
             pile=game.pile,
             turn=game.turn,
             player_states=game.player_states,
@@ -68,6 +77,8 @@ class JudgementGameState(GameState[JudgementAction, JudgementSettings]):
 
 
 class JudgementGame(Game[JudgementAction, JudgementSettings]):
+    phase: JudgementPhase
+
     decks: Decks
     pile: list[Card]
 
@@ -77,6 +88,8 @@ class JudgementGame(Game[JudgementAction, JudgementSettings]):
 
     def __init__(self) -> None:
         super().__init__(JudgementAction, JudgementSettings())
+
+        self.phase = JudgementPhase.BIDDING
 
         self.decks = Decks()
         self.pile = []
