@@ -7,7 +7,7 @@ from pydantic import root_validator
 from server.models.camel_model import CamelModel
 
 from .card import Card
-from .core import Game, GameName, GameState
+from .core import Game, GameError, GameName, GameState
 from .decks import Decks
 
 logger = logging.getLogger(__name__)
@@ -99,4 +99,8 @@ class JudgementGame(Game[JudgementAction, JudgementSettings]):
         logger.info("%s, %s", player_id, game_input)
         if game_input.action_type == JudgementActionType.PLAY_CARD:
             assert game_input.card is not None
-            self.pile.append(Card.from_str(game_input.card))
+            try:
+                card = Card.from_str(game_input.card)
+            except ValueError as error:
+                raise GameError("Invalid card", game_input.card) from error
+            self.pile.append(card)
