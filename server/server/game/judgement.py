@@ -32,10 +32,12 @@ class JudgementAction(CamelModel):
         return values
 
 
-class JudgementScore(CamelModel):
+class JudgementPlayerState(CamelModel):
     score: int = 0
     current_hands: int = 0
     current_bid: int = 0
+
+    hand: list[Card] = []
 
 
 class JudgementSettings(CamelModel):
@@ -48,8 +50,7 @@ class JudgementGameState(GameState[JudgementAction, JudgementSettings]):
     pile: list[Card]
 
     turn: Optional[str]
-    hands: dict[str, list[Card]]
-    scoring: dict[str, JudgementScore]
+    player_states: dict[str, JudgementPlayerState]
 
     @staticmethod
     def from_game(game: Game[JudgementAction, JudgementSettings]) -> "JudgementGameState":
@@ -62,8 +63,7 @@ class JudgementGameState(GameState[JudgementAction, JudgementSettings]):
             settings=game.settings,
             pile=game.pile,
             turn=game.turn,
-            hands=game.hands,
-            scoring=game.scoring,
+            player_states=game.player_states,
         )
 
 
@@ -73,7 +73,7 @@ class JudgementGame(Game[JudgementAction, JudgementSettings]):
 
     turn: Optional[str]
     hands: dict[str, list[Card]]
-    scoring: dict[str, JudgementScore]
+    player_states: dict[str, JudgementPlayerState]
 
     def __init__(self) -> None:
         super().__init__(JudgementAction, JudgementSettings())
@@ -82,15 +82,15 @@ class JudgementGame(Game[JudgementAction, JudgementSettings]):
         self.pile = []
 
         self.turn = None
-        self.hands = {}
-        self.scoring = {}
+        self.player_states = {}
 
     def start_game(self) -> None:
         super().start_game()
 
         self.turn = self.players[0].player_id
-        self.hands = {player.player_id: [] for player in self.players}
-        self.scoring = {player.player_id: JudgementScore() for player in self.players}
+        self.player_states = {
+            player.player_id: JudgementPlayerState() for player in self.players
+        }
 
     def build_game_state(self) -> JudgementGameState:
         return JudgementGameState.from_game(self)
