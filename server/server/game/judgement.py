@@ -50,7 +50,7 @@ class JudgementSettings(CamelModel):
     pass
 
 
-class JudgementGameState(GameState[JudgementAction, JudgementSettings]):
+class JudgementGameState(GameState[JudgementAction]):
     settings: JudgementSettings
 
     phase: JudgementPhase
@@ -61,7 +61,7 @@ class JudgementGameState(GameState[JudgementAction, JudgementSettings]):
     player_states: dict[str, JudgementPlayerState]
 
     @staticmethod
-    def from_game(game: Game[JudgementAction, JudgementSettings]) -> "JudgementGameState":
+    def from_game(game: Game[JudgementAction]) -> "JudgementGameState":
         if not isinstance(game, JudgementGame):
             raise ValueError
 
@@ -76,8 +76,9 @@ class JudgementGameState(GameState[JudgementAction, JudgementSettings]):
         )
 
 
-class JudgementGame(Game[JudgementAction, JudgementSettings]):
+class JudgementGame(Game[JudgementAction]):
     phase: JudgementPhase
+    settings: JudgementSettings
 
     decks: Decks
     pile: list[Card]
@@ -87,9 +88,10 @@ class JudgementGame(Game[JudgementAction, JudgementSettings]):
     player_states: dict[str, JudgementPlayerState]
 
     def __init__(self) -> None:
-        super().__init__(JudgementAction, JudgementSettings())
+        super().__init__(JudgementAction)
 
         self.phase = JudgementPhase.BIDDING
+        self.settings = JudgementSettings()
 
         self.decks = Decks()
         self.pile = []

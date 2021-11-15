@@ -11,7 +11,6 @@ logger = logging.getLogger(__name__)
 
 
 Action = TypeVar("Action", bound=BaseModel)
-Settings = TypeVar("Settings", bound=BaseModel)
 
 
 @unique
@@ -37,35 +36,30 @@ class GamePlayer:
         self.player_id = player_id
 
 
-class GameState(GenericCamelModel, Generic[Action, Settings]):
+class GameState(GenericCamelModel, Generic[Action]):
     game_name: GameName
     game_status: GameStatus
-    settings: Settings
 
     @staticmethod
     @abstractmethod
-    def from_game(game: "Game[Action, Settings]") -> "GameState[Action, Settings]":
+    def from_game(game: "Game[Action]") -> "GameState[Action]":
         ...
 
 
-class Game(Generic[Action, Settings]):
+class Game(Generic[Action]):
     _action_cls: Type[Action]
 
     game_status: GameStatus
-    settings: Settings
-
     players: list[GamePlayer]
 
-    def __init__(self, action_cls: Type[Action], settings: Settings) -> None:
+    def __init__(self, action_cls: Type[Action]) -> None:
         self._action_cls = action_cls
 
         self.game_status = GameStatus.NOT_STARTED
-        self.settings = settings
-
         self.players = []
 
     @abstractmethod
-    def build_game_state(self) -> GameState[Action, Settings]:
+    def build_game_state(self) -> GameState[Action]:
         ...
 
     def add_player(self, player_id: str) -> None:
