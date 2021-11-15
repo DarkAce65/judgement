@@ -122,7 +122,7 @@ class JudgementGame(Game[JudgementAction]):
         return JudgementGameState.from_game(self)
 
     def process_input(self, player_id: str, game_input: JudgementAction) -> None:
-        logger.info("player_id: %s, action: %s", player_id, game_input)
+        logger.debug("player_id: %s, action: %s", player_id, repr(game_input))
         if isinstance(game_input, JudgementPlayCardAction):
             try:
                 card = Card.from_str(game_input.card)

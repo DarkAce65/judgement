@@ -17,7 +17,7 @@
   "handlers": {
     "default": {
       "class": "logging.StreamHandler",
-      "level": "INFO",
+      "level": "DEBUG",
       "formatter": "standard"
     },
     "uvicorn_access": {
@@ -30,7 +30,7 @@
   "loggers": {
     "": {
       "handlers": ["default"],
-      "level": "INFO",
+      "level": "DEBUG",
       "propagate": false
     },
     "pydantic2ts": { "level": "WARNING" },
