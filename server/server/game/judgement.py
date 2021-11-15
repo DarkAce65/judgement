@@ -5,9 +5,12 @@ from typing import Any, Literal, Optional
 
 from server.models.camel_model import CamelModel
 
-from .card import Card
+from .card import Card, Suit
 from .core import Game, GameError, GameName, GameState
 from .decks import Decks
+
+SUIT_ORDER = [Suit.SPADES, Suit.HEARTS, Suit.CLUBS, Suit.DIAMONDS]
+
 
 logger = logging.getLogger(__name__)
 
