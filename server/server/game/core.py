@@ -1,5 +1,5 @@
 import logging
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from enum import Enum, unique
 from typing import Any, Generic, Type, TypeVar
 
@@ -36,7 +36,7 @@ class GamePlayer:
         self.player_id = player_id
 
 
-class GameState(GenericCamelModel, Generic[Action]):
+class GameState(GenericCamelModel, Generic[Action], ABC):
     game_name: GameName
     game_status: GameStatus
 
@@ -46,7 +46,7 @@ class GameState(GenericCamelModel, Generic[Action]):
         ...
 
 
-class Game(Generic[Action]):
+class Game(Generic[Action], ABC):
     _action_cls: Type[Action]
 
     game_status: GameStatus
