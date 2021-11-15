@@ -3,7 +3,7 @@ from abc import abstractmethod
 from enum import Enum, unique
 from typing import Any, Generic, Type, TypeVar
 
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, ValidationError, parse_obj_as
 
 from server.models.camel_model import GenericCamelModel
 
@@ -79,7 +79,7 @@ class Game(Generic[Action]):
 
     def process_raw_input(self, player_id: str, raw_game_input: dict[str, Any]) -> None:
         try:
-            parsed_action = self._action_cls(**raw_game_input)
+            parsed_action = parse_obj_as(self._action_cls, raw_game_input)
         except ValidationError as error:
             raise GameError(
                 f"Input could not be parsed into {self._action_cls.__name__} "

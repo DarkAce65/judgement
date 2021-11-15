@@ -1,8 +1,7 @@
 import logging
+from abc import ABC
 from enum import Enum, unique
-from typing import Any, Optional
-
-from pydantic import root_validator
+from typing import Any, Literal, Optional
 
 from server.models.camel_model import CamelModel
 
@@ -24,18 +23,30 @@ class JudgementActionType(str, Enum):
     PLAY_CARD = "PLAY_CARD"
 
 
-class JudgementAction(CamelModel):
+class JudgementAction(CamelModel, ABC):
+    _types: dict[JudgementActionType, type] = {}
+
     action_type: JudgementActionType
-    card: Optional[str]
 
-    @root_validator(pre=False)
+    def __init_subclass__(cls, action_type: JudgementActionType):
+        cls._types[action_type] = cls
+
     @classmethod
-    def validate_data(cls, values: dict[str, Any]) -> dict[str, Any]:
-        if values["action_type"] == JudgementActionType.PLAY_CARD:
-            if not values["card"]:
-                raise ValueError("No card provided")
+    def __get_validators__(cls):  # type: ignore
+        yield cls.validate
 
-        return values
+    @classmethod
+    def validate(cls, values: dict[str, Any]) -> "JudgementAction":
+        try:
+            action_type = values["actionType"]
+            return cls._types[action_type](**values)
+        except KeyError as error:
+            raise ValueError from error
+
+
+class JudgementPlayCardAction(JudgementAction, action_type=JudgementActionType.PLAY_CARD):
+    action_type: Literal[JudgementActionType.PLAY_CARD]
+    card: str
 
 
 class JudgementPlayerState(CamelModel):
@@ -111,9 +122,8 @@ class JudgementGame(Game[JudgementAction]):
         return JudgementGameState.from_game(self)
 
     def process_input(self, player_id: str, game_input: JudgementAction) -> None:
-        logger.info("%s, %s", player_id, game_input)
-        if game_input.action_type == JudgementActionType.PLAY_CARD:
-            assert game_input.card is not None
+        logger.info("player_id: %s, action: %s", player_id, game_input)
+        if isinstance(game_input, JudgementPlayCardAction):
             try:
                 card = Card.from_str(game_input.card)
             except ValueError as error:
