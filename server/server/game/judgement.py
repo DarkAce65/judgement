@@ -23,6 +23,8 @@ class JudgementPhase(str, Enum):
 
 @unique
 class JudgementActionType(str, Enum):
+    UPDATE_SETTINGS = "UPDATE_SETTINGS"
+    BID_HANDS = "BID_HANDS"
     PLAY_CARD = "PLAY_CARD"
 
 
@@ -47,6 +49,19 @@ class JudgementAction(CamelModel, ABC):
             raise ValueError from error
 
 
+class JudgementUpdateSettingsAction(
+    JudgementAction, action_type=JudgementActionType.UPDATE_SETTINGS
+):
+    action_type: Literal[JudgementActionType.UPDATE_SETTINGS]
+    num_decks: Optional[int]
+    rounds: Optional[int]
+
+
+class JudgementBidHandsAction(JudgementAction, action_type=JudgementActionType.BID_HANDS):
+    action_type: Literal[JudgementActionType.BID_HANDS]
+    num_hands: int
+
+
 class JudgementPlayCardAction(JudgementAction, action_type=JudgementActionType.PLAY_CARD):
     action_type: Literal[JudgementActionType.PLAY_CARD]
     card: str
@@ -61,7 +76,8 @@ class JudgementPlayerState(CamelModel):
 
 
 class JudgementSettings(CamelModel):
-    pass
+    num_decks: int = 0
+    rounds: int = 0
 
 
 class JudgementGameState(GameState[JudgementAction]):
@@ -126,9 +142,20 @@ class JudgementGame(Game[JudgementAction]):
 
     def process_input(self, player_id: str, game_input: JudgementAction) -> None:
         logger.debug("player_id: %s, action: %s", player_id, repr(game_input))
-        if isinstance(game_input, JudgementPlayCardAction):
+
+        if isinstance(game_input, JudgementUpdateSettingsAction):
+            if game_input.num_decks:
+                self.settings.num_decks = game_input.num_decks
+            if game_input.rounds:
+                self.settings.rounds = game_input.rounds
+        elif isinstance(game_input, JudgementBidHandsAction):
+            self.player_states[player_id].current_bid = game_input.num_hands
+        elif isinstance(game_input, JudgementPlayCardAction):
             try:
                 card = Card.from_str(game_input.card)
             except ValueError as error:
                 raise GameError("Invalid card", game_input.card) from error
+            if card not in self.player_states[player_id].hand:
+                raise GameError("Missing card from hand", str(card))
+
             self.pile.append(card)
