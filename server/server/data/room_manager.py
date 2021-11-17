@@ -137,21 +137,24 @@ def set_game(room_id: str, game_name: GameName) -> None:
 
 
 def start_game(room_id: str) -> None:
-    room = get_room(room_id)
+    if room_id not in games:
+        room = get_room(room_id)
 
-    if room.game_name is None:
-        raise ValueError("Cannot start game - no game selected")
+        if room.game_name is None:
+            raise ValueError("Cannot start game - no game selected")
 
-    if room.game_name == GameName.JUDGEMENT:
-        game = JudgementGame()
-    else:
-        raise ValueError(f"Unrecognized game name ({room.game_name})")
+        if room.game_name == GameName.JUDGEMENT:
+            game = JudgementGame()
+        else:
+            raise ValueError(f"Unrecognized game name ({room.game_name})")
 
-    for player in room.players:
-        game.add_player(player.player_id)
+        for player in room.players:
+            game.add_player(player.player_id)
 
-    games[room_id] = game
-    cur = db.get_cursor()
-    cur.execute("UPDATE rooms SET room_state=%s WHERE id = %s", (RoomState.GAME, room_id))
+        games[room_id] = game
+        cur = db.get_cursor()
+        cur.execute(
+            "UPDATE rooms SET room_state=%s WHERE id = %s", (RoomState.GAME, room_id)
+        )
 
-    game.start_game()
+    games[room_id].start_game()

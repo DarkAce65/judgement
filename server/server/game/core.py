@@ -77,7 +77,7 @@ class Game(Generic[Action], ABC):
 
     def start_game(self) -> None:
         if self.game_status != GameStatus.NOT_STARTED:
-            raise GameError
+            raise GameError("Game has already started")
 
         self.game_status = GameStatus.IN_PROGRESS
 
