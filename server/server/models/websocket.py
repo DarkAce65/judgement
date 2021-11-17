@@ -9,6 +9,10 @@ from .camel_model import CamelModel
 ConcreteGameState = JudgementGameState
 
 
+class GameErrorMessage(CamelModel):
+    error_message: str
+
+
 class RoomMessage(CamelModel):
     state: RoomState
     players: list[str]

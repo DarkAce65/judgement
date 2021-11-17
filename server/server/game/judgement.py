@@ -70,7 +70,7 @@ class JudgementPlayCardAction(JudgementAction, action_type=JudgementActionType.P
         try:
             return Card.from_str(self.card)
         except ValueError as error:
-            raise GameError("Invalid card", self.card) from error
+            raise GameError(f"Invalid card: {self.card}") from error
 
 
 class JudgementPlayerState(CamelModel):
@@ -159,6 +159,6 @@ class JudgementGame(Game[JudgementAction]):
         elif isinstance(game_input, JudgementPlayCardAction):
             card = game_input.get_card()
             if card not in self.player_states[player_id].hand:
-                raise GameError("Missing card from hand", str(card))
+                raise GameError(f"Missing card from hand: {str(card)}")
 
             self.pile.append(card)

@@ -1,8 +1,9 @@
 from typing import Optional, cast
 
-from server.game.core import Game
+from server.game.core import Game, GameError
 from server.models.websocket import (
     ConcreteGameState,
+    GameErrorMessage,
     GameStateMessage,
     PlayersMessage,
     RoomMessage,
@@ -10,6 +11,14 @@ from server.models.websocket import (
 from server.sio_app import sio
 
 from . import room_manager
+
+
+async def emit_error(error: GameError, recipient: Optional[str] = None) -> None:
+    await sio.emit(
+        "invalid_input",
+        GameErrorMessage(error_message=error.message).dict(by_alias=True),
+        to=recipient,
+    )
 
 
 async def emit_room(room_id: str, recipient: Optional[str] = None) -> None:

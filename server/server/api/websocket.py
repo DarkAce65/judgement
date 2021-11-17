@@ -136,8 +136,8 @@ async def handle_game_input(
 
     try:
         game.process_raw_input(player.player_id, action)
-    except GameError as ex:
-        await sio.emit("invalid_input", str(ex), to=client_id)
+    except GameError as error:
+        await socket_messager.emit_error(error, client_id)
         return
 
     await socket_messager.emit_game_state(room_id, game)
