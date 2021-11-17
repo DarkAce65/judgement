@@ -22,25 +22,25 @@ class Card(BaseModel):
 
     @staticmethod
     def from_str(card_string: str) -> Card:
-        if len(card_string) < 2:
+        if len(card_string) < 2 or 3 < len(card_string):
             raise ValueError("Invalid string to convert to Card", card_string)
 
         suit_str = card_string[0]
         rank_str = card_string[1:]
 
-        try:
-            if rank_str == "A":
-                rank = 1
-            elif rank_str == "K":
-                rank = 13
-            elif rank_str == "Q":
-                rank = 12
-            elif rank_str == "J":
-                rank = 11
-            else:
+        if rank_str == "A":
+            rank = 1
+        elif rank_str == "K":
+            rank = 13
+        elif rank_str == "Q":
+            rank = 12
+        elif rank_str == "J":
+            rank = 11
+        else:
+            try:
                 rank = int(rank_str)
-        except ValueError as ex:
-            raise ValueError("Invalid rank for Card", rank_str) from ex
+            except ValueError as ex:
+                raise ValueError("Invalid rank for Card", rank_str) from ex
 
         return Card(suit=Suit(suit_str), rank=rank)
 
