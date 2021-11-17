@@ -1,10 +1,11 @@
 import { useCallback, useEffect } from 'react';
 
-import { Button, PageHeader, Select, Space, Typography } from 'antd';
+import { Button, PageHeader, Select, Space, Typography, message } from 'antd';
 import Cookies from 'js-cookie';
 import { useHistory } from 'react-router-dom';
 
 import {
+  GameErrorMessage,
   GameName,
   GameStateMessage,
   PlayersMessage,
@@ -49,6 +50,9 @@ const Room = ({ roomId, socket, namespace }: Props & WithGameSocketProps) => {
     });
     GameSocket.onNamespaced(namespace, 'game_state', (gameStateMessage: GameStateMessage) => {
       dispatch(loadGameState(gameStateMessage));
+    });
+    GameSocket.onNamespaced(namespace, 'invalid_input', (error: GameErrorMessage) => {
+      message.error(error.errorMessage);
     });
   }, [dispatch, namespace]);
 
