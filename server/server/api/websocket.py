@@ -12,8 +12,8 @@ from server.data import (
     room_manager,
     socket_messager,
 )
-from server.data.player import Player
 from server.game.core import GameError
+from server.models.player import Player
 from server.models.websocket import SetGameMessage
 from server.sio_app import sio
 

@@ -2,6 +2,7 @@ import logging
 from typing import Optional
 
 from server.data import socket_messager
+from server.models.game import GameName
 from server.models.judgement import (
     JudgementAction,
     JudgementBidHandsAction,
@@ -14,7 +15,7 @@ from server.models.judgement import (
 )
 
 from .card import Card
-from .core import Game, GameError, GameName
+from .core import Game, GameError
 from .decks import Decks
 
 logger = logging.getLogger(__name__)

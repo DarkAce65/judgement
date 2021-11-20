@@ -2,12 +2,13 @@ import random
 import string
 from typing import Optional, cast
 
-from server.game.core import Game, GameName
+from server.game.core import Game
 from server.game.judgement import JudgementGame
+from server.models.game import GameName
+from server.models.player import Player
+from server.models.room import Room, RoomState
 
 from . import ROOM_ID_LENGTH, db, player_manager
-from .player import Player
-from .room import Room, RoomState
 
 games: dict[str, Game] = {}
 

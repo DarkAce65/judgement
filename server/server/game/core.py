@@ -1,28 +1,15 @@
 import logging
 from abc import ABC, abstractmethod
-from enum import Enum, unique
 from typing import Any, Generic, Type, TypeVar
 
 from pydantic import BaseModel, ValidationError, parse_obj_as
 
-from server.models.camel_model import CamelModel
+from server.models.game import GamePlayer, GameState, GameStatus
 
 logger = logging.getLogger(__name__)
 
 
 Action = TypeVar("Action", bound=BaseModel)
-
-
-@unique
-class GameName(str, Enum):
-    JUDGEMENT = "JUDGEMENT"
-
-
-@unique
-class GameStatus(str, Enum):
-    NOT_STARTED = "NOT_STARTED"
-    IN_PROGRESS = "IN_PROGRESS"
-    COMPLETE = "COMPLETE"
 
 
 class GameError(Exception):
@@ -31,18 +18,6 @@ class GameError(Exception):
     def __init__(self, message: str):
         super().__init__(message)
         self.message = message
-
-
-class GamePlayer:
-    player_id: str
-
-    def __init__(self, player_id: str) -> None:
-        self.player_id = player_id
-
-
-class GameState(CamelModel, ABC):
-    game_name: GameName
-    game_status: GameStatus
 
 
 class Game(Generic[Action], ABC):

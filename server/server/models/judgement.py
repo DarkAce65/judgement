@@ -3,8 +3,10 @@ from enum import Enum, unique
 from typing import Any, Literal, Optional
 
 from server.game.card import Card, Suit
-from server.game.core import GameError, GameState
-from server.models.camel_model import CamelModel
+from server.game.core import GameError
+
+from .camel_model import CamelModel
+from .game import GameState
 
 SUIT_ORDER = [Suit.SPADES, Suit.HEARTS, Suit.CLUBS, Suit.DIAMONDS]
 

@@ -1,8 +1,8 @@
 from typing import Iterable, Optional, cast
 
-from server.data.player import Player
-from server.data.room import Room
 from server.game.core import Game, GameError
+from server.models.player import Player
+from server.models.room import Room
 from server.models.websocket import (
     ConcreteGameState,
     GameErrorMessage,

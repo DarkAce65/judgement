@@ -1,8 +1,9 @@
 from enum import Enum, unique
 from typing import Optional
 
-from server.game.core import Game, GameName, GameState
+from server.game.core import Game
 
+from .game import GameName, GameState
 from .player import Player
 
 

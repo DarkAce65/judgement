@@ -1,10 +1,9 @@
 from typing import Optional
 
-from server.data.room import RoomState
-from server.game.core import GameName
-
 from .camel_model import CamelModel
+from .game import GameName
 from .judgement import JudgementGameState
+from .room import RoomState
 
 ConcreteGameState = JudgementGameState
 

@@ -4,7 +4,7 @@ from fastapi import APIRouter, Cookie, Response
 from starlette.status import HTTP_204_NO_CONTENT
 
 from server.data import connection_manager, player_manager
-from server.data.player import Player
+from server.models.player import Player
 from server.models.requests import EnsurePlayerRequest
 
 router = APIRouter(prefix="/player", tags=["player"])

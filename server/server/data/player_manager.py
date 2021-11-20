@@ -1,8 +1,9 @@
 import uuid
 from typing import Collection, Optional, Tuple, cast
 
+from server.models.player import Player
+
 from . import db
-from .player import Player
 
 
 def player_exists(player_id: str) -> bool:

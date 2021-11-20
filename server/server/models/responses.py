@@ -1,8 +1,7 @@
 from pydantic import Field
 
-from server.data.room import Room, RoomState
-
 from .camel_model import CamelModel
+from .room import Room, RoomState
 
 
 class RoomIdResponse(CamelModel):
