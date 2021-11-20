@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from typing import Optional
 
@@ -52,6 +53,9 @@ class JudgementGame(Game[JudgementAction]):
             player.player_id: JudgementPlayerState() for player in self.players
         }
 
+        self.decks.shuffle()
+        asyncio.create_task(self.deal())
+
     def build_game_state(self) -> JudgementGameState:
         return JudgementGameState(
             game_name=GameName.JUDGEMENT,
@@ -80,3 +84,9 @@ class JudgementGame(Game[JudgementAction]):
 
             self.player_states[player_id].hand.remove(card)
             self.pile.append(card)
+
+    async def deal(self) -> None:
+        for player_id in self.player_states:
+            self.player_states[player_id].hand.extend(self.decks.draw(4))
+
+        await socket_messager.emit_game_state(self.room_id, self)
