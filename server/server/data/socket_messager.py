@@ -1,5 +1,7 @@
-from typing import Optional, cast
+from typing import Iterable, Optional, cast
 
+from server.data.player import Player
+from server.data.room import Room
 from server.game.core import Game, GameError
 from server.models.websocket import (
     ConcreteGameState,
@@ -10,8 +12,6 @@ from server.models.websocket import (
 )
 from server.sio_app import sio
 
-from . import room_manager
-
 
 async def emit_error(error: GameError, recipient: Optional[str] = None) -> None:
     await sio.emit(
@@ -21,11 +21,9 @@ async def emit_error(error: GameError, recipient: Optional[str] = None) -> None:
     )
 
 
-async def emit_room(room_id: str, recipient: Optional[str] = None) -> None:
+async def emit_room(room: Room, recipient: Optional[str] = None) -> None:
     if recipient is None:
-        recipient = room_id
-
-    room = room_manager.get_room(room_id)
+        recipient = room.room_id
 
     await sio.emit(
         "room",
@@ -39,12 +37,7 @@ async def emit_room(room_id: str, recipient: Optional[str] = None) -> None:
     )
 
 
-async def emit_game_state(room_id: str, game: Optional[Game] = None) -> None:
-    if game is None:
-        game = room_manager.get_game_for_room(room_id)
-        if game is None:
-            return
-
+async def emit_game_state(room_id: str, game: Game) -> None:
     await sio.emit(
         "game_state",
         GameStateMessage(state=cast(ConcreteGameState, game.build_game_state())).dict(
@@ -54,9 +47,7 @@ async def emit_game_state(room_id: str, game: Optional[Game] = None) -> None:
     )
 
 
-async def emit_players(room_id: str) -> None:
-    players_in_room = room_manager.get_players_in_room(room_id).values()
-
+async def emit_players(room_id: str, players_in_room: Iterable[Player]) -> None:
     await sio.emit(
         "players",
         PlayersMessage(players=[player.name or "" for player in players_in_room]).dict(

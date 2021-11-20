@@ -83,7 +83,9 @@ async def propagate_name_change(player_id: str) -> None:
     room_ids = {room_id for (room_id,) in results}
 
     for room_id in room_ids:
-        await socket_messager.emit_players(room_id)
+        await socket_messager.emit_players(
+            room_id, room_manager.get_players_in_room(room_id).values()
+        )
 
 
 def add_player_client_to_room(client_id: str, room_id: str) -> None:

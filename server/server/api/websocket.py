@@ -85,21 +85,23 @@ async def connect(client_id: str, _environ: dict, auth: dict) -> None:
 @sio.on("get_room")
 @supply_room_id
 async def handle_get_room(client_id: str, room_id: str) -> None:
-    await socket_messager.emit_room(room_id, client_id)
+    await socket_messager.emit_room(room_manager.get_room(room_id), client_id)
 
 
 @sio.on("join_room")
 @require_player
 async def handle_join_room(client_id: str, room_id: str) -> None:
     connection_manager.add_player_client_to_room(client_id, room_id)
-    await socket_messager.emit_room(room_id)
+    await socket_messager.emit_room(room_manager.get_room(room_id))
 
 
 @sio.on("leave_room")
 @require_player
 async def handle_leave_room(client_id: str, room_id: str) -> None:
     connection_manager.remove_player_client_from_room(client_id, room_id)
-    await socket_messager.emit_players(room_id)
+    await socket_messager.emit_players(
+        room_id, room_manager.get_players_in_room(room_id).values()
+    )
 
 
 @sio.on("set_game")
@@ -111,7 +113,7 @@ async def handle_set_game(
     message = SetGameMessage(**raw_message)
     room_manager.set_game(room_id, message.game_name)
 
-    await socket_messager.emit_room(room_id)
+    await socket_messager.emit_room(room_manager.get_room(room_id))
 
 
 @sio.on("start_game")
@@ -120,7 +122,7 @@ async def handle_set_game(
 async def handle_start_game(_client_id: str, room_id: str) -> None:
     room_manager.start_game(room_id)
 
-    await socket_messager.emit_room(room_id)
+    await socket_messager.emit_room(room_manager.get_room(room_id))
 
 
 @sio.on("game_input")
