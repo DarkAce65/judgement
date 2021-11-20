@@ -86,7 +86,7 @@ class JudgementSettings(CamelModel):
     rounds: int = 0
 
 
-class JudgementGameState(GameState[JudgementAction]):
+class JudgementGameState(GameState):
     settings: JudgementSettings
 
     phase: JudgementPhase
@@ -95,21 +95,6 @@ class JudgementGameState(GameState[JudgementAction]):
 
     turn: Optional[str]
     player_states: dict[str, JudgementPlayerState]
-
-    @staticmethod
-    def from_game(game: Game[JudgementAction]) -> "JudgementGameState":
-        if not isinstance(game, JudgementGame):
-            raise ValueError
-
-        return JudgementGameState(
-            game_name=GameName.JUDGEMENT,
-            game_status=game.game_status,
-            settings=game.settings,
-            phase=game.phase,
-            pile=game.pile,
-            turn=game.turn,
-            player_states=game.player_states,
-        )
 
 
 class JudgementGame(Game[JudgementAction]):
@@ -144,7 +129,15 @@ class JudgementGame(Game[JudgementAction]):
         }
 
     def build_game_state(self) -> JudgementGameState:
-        return JudgementGameState.from_game(self)
+        return JudgementGameState(
+            game_name=GameName.JUDGEMENT,
+            game_status=self.game_status,
+            settings=self.settings,
+            phase=self.phase,
+            pile=self.pile,
+            turn=self.turn,
+            player_states=self.player_states,
+        )
 
     def process_input(self, player_id: str, game_input: JudgementAction) -> None:
         logger.debug("player_id: %s, action: %s", player_id, repr(game_input))

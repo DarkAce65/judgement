@@ -5,7 +5,7 @@ from typing import Any, Generic, Type, TypeVar
 
 from pydantic import BaseModel, ValidationError, parse_obj_as
 
-from server.models.camel_model import GenericCamelModel
+from server.models.camel_model import CamelModel
 
 logger = logging.getLogger(__name__)
 
@@ -40,14 +40,9 @@ class GamePlayer:
         self.player_id = player_id
 
 
-class GameState(GenericCamelModel, Generic[Action], ABC):
+class GameState(CamelModel, ABC):
     game_name: GameName
     game_status: GameStatus
-
-    @staticmethod
-    @abstractmethod
-    def from_game(game: "Game[Action]") -> "GameState[Action]":
-        ...
 
 
 class Game(Generic[Action], ABC):
@@ -63,7 +58,7 @@ class Game(Generic[Action], ABC):
         self.players = []
 
     @abstractmethod
-    def build_game_state(self) -> GameState[Action]:
+    def build_game_state(self) -> GameState:
         ...
 
     def add_player(self, player_id: str) -> None:
