@@ -7,10 +7,10 @@ from pathlib import Path, PurePath
 from pydantic2ts import generate_typescript_defs
 
 MODEL_MODULES = [
+    "server.models.judgement",
     "server.models.requests",
     "server.models.responses",
     "server.models.websocket",
-    "server.game.judgement",
 ]
 
 logger = logging.getLogger(__name__)
