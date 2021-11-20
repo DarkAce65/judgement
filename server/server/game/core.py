@@ -48,11 +48,15 @@ class GameState(CamelModel, ABC):
 class Game(Generic[Action], ABC):
     _action_cls: Type[Action]
 
+    room_id: str
+
     game_status: GameStatus
     players: list[GamePlayer]
 
-    def __init__(self, action_cls: Type[Action]) -> None:
+    def __init__(self, action_cls: Type[Action], room_id: str) -> None:
         self._action_cls = action_cls
+
+        self.room_id = room_id
 
         self.game_status = GameStatus.NOT_STARTED
         self.players = []

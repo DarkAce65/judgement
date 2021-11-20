@@ -108,8 +108,8 @@ class JudgementGame(Game[JudgementAction]):
     hands: dict[str, list[Card]]
     player_states: dict[str, JudgementPlayerState]
 
-    def __init__(self) -> None:
-        super().__init__(JudgementAction)
+    def __init__(self, room_id: str) -> None:
+        super().__init__(JudgementAction, room_id)
 
         self.phase = JudgementPhase.BIDDING
         self.settings = JudgementSettings()

@@ -144,7 +144,7 @@ def start_game(room_id: str) -> None:
             raise ValueError("Cannot start game - no game selected")
 
         if room.game_name == GameName.JUDGEMENT:
-            game = JudgementGame()
+            game = JudgementGame(room_id)
         else:
             raise ValueError(f"Unrecognized game name ({room.game_name})")
 
