@@ -78,4 +78,5 @@ class JudgementGame(Game[JudgementAction]):
             if card not in self.player_states[player_id].hand:
                 raise GameError(f"Missing card from hand: {str(card)}")
 
+            self.player_states[player_id].hand.remove(card)
             self.pile.append(card)
