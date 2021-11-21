@@ -78,8 +78,8 @@ class JudgementPlayerState(CamelModel):
 
 
 class JudgementSettings(CamelModel):
-    num_decks: int = 0
-    rounds: int = 0
+    num_decks: int = 1
+    rounds: int = 5
 
 
 class JudgementGameState(GameState):
@@ -89,5 +89,6 @@ class JudgementGameState(GameState):
 
     pile: list[Card]
 
-    turn: Optional[int]
+    current_round: int
+    current_turn: int
     player_states: dict[str, JudgementPlayerState]

@@ -1,6 +1,5 @@
 import asyncio
 import logging
-from typing import Optional
 
 from server.data import socket_messager
 from server.models.game import GameName
@@ -29,7 +28,8 @@ class JudgementGame(Game[JudgementAction]):
     decks: Decks
     pile: list[Card]
 
-    turn: Optional[int]
+    current_round: int
+    current_turn: int
     hands: dict[str, list[Card]]
     player_states: dict[str, JudgementPlayerState]
 
@@ -39,16 +39,14 @@ class JudgementGame(Game[JudgementAction]):
         self.phase = JudgementPhase.BIDDING
         self.settings = JudgementSettings()
 
-        self.decks = Decks()
-        self.pile = []
-
-        self.turn = None
-        self.player_states = {}
-
     def start_game(self) -> None:
         super().start_game()
 
-        self.turn = 0
+        self.decks = Decks(num_decks=self.settings.num_decks)
+        self.pile = []
+
+        self.current_round = 0
+        self.current_turn = 0
         self.player_states = {
             player.player_id: JudgementPlayerState() for player in self.players
         }
@@ -63,7 +61,8 @@ class JudgementGame(Game[JudgementAction]):
             settings=self.settings,
             phase=self.phase,
             pile=self.pile,
-            turn=self.turn,
+            current_round=self.current_round,
+            current_turn=self.current_turn,
             player_states=self.player_states,
         )
 
@@ -88,7 +87,7 @@ class JudgementGame(Game[JudgementAction]):
             self.pile.append(card)
 
     def assert_turn(self, player_id: str) -> None:
-        if self.turn is None or player_id != self.players[self.turn].player_id:
+        if self.players[self.current_turn].player_id != player_id:
             raise GameError("It is not your turn!")
 
     async def deal(self) -> None:
