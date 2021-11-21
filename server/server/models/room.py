@@ -26,15 +26,13 @@ class Room:
         room_id: str,
         room_state: RoomState = RoomState.LOBBY,
         players: Optional[list[Player]] = None,
-        game_name: Optional[GameName] = None,
-        game: Optional[Game] = None,
     ) -> None:
         self.room_id = room_id
         self.room_state = room_state
         self.players = players or []
 
-        self.game_name = game_name
-        self.game = game
+        self.game_name = None
+        self.game = None
 
     @staticmethod
     def new(room_id: str) -> "Room":
@@ -48,13 +46,13 @@ class Room:
         game_name: Optional[str],
         game: Optional[Game],
     ) -> "Room":
-        return Room(
-            room_id,
-            RoomState(room_state),
-            players,
-            None if game_name is None else GameName(game_name),
-            game,
-        )
+        room = Room(room_id, RoomState(room_state), players)
+        if game_name is not None:
+            room.game_name = GameName(game_name)
+        if game is not None:
+            room.game = game
+
+        return room
 
     def get_game_state(self) -> Optional[GameState]:
         return None if self.game is None else self.game.build_game_state()
