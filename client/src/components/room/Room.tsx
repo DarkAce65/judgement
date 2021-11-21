@@ -1,7 +1,6 @@
 import { useCallback, useEffect } from 'react';
 
 import { Button, PageHeader, Select, Space, Typography, message } from 'antd';
-import Cookies from 'js-cookie';
 import { useHistory } from 'react-router-dom';
 
 import {
@@ -12,8 +11,8 @@ import {
   RoomMessage,
   SetGameMessage,
 } from '../../../generated_types/websocket';
-import { PLAYER_ID_COOKIE } from '../../constants';
 import { loadGameState } from '../../data/gameSlice';
+import { getPlayerId } from '../../data/playerSlice';
 import { useAppDispatch, useAppSelector } from '../../data/reduxHooks';
 import { getGameName, getPlayers, loadPlayers, loadRoomState } from '../../data/roomSlice';
 import GameSocket from '../../game/GameSocket';
@@ -31,6 +30,7 @@ const Room = ({ roomId, socket, namespace }: Props & WithGameSocketProps) => {
   const dispatch = useAppDispatch();
   const history = useHistory();
 
+  const playerId = useAppSelector(getPlayerId)!;
   const gameName = useAppSelector(getGameName);
   const players = useAppSelector(getPlayers);
 
@@ -81,7 +81,7 @@ const Room = ({ roomId, socket, namespace }: Props & WithGameSocketProps) => {
         onChange={handleGameChange}
         style={{ width: '100%', maxWidth: 250 }}
       />
-      <Typography.Paragraph>{Cookies.get(PLAYER_ID_COOKIE)}</Typography.Paragraph>
+      <Typography.Paragraph>{playerId}</Typography.Paragraph>
       {players.map((player, index) => (
         <Typography.Paragraph key={index}>{player}</Typography.Paragraph>
       ))}

@@ -1,18 +1,22 @@
 import { PayloadAction, createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
+import Cookies from 'js-cookie';
 
 import { EnsurePlayerRequest } from '../../generated_types/requests';
 import { FetchStatus } from '../api/FetchStatus';
 import { fetchAPI, makeJSONBodyWithContentType } from '../api/client';
+import { PLAYER_ID_COOKIE } from '../constants';
 
 import type { RootState } from './store';
 
 interface PlayerState {
   ensurePlayerStatus: FetchStatus;
+  playerId: string | null;
   playerName: string | null;
 }
 
 const initialState: PlayerState = {
   ensurePlayerStatus: 'uninitialized',
+  playerId: Cookies.get(PLAYER_ID_COOKIE) ?? null,
   playerName: localStorage.getItem('playerName'),
 };
 
@@ -21,6 +25,11 @@ const getPlayerState = (state: RootState): PlayerState => state.player;
 export const getEnsurePlayerFetchStatus = createSelector(
   [getPlayerState],
   (state): FetchStatus => state.ensurePlayerStatus
+);
+
+export const getPlayerId = createSelector(
+  [getPlayerState],
+  (state): string | null => state.playerId ?? Cookies.get(PLAYER_ID_COOKIE) ?? null
 );
 
 export const getPlayerName = createSelector(
@@ -56,6 +65,7 @@ const playerSlice = createSlice({
           localStorage.removeItem('playerName');
         }
 
+        state.playerId = Cookies.get(PLAYER_ID_COOKIE) ?? null;
         state.playerName = playerName;
         state.ensurePlayerStatus = 'succeeded';
       }
