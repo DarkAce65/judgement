@@ -89,5 +89,5 @@ class JudgementGameState(GameState):
 
     pile: list[Card]
 
-    turn: Optional[str]
+    turn: Optional[int]
     player_states: dict[str, JudgementPlayerState]

@@ -29,7 +29,7 @@ class JudgementGame(Game[JudgementAction]):
     decks: Decks
     pile: list[Card]
 
-    turn: Optional[str]
+    turn: Optional[int]
     hands: dict[str, list[Card]]
     player_states: dict[str, JudgementPlayerState]
 
@@ -48,7 +48,7 @@ class JudgementGame(Game[JudgementAction]):
     def start_game(self) -> None:
         super().start_game()
 
-        self.turn = self.players[0].player_id
+        self.turn = 0
         self.player_states = {
             player.player_id: JudgementPlayerState() for player in self.players
         }
@@ -76,14 +76,20 @@ class JudgementGame(Game[JudgementAction]):
             if game_input.rounds:
                 self.settings.rounds = game_input.rounds
         elif isinstance(game_input, JudgementBidHandsAction):
+            self.assert_turn(player_id)
             self.player_states[player_id].current_bid = game_input.num_hands
         elif isinstance(game_input, JudgementPlayCardAction):
+            self.assert_turn(player_id)
             card = game_input.get_card()
             if card not in self.player_states[player_id].hand:
                 raise GameError(f"Missing card from hand: {str(card)}")
 
             self.player_states[player_id].hand.remove(card)
             self.pile.append(card)
+
+    def assert_turn(self, player_id: str) -> None:
+        if self.turn is None or player_id != self.players[self.turn].player_id:
+            raise GameError("It is not your turn!")
 
     async def deal(self) -> None:
         for player_id in self.player_states:
