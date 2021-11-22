@@ -70,6 +70,9 @@ class JudgementGame(Game[JudgementAction]):
         logger.debug("player_id: %s, action: %s", player_id, repr(game_input))
 
         if isinstance(game_input, JudgementUpdateSettingsAction):
+            if not self.is_host(player_id):
+                raise GameError("Only the host may change settings!")
+
             if self.game_phase != GamePhase.NOT_STARTED:
                 raise GameError(
                     "Cannot change settings after the game has already started!"

@@ -69,3 +69,6 @@ class Game(Generic[Action], ABC):
     @abstractmethod
     def process_input(self, player_id: str, game_input: Action) -> None:
         ...
+
+    def is_host(self, player_id: str) -> bool:
+        return len(self.players) > 0 and self.players[0].player_id == player_id
