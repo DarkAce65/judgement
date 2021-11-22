@@ -1,8 +1,9 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-import { Button, PageHeader, Select, Space, Typography, message } from 'antd';
+import { Button, PageHeader, Radio, Select, Space, Typography, message } from 'antd';
 import { useHistory } from 'react-router-dom';
 
+import { JudgementPlayCardAction } from '../../../generated_types/judgement';
 import {
   GameErrorMessage,
   GameName,
@@ -11,7 +12,7 @@ import {
   RoomMessage,
   SetGameMessage,
 } from '../../../generated_types/websocket';
-import { loadGameState } from '../../data/gameSlice';
+import { getGame, loadGameState } from '../../data/gameSlice';
 import { getPlayerId } from '../../data/playerSlice';
 import { useAppDispatch, useAppSelector } from '../../data/reduxHooks';
 import { getGameName, getPlayers, loadPlayers, loadRoomState } from '../../data/roomSlice';
@@ -33,6 +34,7 @@ const Room = ({ roomId, socket, namespace }: Props & WithGameSocketProps) => {
   const playerId = useAppSelector(getPlayerId)!;
   const gameName = useAppSelector(getGameName);
   const players = useAppSelector(getPlayers);
+  const game = useAppSelector(getGame);
 
   useEffect(() => {
     socket.emit('join_room', roomId);
@@ -68,6 +70,19 @@ const Room = ({ roomId, socket, namespace }: Props & WithGameSocketProps) => {
     socket.emit('start_game');
   }, [socket]);
 
+  const [selectedCard, setSelectedCard] = useState<string | null>(null);
+
+  const ping = useCallback(() => {
+    if (!selectedCard) {
+      return;
+    }
+
+    const action: JudgementPlayCardAction = { actionType: 'PLAY_CARD', card: selectedCard };
+
+    socket.emit('game_input', action);
+    setSelectedCard(null);
+  }, [socket, selectedCard]);
+
   return (
     <PageHeader
       title={`hello ${roomId}`}
@@ -85,11 +100,41 @@ const Room = ({ roomId, socket, namespace }: Props & WithGameSocketProps) => {
       {players.map((player, index) => (
         <Typography.Paragraph key={index}>{player}</Typography.Paragraph>
       ))}
-      <Button onClick={handleGameStart}>Start game</Button>
-      <Space direction="vertical" style={{ width: '100%' }}>
-        <PlayerNameInput />
-        <LeaveRoomButton roomId={roomId} />
-      </Space>
+      <p>
+        <Button onClick={handleGameStart}>Start game</Button>
+      </p>
+      {game && (
+        <p>
+          <Space direction="vertical">
+            <Radio.Group
+              value={selectedCard}
+              onChange={(evt) => {
+                setSelectedCard(evt.target.value);
+              }}
+            >
+              <Space direction="horizontal">
+                {game?.playerStates?.[playerId]?.hand?.map((value, index) => (
+                  <Radio key={index} value={value.suit + value.rank}>
+                    {value.suit + value.rank}
+                  </Radio>
+                ))}
+              </Space>
+            </Radio.Group>
+            <Button disabled={!selectedCard} onClick={ping}>
+              Play card
+            </Button>
+          </Space>
+        </p>
+      )}
+      <p>
+        <Space direction="vertical" style={{ width: '100%' }}>
+          <PlayerNameInput />
+          <LeaveRoomButton roomId={roomId} />
+        </Space>
+      </p>
+      <Typography.Paragraph style={{ fontSize: '0.7em' }}>
+        <pre>{JSON.stringify(game, null, 2)}</pre>
+      </Typography.Paragraph>
     </PageHeader>
   );
 };
