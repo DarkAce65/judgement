@@ -1,6 +1,7 @@
 import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit';
 
-import { GameStateMessage, JudgementGameState } from '../../generated_types/websocket';
+import { JudgementGameState } from '../../generated_types/judgement';
+import { GameStateMessage } from '../../generated_types/websocket';
 
 import { loadRoomState } from './roomSlice';
 import type { RootState } from './store';
