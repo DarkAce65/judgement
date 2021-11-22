@@ -10,7 +10,7 @@ class GameName(str, Enum):
 
 
 @unique
-class GameStatus(str, Enum):
+class GamePhase(str, Enum):
     NOT_STARTED = "NOT_STARTED"
     IN_PROGRESS = "IN_PROGRESS"
     COMPLETE = "COMPLETE"
@@ -25,4 +25,4 @@ class GamePlayer:
 
 class GameState(CamelModel, ABC):
     game_name: GameName
-    game_status: GameStatus
+    game_phase: GamePhase

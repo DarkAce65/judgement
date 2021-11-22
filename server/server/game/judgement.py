@@ -2,7 +2,7 @@ import asyncio
 import logging
 
 from server.data import socket_messager
-from server.models.game import GameName, GameStatus
+from server.models.game import GameName, GamePhase
 from server.models.judgement import (
     JudgementAction,
     JudgementBidHandsAction,
@@ -57,7 +57,7 @@ class JudgementGame(Game[JudgementAction]):
     def build_game_state(self) -> JudgementGameState:
         return JudgementGameState(
             game_name=GameName.JUDGEMENT,
-            game_status=self.game_status,
+            game_phase=self.game_phase,
             settings=self.settings,
             phase=self.phase,
             pile=self.pile,
@@ -70,7 +70,7 @@ class JudgementGame(Game[JudgementAction]):
         logger.debug("player_id: %s, action: %s", player_id, repr(game_input))
 
         if isinstance(game_input, JudgementUpdateSettingsAction):
-            if self.game_status != GameStatus.NOT_STARTED:
+            if self.game_phase != GamePhase.NOT_STARTED:
                 raise GameError(
                     "Cannot change settings after the game has already started!"
                 )
