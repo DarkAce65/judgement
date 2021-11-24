@@ -100,11 +100,11 @@ const Room = ({ roomId, socket, namespace }: Props & WithGameSocketProps) => {
       {players.map((player, index) => (
         <Typography.Paragraph key={index}>{player}</Typography.Paragraph>
       ))}
-      <p>
+      <Typography.Paragraph>
         <Button onClick={handleGameStart}>Start game</Button>
-      </p>
+      </Typography.Paragraph>
       {game && (
-        <p>
+        <Typography.Paragraph>
           <Space direction="vertical">
             <Radio.Group
               value={selectedCard}
@@ -124,14 +124,14 @@ const Room = ({ roomId, socket, namespace }: Props & WithGameSocketProps) => {
               Play card
             </Button>
           </Space>
-        </p>
+        </Typography.Paragraph>
       )}
-      <p>
+      <Typography.Paragraph>
         <Space direction="vertical" style={{ width: '100%' }}>
           <PlayerNameInput />
           <LeaveRoomButton roomId={roomId} />
         </Space>
-      </p>
+      </Typography.Paragraph>
       <Typography.Paragraph style={{ fontSize: '0.7em' }}>
         <pre>{JSON.stringify(game, null, 2)}</pre>
       </Typography.Paragraph>
