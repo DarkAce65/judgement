@@ -1,9 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { Button, PageHeader, Radio, Select, Space, Typography, message } from 'antd';
+import { Button, InputNumber, PageHeader, Radio, Select, Space, Typography, message } from 'antd';
 import { useHistory } from 'react-router-dom';
 
-import { JudgementPlayCardAction } from '../../../generated_types/judgement';
+import {
+  JudgementBidHandsAction,
+  JudgementPlayCardAction,
+} from '../../../generated_types/judgement';
 import {
   GameErrorMessage,
   GameName,
@@ -58,6 +61,9 @@ const Room = ({ roomId, socket, namespace }: Props & WithGameSocketProps) => {
     });
   }, [dispatch, namespace]);
 
+  const [bidAmount, setBidAmount] = useState<number | null>(null);
+  const [selectedCard, setSelectedCard] = useState<string | null>(null);
+
   const handleGameChange = useCallback(
     (name: GameName) => {
       const setGameMessage: SetGameMessage = { gameName: name };
@@ -70,9 +76,18 @@ const Room = ({ roomId, socket, namespace }: Props & WithGameSocketProps) => {
     socket.emit('start_game');
   }, [socket]);
 
-  const [selectedCard, setSelectedCard] = useState<string | null>(null);
+  const bidHands = useCallback(() => {
+    if (bidAmount === null) {
+      return;
+    }
 
-  const ping = useCallback(() => {
+    const action: JudgementBidHandsAction = { actionType: 'BID_HANDS', numHands: bidAmount };
+
+    socket.emit('game_input', action);
+    setBidAmount(null);
+  }, [socket, bidAmount]);
+
+  const playCard = useCallback(() => {
     if (!selectedCard) {
       return;
     }
@@ -103,7 +118,23 @@ const Room = ({ roomId, socket, namespace }: Props & WithGameSocketProps) => {
       <Typography.Paragraph>
         <Button onClick={handleGameStart}>Start game</Button>
       </Typography.Paragraph>
-      {game && (
+      {game && game.phase === 'BIDDING' && (
+        <Typography.Paragraph>
+          <Space direction="vertical">
+            <InputNumber
+              value={bidAmount || undefined}
+              min={0}
+              onChange={(bid) => {
+                setBidAmount(bid);
+              }}
+            />
+            <Button disabled={bidAmount === null} onClick={bidHands}>
+              Bid hands
+            </Button>
+          </Space>
+        </Typography.Paragraph>
+      )}
+      {game && game.phase === 'PLAYING' && (
         <Typography.Paragraph>
           <Space direction="vertical">
             <Radio.Group
@@ -120,7 +151,7 @@ const Room = ({ roomId, socket, namespace }: Props & WithGameSocketProps) => {
                 ))}
               </Space>
             </Radio.Group>
-            <Button disabled={!selectedCard} onClick={ping}>
+            <Button disabled={!selectedCard} onClick={playCard}>
               Play card
             </Button>
           </Space>
