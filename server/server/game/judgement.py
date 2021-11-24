@@ -80,8 +80,8 @@ class JudgementGame(Game[JudgementAction]):
 
             if game_input.num_decks:
                 self.settings.num_decks = game_input.num_decks
-            if game_input.rounds:
-                self.settings.rounds = game_input.rounds
+            if game_input.num_rounds:
+                self.settings.num_rounds = game_input.num_rounds
         elif isinstance(game_input, JudgementBidHandsAction):
             self.assert_turn(player_id)
             self.player_states[player_id].current_bid = game_input.num_hands
