@@ -85,6 +85,12 @@ class JudgementGame(Game[JudgementAction]):
         elif isinstance(game_input, JudgementBidHandsAction):
             self.assert_turn(player_id)
             self.player_states[player_id].current_bid = game_input.num_hands
+
+            if self.current_turn < len(self.players) - 1:
+                self.current_turn += 1
+            else:
+                self.current_turn = 0
+                self.phase = JudgementPhase.PLAYING
         elif isinstance(game_input, JudgementPlayCardAction):
             self.assert_turn(player_id)
             card = game_input.get_card()
