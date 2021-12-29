@@ -22,43 +22,41 @@ ENV PATH="$POETRY_HOME/bin:$PATH"
 RUN addgroup --gid 1000 --system poetryuser \
   && adduser --uid 1000 --system --disabled-password --ingroup poetryuser --home /poetryuser poetryuser
 
-# Base server container
-FROM python_poetry as base_server
+# Base server dependencies stage
+FROM python_poetry as base_server_deps
 
 USER poetryuser
 WORKDIR /server
-EXPOSE "$API_PORT"
 
 COPY pyproject.toml poetry.lock ./
 RUN poetry install --no-dev --no-interaction
 
 # Debug/hot-reloading container
-FROM base_server as debug
+FROM base_server_deps as debug
+EXPOSE "$API_PORT"
 RUN poetry install --no-dev -E debug --no-interaction
 COPY . .
 CMD ["sh", "-c", "poetry run python -m debugpy --listen 0.0.0.0:5678 -m uvicorn main:app --host 0.0.0.0 --port $API_PORT --use-colors --log-config logging.config.json --reload --reload-dir server"]
 
 # Production container
-FROM base_server as production
+FROM base_server_deps as production
+EXPOSE "$API_PORT"
 COPY . .
 CMD ["sh", "-c", "poetry run uvicorn main:app --root-path \"$API_ROOT\" --host 0.0.0.0 --port $API_PORT --proxy-headers --use-colors"]
 
 # Model generator container
-FROM python_poetry as model_generator
+FROM base_server_deps as model_generator
 
+USER root
 RUN apk add --no-cache yarn
-
 USER poetryuser
-WORKDIR /server
-
-COPY pyproject.toml poetry.lock ./
-RUN poetry install --no-dev -E generator --no-interaction
 
 WORKDIR /server/model_generator
 COPY model_generator/package.json model_generator/yarn.lock ./
 RUN yarn
 
 WORKDIR /server
+RUN poetry install --no-dev -E generator --no-interaction
 
 COPY . .
 CMD ["sh", "-c", "poetry run python -m model_generator.watcher --out_dir \"$GENERATED_TYPES_OUT_DIR\""]

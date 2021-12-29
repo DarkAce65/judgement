@@ -24,15 +24,13 @@ RUN addgroup --gid 1000 --system poetryuser \
   && adduser --uid 1000 --system --disabled-password --ingroup poetryuser --home /poetryuser poetryuser
 USER poetryuser
 
-WORKDIR /server
-COPY server/pyproject.toml server/poetry.lock ./
-RUN poetry install --no-dev -E generator --no-interaction
-
 WORKDIR /server/model_generator
 COPY server/model_generator/package.json server/model_generator/yarn.lock ./
 RUN yarn
 
 WORKDIR /server
+COPY server/pyproject.toml server/poetry.lock ./
+RUN poetry install --no-dev -E generator --no-interaction
 
 COPY server .
 RUN poetry run python -m model_generator.model_generator --out_dir /poetryuser/generated_types
