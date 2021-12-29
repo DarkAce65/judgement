@@ -55,7 +55,9 @@ class Game(Generic[Action], ABC):
 
         self.game_phase = GamePhase.IN_PROGRESS
 
-    def process_raw_input(self, player_id: str, raw_game_input: dict[str, Any]) -> None:
+    async def process_raw_input(
+        self, player_id: str, raw_game_input: dict[str, Any]
+    ) -> None:
         try:
             parsed_action = parse_obj_as(self._action_cls, raw_game_input)
         except ValidationError as error:
@@ -64,10 +66,10 @@ class Game(Generic[Action], ABC):
                 f"(input: {raw_game_input})"
             ) from error
 
-        self.process_input(player_id, parsed_action)
+        await self.process_input(player_id, parsed_action)
 
     @abstractmethod
-    def process_input(self, player_id: str, game_input: Action) -> None:
+    async def process_input(self, player_id: str, game_input: Action) -> None:
         ...
 
     def is_host(self, player_id: str) -> bool:

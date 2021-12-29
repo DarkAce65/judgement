@@ -66,7 +66,7 @@ class JudgementGame(Game[JudgementAction]):
             player_states=self.player_states,
         )
 
-    def process_input(self, player_id: str, game_input: JudgementAction) -> None:
+    async def process_input(self, player_id: str, game_input: JudgementAction) -> None:
         logger.debug("player_id: %s, action: %s", player_id, repr(game_input))
 
         if isinstance(game_input, JudgementUpdateSettingsAction):

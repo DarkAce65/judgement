@@ -137,7 +137,7 @@ async def handle_game_input(
         raise ValueError(f"No game for room id {room_id}")
 
     try:
-        game.process_raw_input(player.player_id, action)
+        await game.process_raw_input(player.player_id, action)
     except GameError as error:
         await socket_messager.emit_error(error, client_id)
         return
