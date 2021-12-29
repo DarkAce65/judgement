@@ -37,10 +37,10 @@ class JudgementAction(CamelModel, ABC):
         yield cls.validate
 
     @classmethod
-    def validate(cls, values: dict[str, Any]) -> "JudgementAction":
+    def validate(cls, value: dict[str, Any]) -> "JudgementAction":
         try:
-            action_type = values["actionType"]
-            return cls._types[action_type](**values)
+            action_type = value["actionType"]
+            return cls._types[action_type](**value)
         except KeyError as error:
             raise ValueError from error
 

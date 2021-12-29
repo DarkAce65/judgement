@@ -1,5 +1,5 @@
 import { Button, Result } from 'antd';
-import { useHistory, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import useFetch from '../../api/useFetch';
 import useLocationStatePropertyOnce from '../../utils/useLocationStatePropertyOnce';
@@ -9,8 +9,9 @@ import LoadingPage from '../LoadingPage';
 import Room from './Room';
 
 const RoomContainer = () => {
-  const history = useHistory();
-  const { roomId } = useParams<{ roomId: string }>();
+  const navigate = useNavigate();
+  const pathParams = useParams<'roomId'>();
+  const roomId = pathParams.roomId!;
 
   const gameExists = useLocationStatePropertyOnce('gameExists');
 
@@ -34,7 +35,7 @@ const RoomContainer = () => {
             title={`Room ${roomId} not found`}
             subTitle="Double check that you've entered the correct room code"
             extra={
-              <Button type="primary" onClick={() => history.push('/')}>
+              <Button type="primary" onClick={() => navigate('/')}>
                 Go Home
               </Button>
             }

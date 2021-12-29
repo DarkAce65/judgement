@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { Button, InputNumber, PageHeader, Radio, Select, Space, Typography, message } from 'antd';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import {
   JudgementBidHandsAction,
@@ -32,7 +32,7 @@ interface Props {
 
 const Room = ({ roomId, socket, namespace }: Props & WithGameSocketProps) => {
   const dispatch = useAppDispatch();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const playerId = useAppSelector(getPlayerId)!;
   const gameName = useAppSelector(getGameName);
@@ -102,7 +102,7 @@ const Room = ({ roomId, socket, namespace }: Props & WithGameSocketProps) => {
     <PageHeader
       title={`hello ${roomId}`}
       onBack={() => {
-        history.push('/');
+        navigate('/');
       }}
     >
       <Select<GameName>

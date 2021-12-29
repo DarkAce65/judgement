@@ -1,5 +1,5 @@
 import { Layout } from 'antd';
-import { Redirect, Route, BrowserRouter as Router, Switch } from 'react-router-dom';
+import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 
 import Home from './Home';
 import RoomContainer from './room/RoomContainer';
@@ -8,11 +8,11 @@ const App = () => (
   <Router>
     <Layout style={{ minHeight: '100vh' }}>
       <Layout.Content>
-        <Switch>
-          <Route exact path="/" component={Home} />
-          <Route path="/room/:roomId" component={RoomContainer} />
-          <Redirect path="*" to="/" />
-        </Switch>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/room/:roomId" element={<RoomContainer />} />
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
       </Layout.Content>
     </Layout>
   </Router>

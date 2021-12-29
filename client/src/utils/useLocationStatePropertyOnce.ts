@@ -1,25 +1,28 @@
 import { useEffect, useState } from 'react';
 
-import { useHistory, useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { LocationState } from '../constants';
 
+import useLocationState from './useLocationState';
+
 const useLocationStatePropertyOnce = <P extends keyof LocationState>(stateProperty: P) => {
-  const history = useHistory();
-  const location = useLocation<LocationState>();
+  const location = useLocation();
+  const locationState = useLocationState();
+  const navigate = useNavigate();
 
   const [statePropertyValue, setStatePropertyValue] = useState<LocationState[P]>(
-    location.state?.[stateProperty]
+    locationState?.[stateProperty]
   );
 
   useEffect(() => {
-    if (location.state && Object.prototype.hasOwnProperty.call(location.state, stateProperty)) {
-      setStatePropertyValue(location.state[stateProperty]);
-      const state = { ...location.state };
+    if (locationState && Object.prototype.hasOwnProperty.call(locationState, stateProperty)) {
+      setStatePropertyValue(locationState[stateProperty]);
+      const state = { ...locationState };
       delete state[stateProperty];
-      history.replace({ ...history.location, state });
+      navigate(location, { replace: true, state });
     }
-  }, [history, location, stateProperty]);
+  }, [location, locationState, stateProperty, navigate]);
 
   return statePropertyValue;
 };

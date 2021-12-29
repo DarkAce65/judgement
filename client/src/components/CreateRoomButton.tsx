@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 
 import { unwrapResult } from '@reduxjs/toolkit';
 import { Button, message } from 'antd';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 
 import { LocationState } from '../constants';
 import { useAppDispatch } from '../data/reduxHooks';
@@ -10,18 +10,19 @@ import { createRoom } from '../data/roomSlice';
 
 const CreateRoomButton = () => {
   const dispatch = useAppDispatch();
-  const history = useHistory<LocationState>();
+  const navigate = useNavigate();
 
   const handleCreate = useCallback(() => {
     dispatch(createRoom())
       .then(unwrapResult)
       .then((roomId) => {
-        history.push(`/room/${roomId}`, { gameExists: true });
+        const state: LocationState = { gameExists: true };
+        navigate(`/room/${roomId}`, { state });
       })
       .catch(() => {
         message.error('Failed to create a new room');
       });
-  }, [dispatch, history]);
+  }, [dispatch, navigate]);
 
   return (
     <Button type="primary" size="large" onClick={handleCreate}>

@@ -1,5 +1,5 @@
 import { Button } from 'antd';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import withGameSocket, { WithGameSocketProps } from '../../game/withGameSocket';
 
@@ -8,7 +8,7 @@ interface Props {
 }
 
 const LeaveRoomButton = ({ roomId, socket }: Props & WithGameSocketProps) => {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   return (
     <Button
@@ -16,7 +16,7 @@ const LeaveRoomButton = ({ roomId, socket }: Props & WithGameSocketProps) => {
       danger={true}
       onClick={() => {
         socket.emit('leave_room', roomId);
-        history.push('/');
+        navigate('/');
       }}
     >
       Leave room

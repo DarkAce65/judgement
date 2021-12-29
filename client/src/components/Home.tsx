@@ -11,16 +11,14 @@ const CenteredBlock = styled.div`
   text-align: center;
 `;
 
-const Home = () => {
-  return (
-    <PageHeader title="Home">
-      <CenteredBlock>
-        <CreateRoomButton />
-        <Divider style={{ textTransform: 'lowercase', fontVariant: 'small-caps' }}>Or</Divider>
-        <JoinRoomInput />
-      </CenteredBlock>
-    </PageHeader>
-  );
-};
+const Home = () => (
+  <PageHeader title="Home">
+    <CenteredBlock>
+      <CreateRoomButton />
+      <Divider style={{ textTransform: 'lowercase', fontVariant: 'small-caps' }}>Or</Divider>
+      <JoinRoomInput />
+    </CenteredBlock>
+  </PageHeader>
+);
 
 export default Home;

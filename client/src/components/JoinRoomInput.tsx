@@ -3,7 +3,7 @@ import { useCallback, useState } from 'react';
 import { ArrowRightOutlined } from '@ant-design/icons';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { Button, Input, message } from 'antd';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 
 import { LocationState } from '../constants';
 import { useAppDispatch } from '../data/reduxHooks';
@@ -11,7 +11,7 @@ import { joinRoom } from '../data/roomSlice';
 
 const JoinRoomInput = () => {
   const dispatch = useAppDispatch();
-  const history = useHistory<LocationState>();
+  const navigate = useNavigate();
 
   const [roomId, setRoomId] = useState('');
 
@@ -23,12 +23,13 @@ const JoinRoomInput = () => {
     dispatch(joinRoom(roomId))
       .then(unwrapResult)
       .then(() => {
-        history.push(`/room/${roomId}`, { gameExists: true });
+        const state: LocationState = { gameExists: true };
+        navigate(`/room/${roomId}`, { state });
       })
       .catch(() => {
         message.error(`Room ${roomId} not found`);
       });
-  }, [dispatch, history, roomId]);
+  }, [dispatch, navigate, roomId]);
 
   return (
     <Input.Group compact={true} size="large" style={{ display: 'flex' }}>

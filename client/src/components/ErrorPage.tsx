@@ -1,8 +1,8 @@
 import { Button, Result } from 'antd';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 
 const ErrorPage = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   return (
     <Result
@@ -10,7 +10,7 @@ const ErrorPage = () => {
       title="Error"
       subTitle="An error occurred, please refresh the page or try again later."
       extra={
-        <Button type="primary" onClick={() => history.push('/')}>
+        <Button type="primary" onClick={() => navigate('/')}>
           Go Home
         </Button>
       }
