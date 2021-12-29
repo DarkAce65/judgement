@@ -29,6 +29,7 @@ class JudgementGame(Game[JudgementAction]):
     pile: list[Card]
 
     current_round: int
+    current_round_within_trick: int
     current_turn: int
     hands: dict[str, list[Card]]
     player_states: dict[str, JudgementPlayerState]
@@ -46,6 +47,7 @@ class JudgementGame(Game[JudgementAction]):
         self.pile = []
 
         self.current_round = 0
+        self.current_round_within_trick = 0
         self.current_turn = 0
         self.player_states = {
             player.player_id: JudgementPlayerState() for player in self.players
@@ -62,6 +64,7 @@ class JudgementGame(Game[JudgementAction]):
             phase=self.phase,
             pile=self.pile,
             current_round=self.current_round,
+            current_round_within_trick=self.current_round_within_trick,
             current_turn=self.current_turn,
             player_states=self.player_states,
         )
@@ -83,29 +86,103 @@ class JudgementGame(Game[JudgementAction]):
             if game_input.num_rounds:
                 self.settings.num_rounds = game_input.num_rounds
         elif isinstance(game_input, JudgementBidHandsAction):
-            self.assert_turn(player_id)
-            self.player_states[player_id].current_bid = game_input.num_hands
-
-            if self.current_turn < len(self.players) - 1:
-                self.current_turn += 1
-            else:
-                self.current_turn = 0
-                self.phase = JudgementPhase.PLAYING
+            await self.handle_bid_action(player_id, game_input)
         elif isinstance(game_input, JudgementPlayCardAction):
-            self.assert_turn(player_id)
-            card = game_input.get_card()
-            if card not in self.player_states[player_id].hand:
-                raise GameError(f"Missing card from hand: {str(card)}")
+            await self.handle_play_card_action(player_id, game_input)
 
-            self.player_states[player_id].hand.remove(card)
-            self.pile.append(card)
+    def assert_phase(self, phase: JudgementPhase) -> None:
+        if self.phase != phase:
+            raise GameError("You can't do that right now!")
 
     def assert_turn(self, player_id: str) -> None:
         if self.players[self.current_turn].player_id != player_id:
             raise GameError("It is not your turn!")
 
     async def deal(self) -> None:
+        num_cards_to_deal = self.settings.num_rounds - self.current_round
+
         for player_id in self.player_states:
-            self.player_states[player_id].hand.extend(self.decks.draw(4))
+            self.player_states[player_id].hand.extend(self.decks.draw(num_cards_to_deal))
 
         await socket_messager.emit_game_state(self.room_id, self)
+
+    async def handle_bid_action(
+        self, player_id: str, action: JudgementBidHandsAction
+    ) -> None:
+        self.assert_phase(JudgementPhase.BIDDING)
+        self.assert_turn(player_id)
+        self.player_states[player_id].current_bid = action.num_hands
+
+        await socket_messager.emit_game_state(self.room_id, self)
+
+        if self.current_turn < len(self.players) - 1:
+            self.current_turn += 1
+        else:
+            self.phase = JudgementPhase.PLAYING
+            self.start_trick()
+
+    async def handle_play_card_action(
+        self, player_id: str, action: JudgementPlayCardAction
+    ) -> None:
+        self.assert_phase(JudgementPhase.PLAYING)
+        self.assert_turn(player_id)
+
+        card = action.get_card()
+        if card not in self.player_states[player_id].hand:
+            raise GameError(f"Missing card from hand: {str(card)}")
+
+        self.player_states[player_id].hand.remove(card)
+        self.pile.append(card)
+
+        await socket_messager.emit_game_state(self.room_id, self)
+
+        if self.current_turn < len(self.players) - 1:
+            self.current_turn += 1
+        else:
+            await self.end_trick()
+
+    async def start_round(self) -> None:
+        self.current_round_within_trick = 0
+        self.current_turn = 0
+        self.pile = []
+        self.phase = JudgementPhase.BIDDING
+        for player_id in self.player_states:
+            self.player_states[player_id].current_bid = None
+            self.player_states[player_id].current_hands = 0
+
+        await self.deal()
+
+    def start_trick(self) -> None:
+        self.current_turn = 0
+        self.pile = []
+
+    async def end_trick(self) -> None:
+        # TODO: Figure out trick winner
+        logger.info("Pile: %s", self.pile)
+
+        tricks_left = (
+            self.settings.num_rounds
+            - self.current_round
+            - self.current_round_within_trick
+            > 0
+        )
+        if tricks_left > 0:
+            self.current_round_within_trick += 1
+            self.start_trick()
+        else:
+            await self.end_round()
+
+    async def end_round(self) -> None:
+        for player_id, player_state in self.player_states.items():
+            if player_state.current_bid == player_state.current_hands:
+                self.player_states[player_id].score += player_state.current_bid + 10
+
+            self.player_states[player_id].current_bid = None
+            self.player_states[player_id].current_hands = 0
+
+        if self.current_round < self.settings.num_rounds:
+            self.current_round += 1
+            await self.start_round()
+        else:
+            # TODO: Handle end game
+            logger.info("Game complete")
