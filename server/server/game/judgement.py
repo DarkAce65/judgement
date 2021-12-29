@@ -104,7 +104,7 @@ class JudgementGame(Game[JudgementAction]):
         for player_id in self.player_states:
             self.player_states[player_id].hand.extend(self.decks.draw(num_cards_to_deal))
 
-        await socket_messager.emit_game_state(self.room_id, self)
+        await socket_messager.emit_game_state(self, self.room_id)
 
     async def handle_bid_action(
         self, player_id: str, action: JudgementBidHandsAction
@@ -113,7 +113,7 @@ class JudgementGame(Game[JudgementAction]):
         self.assert_turn(player_id)
         self.player_states[player_id].current_bid = action.num_hands
 
-        await socket_messager.emit_game_state(self.room_id, self)
+        await socket_messager.emit_game_state(self, self.room_id)
 
         if self.current_turn < len(self.players) - 1:
             self.current_turn += 1
@@ -134,7 +134,7 @@ class JudgementGame(Game[JudgementAction]):
         self.player_states[player_id].hand.remove(card)
         self.pile.append(card)
 
-        await socket_messager.emit_game_state(self.room_id, self)
+        await socket_messager.emit_game_state(self, self.room_id)
 
         if self.current_turn < len(self.players) - 1:
             self.current_turn += 1

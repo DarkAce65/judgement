@@ -84,7 +84,7 @@ async def propagate_name_change(player_id: str) -> None:
 
     for room_id in room_ids:
         await socket_messager.emit_players(
-            room_id, room_manager.get_players_in_room(room_id).values()
+            room_manager.get_players_in_room(room_id).values(), room_id
         )
 
 

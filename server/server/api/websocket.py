@@ -100,7 +100,7 @@ async def handle_join_room(client_id: str, room_id: str) -> None:
 async def handle_leave_room(client_id: str, room_id: str) -> None:
     connection_manager.remove_player_client_from_room(client_id, room_id)
     await socket_messager.emit_players(
-        room_id, room_manager.get_players_in_room(room_id).values()
+        room_manager.get_players_in_room(room_id).values(), room_id
     )
 
 
@@ -142,7 +142,7 @@ async def handle_game_input(
         await socket_messager.emit_error(error, client_id)
         return
 
-    await socket_messager.emit_game_state(room_id, game)
+    await socket_messager.emit_game_state(game, room_id)
 
 
 @sio.on("disconnect")

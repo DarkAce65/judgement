@@ -13,7 +13,7 @@ from server.models.websocket import (
 from server.sio_app import sio
 
 
-async def emit_error(error: GameError, recipient: Optional[str] = None) -> None:
+async def emit_error(error: GameError, recipient: str) -> None:
     await sio.emit(
         "invalid_input",
         GameErrorMessage(error_message=error.message).dict(by_alias=True),
@@ -37,21 +37,21 @@ async def emit_room(room: Room, recipient: Optional[str] = None) -> None:
     )
 
 
-async def emit_game_state(room_id: str, game: Game) -> None:
+async def emit_game_state(game: Game, recipient: str) -> None:
     await sio.emit(
         "game_state",
         GameStateMessage(state=cast(ConcreteGameState, game.build_game_state())).dict(
             by_alias=True
         ),
-        to=room_id,
+        to=recipient,
     )
 
 
-async def emit_players(room_id: str, players_in_room: Iterable[Player]) -> None:
+async def emit_players(players_in_room: Iterable[Player], recipient: str) -> None:
     await sio.emit(
         "players",
         PlayersMessage(players=[player.name or "" for player in players_in_room]).dict(
             by_alias=True
         ),
-        to=room_id,
+        to=recipient,
     )
