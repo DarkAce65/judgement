@@ -68,11 +68,16 @@ def delete_room(room_id: str) -> None:
         del games[room_id]
 
 
-def get_player_ids_in_room(room_id: str) -> set[str]:
+def get_player_ids_in_room(room_id: str) -> list[str]:
     cur = db.get_cursor()
-    cur.execute("SELECT player_id FROM room_players WHERE room_id = %s", (room_id,))
+    cur.execute(
+        "SELECT player_id FROM room_players "
+        "WHERE room_id = %s "
+        "ORDER BY order_index DESC",
+        (room_id,),
+    )
     results = cast(list[tuple[str]], cur.fetchall())
-    return {player_id for (player_id,) in results}
+    return [player_id for (player_id,) in results]
 
 
 def get_players_in_room(room_id: str) -> dict[str, Player]:
@@ -119,10 +124,6 @@ def drop_player_from_room(player_id: str, room_id: str) -> None:
 
 def set_game(room_id: str, game_name: GameName) -> None:
     cur = db.get_cursor()
-    cur.execute(
-        "UPDATE rooms SET game_name=%s WHERE id = %s",
-        (game_name, room_id),
-    )
 
     cur.execute("SELECT room_state FROM rooms WHERE id = %s", (room_id,))
     result = cast(Optional[tuple[str]], cur.fetchone())
