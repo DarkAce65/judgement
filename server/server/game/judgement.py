@@ -29,7 +29,7 @@ class JudgementGame(Game[JudgementAction]):
     pile: list[Card]
 
     current_round: int
-    current_round_within_trick: int
+    current_trick: int
     current_turn: int
     hands: dict[str, list[Card]]
     player_states: dict[str, JudgementPlayerState]
@@ -47,7 +47,7 @@ class JudgementGame(Game[JudgementAction]):
         self.pile = []
 
         self.current_round = 0
-        self.current_round_within_trick = 0
+        self.current_trick = 0
         self.current_turn = 0
         self.player_states = {
             player.player_id: JudgementPlayerState() for player in self.players
@@ -64,7 +64,7 @@ class JudgementGame(Game[JudgementAction]):
             phase=self.phase,
             pile=self.pile,
             current_round=self.current_round,
-            current_round_within_trick=self.current_round_within_trick,
+            current_trick=self.current_trick,
             current_turn=self.current_turn,
             player_states=self.player_states,
         )
@@ -142,7 +142,7 @@ class JudgementGame(Game[JudgementAction]):
             await self.end_trick()
 
     async def start_round(self) -> None:
-        self.current_round_within_trick = 0
+        self.current_trick = 0
         self.current_turn = 0
         self.pile = []
         self.phase = JudgementPhase.BIDDING
@@ -161,13 +161,10 @@ class JudgementGame(Game[JudgementAction]):
         logger.info("Pile: %s", self.pile)
 
         tricks_left = (
-            self.settings.num_rounds
-            - self.current_round
-            - self.current_round_within_trick
-            > 0
+            self.settings.num_rounds - self.current_round - self.current_trick - 1
         )
         if tricks_left > 0:
-            self.current_round_within_trick += 1
+            self.current_trick += 1
             self.start_trick()
         else:
             await self.end_round()
@@ -180,7 +177,7 @@ class JudgementGame(Game[JudgementAction]):
             self.player_states[player_id].current_bid = None
             self.player_states[player_id].current_hands = 0
 
-        if self.current_round < self.settings.num_rounds:
+        if self.current_round < self.settings.num_rounds - 1:
             self.current_round += 1
             await self.start_round()
         else:

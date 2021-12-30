@@ -90,6 +90,6 @@ class JudgementGameState(GameState):
     pile: list[Card]
 
     current_round: int
-    current_round_within_trick: int
+    current_trick: int
     current_turn: int
     player_states: dict[str, JudgementPlayerState]
