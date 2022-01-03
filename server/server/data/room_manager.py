@@ -138,25 +138,33 @@ def set_game(room_id: str, game_name: GameName) -> None:
     )
 
 
-def start_game(room_id: str) -> None:
+def initialize_game(room_id: str) -> None:
+    if room_id in games:
+        raise ValueError("Room already has a game configured")
+
+    room = get_room(room_id)
+
+    if room.game_name is None:
+        raise ValueError("Cannot start game - no game selected")
+
+    if room.game_name == GameName.JUDGEMENT:
+        game = JudgementGame(room_id)
+    else:
+        raise ValueError(f"Unrecognized game name ({room.game_name})")
+
+    for player in room.players:
+        game.add_player(player.player_id)
+
+    games[room_id] = game
+    cur = db.get_cursor()
+    cur.execute("UPDATE rooms SET room_state=%s WHERE id = %s", (RoomState.GAME, room_id))
+
+
+async def start_game(room_id: str) -> None:
+    if not room_exists(room_id):
+        raise ValueError(f"Invalid room id ({room_id})")
+
     if room_id not in games:
-        room = get_room(room_id)
+        raise ValueError("No game selected")
 
-        if room.game_name is None:
-            raise ValueError("Cannot start game - no game selected")
-
-        if room.game_name == GameName.JUDGEMENT:
-            game = JudgementGame(room_id)
-        else:
-            raise ValueError(f"Unrecognized game name ({room.game_name})")
-
-        for player in room.players:
-            game.add_player(player.player_id)
-
-        games[room_id] = game
-        cur = db.get_cursor()
-        cur.execute(
-            "UPDATE rooms SET room_state=%s WHERE id = %s", (RoomState.GAME, room_id)
-        )
-
-    games[room_id].start_game()
+    await games[room_id].start_game()
