@@ -49,7 +49,7 @@ class Game(Generic[Action], ABC):
                 self.players.pop(index)
                 break
 
-    def start_game(self) -> None:
+    async def start_game(self) -> None:
         if self.game_phase != GamePhase.NOT_STARTED:
             raise GameError("Game has already started")
 

@@ -31,7 +31,7 @@ class JudgementGame(Game[JudgementAction]):
     current_round: int
     current_trick: int
     current_turn: int
-    hands: dict[str, list[Card]]
+
     player_states: dict[str, JudgementPlayerState]
 
     def __init__(self, room_id: str) -> None:
@@ -40,21 +40,16 @@ class JudgementGame(Game[JudgementAction]):
         self.phase = JudgementPhase.BIDDING
         self.settings = JudgementSettings()
 
-    def start_game(self) -> None:
-        super().start_game()
-
-        self.decks = Decks(num_decks=self.settings.num_decks)
+        self.decks = Decks()
         self.pile = []
 
         self.current_round = 0
         self.current_trick = 0
         self.current_turn = 0
+
         self.player_states = {
             player.player_id: JudgementPlayerState() for player in self.players
         }
-
-        self.decks.shuffle()
-        asyncio.create_task(self.deal())
 
     def build_game_state(self) -> JudgementGameState:
         return JudgementGameState(
@@ -68,6 +63,20 @@ class JudgementGame(Game[JudgementAction]):
             current_turn=self.current_turn,
             player_states=self.player_states,
         )
+
+    async def start_game(self) -> None:
+        await super().start_game()
+
+        self.decks = Decks(num_decks=self.settings.num_decks)
+
+        await self.start_round()
+
+    def add_player(self, player_id: str) -> None:
+        super().add_player(player_id)
+        self.player_states[player_id] = JudgementPlayerState()
+
+    def remove_player(self, player_id: str) -> None:
+        raise NotImplementedError("Cannot remove a player from this game")
 
     async def process_input(self, player_id: str, game_input: JudgementAction) -> None:
         logger.debug("player_id: %s, action: %s", player_id, repr(game_input))

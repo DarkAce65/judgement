@@ -13,6 +13,7 @@ SUIT_ORDER = [Suit.SPADES, Suit.HEARTS, Suit.CLUBS, Suit.DIAMONDS]
 
 @unique
 class JudgementPhase(str, Enum):
+    NOT_STARTED = "NOT_STARTED"
     BIDDING = "BIDDING"
     PLAYING = "PLAYING"
 
@@ -84,7 +85,6 @@ class JudgementSettings(CamelModel):
 
 class JudgementGameState(GameState):
     settings: JudgementSettings
-
     phase: JudgementPhase
 
     pile: list[Card]
