@@ -72,6 +72,10 @@ const Room = ({ roomId, socket, namespace }: Props & WithGameSocketProps) => {
     [socket]
   );
 
+  const handleGameInit = useCallback(() => {
+    socket.emit('confirm_game');
+  }, [socket]);
+
   const handleGameStart = useCallback(() => {
     socket.emit('start_game');
   }, [socket]);
@@ -82,7 +86,6 @@ const Room = ({ roomId, socket, namespace }: Props & WithGameSocketProps) => {
     }
 
     const action: JudgementBidHandsAction = { actionType: 'BID_HANDS', numHands: bidAmount };
-
     socket.emit('game_input', action);
     setBidAmount(null);
   }, [socket, bidAmount]);
@@ -93,7 +96,6 @@ const Room = ({ roomId, socket, namespace }: Props & WithGameSocketProps) => {
     }
 
     const action: JudgementPlayCardAction = { actionType: 'PLAY_CARD', card: selectedCard };
-
     socket.emit('game_input', action);
     setSelectedCard(null);
   }, [socket, selectedCard]);
@@ -116,7 +118,10 @@ const Room = ({ roomId, socket, namespace }: Props & WithGameSocketProps) => {
         <Typography.Paragraph key={index}>{player}</Typography.Paragraph>
       ))}
       <Typography.Paragraph>
-        <Button onClick={handleGameStart}>Start game</Button>
+        <Space direction="horizontal">
+          <Button onClick={handleGameInit}>Init game</Button>
+          <Button onClick={handleGameStart}>Start game</Button>
+        </Space>
       </Typography.Paragraph>
       {game && game.phase === 'BIDDING' && (
         <Typography.Paragraph>
