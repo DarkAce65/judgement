@@ -37,7 +37,7 @@ class JudgementGame(Game[JudgementAction]):
     def __init__(self, room_id: str) -> None:
         super().__init__(JudgementAction, room_id)
 
-        self.phase = JudgementPhase.BIDDING
+        self.phase = JudgementPhase.NOT_STARTED
         self.settings = JudgementSettings()
 
         self.decks = Decks()
@@ -99,6 +99,8 @@ class JudgementGame(Game[JudgementAction]):
         elif isinstance(game_input, JudgementPlayCardAction):
             await self.handle_play_card_action(player_id, game_input)
 
+        await socket_messager.emit_game_state(self, self.room_id)
+
     def assert_phase(self, phase: JudgementPhase) -> None:
         if self.phase != phase:
             raise GameError("You can't do that right now!")
@@ -107,13 +109,14 @@ class JudgementGame(Game[JudgementAction]):
         if self.players[self.current_turn].player_id != player_id:
             raise GameError("It is not your turn!")
 
-    async def deal(self) -> None:
-        num_cards_to_deal = self.settings.num_rounds - self.current_round
+    def get_num_tricks_for_round(self) -> int:
+        return self.settings.num_rounds - self.current_round
+
+    def deal(self) -> None:
+        num_cards_to_deal = self.get_num_tricks_for_round()
 
         for player_id in self.player_states:
             self.player_states[player_id].hand.extend(self.decks.draw(num_cards_to_deal))
-
-        await socket_messager.emit_game_state(self, self.room_id)
 
     async def handle_bid_action(
         self, player_id: str, action: JudgementBidHandsAction
@@ -121,8 +124,6 @@ class JudgementGame(Game[JudgementAction]):
         self.assert_phase(JudgementPhase.BIDDING)
         self.assert_turn(player_id)
         self.player_states[player_id].current_bid = action.num_hands
-
-        await socket_messager.emit_game_state(self, self.room_id)
 
         if self.current_turn < len(self.players) - 1:
             self.current_turn += 1
@@ -143,8 +144,6 @@ class JudgementGame(Game[JudgementAction]):
         self.player_states[player_id].hand.remove(card)
         self.pile.append(card)
 
-        await socket_messager.emit_game_state(self, self.room_id)
-
         if self.current_turn < len(self.players) - 1:
             self.current_turn += 1
         else:
@@ -159,7 +158,9 @@ class JudgementGame(Game[JudgementAction]):
             self.player_states[player_id].current_bid = None
             self.player_states[player_id].current_hands = 0
 
-        await self.deal()
+        self.deal()
+
+        await socket_messager.emit_game_state(self, self.room_id)
 
     def start_trick(self) -> None:
         self.current_turn = 0
@@ -169,14 +170,14 @@ class JudgementGame(Game[JudgementAction]):
         # TODO: Figure out trick winner
         logger.info("Pile: %s", self.pile)
 
-        tricks_left = (
-            self.settings.num_rounds - self.current_round - self.current_trick - 1
-        )
+        tricks_left = self.get_num_tricks_for_round() - self.current_trick - 1
         if tricks_left > 0:
             self.current_trick += 1
             self.start_trick()
         else:
             await self.end_round()
+
+        await socket_messager.emit_game_state(self, self.room_id)
 
     async def end_round(self) -> None:
         for player_id, player_state in self.player_states.items():
@@ -192,3 +193,6 @@ class JudgementGame(Game[JudgementAction]):
         else:
             # TODO: Handle end game
             logger.info("Game complete")
+            self.game_phase = GamePhase.COMPLETE
+
+        await socket_messager.emit_game_state(self, self.room_id)
