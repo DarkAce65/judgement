@@ -2,7 +2,7 @@ import { useLocation } from 'react-router-dom';
 
 import { LocationState } from '../constants';
 
-export default (): LocationState | null => {
+const useLocationState = (): LocationState | null => {
   const location = useLocation();
   if (!location.state) {
     return null;
@@ -19,3 +19,5 @@ export default (): LocationState | null => {
 
   return null;
 };
+
+export default useLocationState;
