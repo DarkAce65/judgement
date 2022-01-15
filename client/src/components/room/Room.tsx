@@ -1,12 +1,8 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 
-import { Button, InputNumber, PageHeader, Radio, Select, Space, Typography, message } from 'antd';
+import { Button, PageHeader, Select, Space, Typography, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
 
-import {
-  JudgementBidHandsAction,
-  JudgementPlayCardAction,
-} from '../../../generated_types/judgement';
 import {
   GameErrorMessage,
   GameName,
@@ -25,6 +21,7 @@ import PlayerNameInput from '../PlayerNameInput';
 import requirePlayerName from '../requirePlayerName';
 
 import LeaveRoomButton from './LeaveRoomButton';
+import JudgementContainer from './judgement/JudgementContainer';
 
 interface Props {
   roomId: string;
@@ -61,9 +58,6 @@ const Room = ({ roomId, socket, namespace }: Props & WithGameSocketProps) => {
     });
   }, [dispatch, namespace]);
 
-  const [bidAmount, setBidAmount] = useState<number | null>(null);
-  const [selectedCard, setSelectedCard] = useState<string | null>(null);
-
   const handleGameChange = useCallback(
     (name: GameName) => {
       const setGameMessage: SetGameMessage = { gameName: name };
@@ -80,25 +74,18 @@ const Room = ({ roomId, socket, namespace }: Props & WithGameSocketProps) => {
     socket.emit('start_game');
   }, [socket]);
 
-  const bidHands = useCallback(() => {
-    if (bidAmount === null) {
-      return;
+  const renderedGame = useMemo(() => {
+    if (!game) {
+      return null;
     }
 
-    const action: JudgementBidHandsAction = { actionType: 'BID_HANDS', numHands: bidAmount };
-    socket.emit('game_input', action);
-    setBidAmount(null);
-  }, [socket, bidAmount]);
-
-  const playCard = useCallback(() => {
-    if (!selectedCard) {
-      return;
+    switch (game.gameName) {
+      case 'JUDGEMENT':
+        return <JudgementContainer game={game} />;
+      default:
+        return null;
     }
-
-    const action: JudgementPlayCardAction = { actionType: 'PLAY_CARD', card: selectedCard };
-    socket.emit('game_input', action);
-    setSelectedCard(null);
-  }, [socket, selectedCard]);
+  }, [game]);
 
   return (
     <PageHeader
@@ -123,45 +110,7 @@ const Room = ({ roomId, socket, namespace }: Props & WithGameSocketProps) => {
           <Button onClick={handleGameStart}>Start game</Button>
         </Space>
       </Typography.Paragraph>
-      {game && game.phase === 'BIDDING' && (
-        <Typography.Paragraph>
-          <Space direction="vertical">
-            <InputNumber
-              value={bidAmount || undefined}
-              min={0}
-              onChange={(bid) => {
-                setBidAmount(bid);
-              }}
-            />
-            <Button disabled={bidAmount === null} onClick={bidHands}>
-              Bid hands
-            </Button>
-          </Space>
-        </Typography.Paragraph>
-      )}
-      {game && game.phase === 'PLAYING' && (
-        <Typography.Paragraph>
-          <Space direction="vertical">
-            <Radio.Group
-              value={selectedCard}
-              onChange={(evt) => {
-                setSelectedCard(evt.target.value);
-              }}
-            >
-              <Space direction="horizontal">
-                {game?.playerStates?.[playerId]?.hand?.map((value, index) => (
-                  <Radio key={index} value={value.suit + value.rank}>
-                    {value.suit + value.rank}
-                  </Radio>
-                ))}
-              </Space>
-            </Radio.Group>
-            <Button disabled={!selectedCard} onClick={playCard}>
-              Play card
-            </Button>
-          </Space>
-        </Typography.Paragraph>
-      )}
+      {renderedGame}
       <Typography.Paragraph>
         <Space direction="vertical" style={{ width: '100%' }}>
           <PlayerNameInput />
