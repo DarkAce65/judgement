@@ -1,8 +1,8 @@
-import { ComponentType } from 'react';
+import { ComponentType, useEffect, useState } from 'react';
 
 import { Socket } from 'socket.io-client';
 
-import useGameSocket from './useGameSocket';
+import GameSocket from './GameSocket';
 
 export interface WithGameSocketProps {
   socket: Socket;
@@ -11,13 +11,22 @@ export interface WithGameSocketProps {
 
 const withGameSocket = <P,>(WrappedComponent: ComponentType<P & WithGameSocketProps>) => {
   const ComponentWithGameSocket = (props: P) => {
-    const { socket, namespace } = useGameSocket();
+    const [socketAndNamespace, setSocketAndNamespace] = useState<WithGameSocketProps | null>(null);
 
-    if (socket === null || namespace === null) {
+    useEffect(() => {
+      const { socket, namespace } = GameSocket.attach();
+      setSocketAndNamespace({ socket, namespace });
+
+      return () => {
+        GameSocket.detach(namespace);
+      };
+    }, []);
+
+    if (socketAndNamespace === null) {
       return null;
     }
 
-    return <WrappedComponent socket={socket} namespace={namespace} {...props} />;
+    return <WrappedComponent {...socketAndNamespace} {...props} />;
   };
 
   const displayName = WrappedComponent.displayName || WrappedComponent.name || 'Component';
