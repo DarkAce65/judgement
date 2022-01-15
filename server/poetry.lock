@@ -282,14 +282,6 @@ reference = "a8f182d"
 resolved_reference = "a8f182d13ab279ec09b4a091abe018b63a1ae018"
 
 [[package]]
-name = "pyhumps"
-version = "3.5.0"
-description = "🐫  Convert strings (and dictionary keys) between snake case, camel case and pascal case in Python. Inspired by Humps for Node"
-category = "main"
-optional = false
-python-versions = "*"
-
-[[package]]
 name = "pylint"
 version = "2.12.2"
 description = "python code static checker"
@@ -488,7 +480,7 @@ generator = ["pydantic-to-typescript", "watchgod"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "de8162e42c21d83d34014beb395192f43355abc0c3a25816b9390ad112bd81d2"
+content-hash = "04edb576a4fcd0afb62e7120b32d1e523a54cf42b7c08a024486542a0eeea53b"
 
 [metadata.files]
 anyio = [
@@ -750,10 +742,6 @@ pydantic = [
     {file = "pydantic-1.9.0.tar.gz", hash = "sha256:742645059757a56ecd886faf4ed2441b9c0cd406079c2b4bee51bcc3fbcd510a"},
 ]
 pydantic-to-typescript = []
-pyhumps = [
-    {file = "pyhumps-3.5.0-py3-none-any.whl", hash = "sha256:2433eef13d1c258227a0bd5de9660ba17dd6a307e1255d2d20ec9287f8626d96"},
-    {file = "pyhumps-3.5.0.tar.gz", hash = "sha256:55e37f16846eaab26057200924cbdadd2152bf0a5d49175a42358464fa881c73"},
-]
 pylint = [
     {file = "pylint-2.12.2-py3-none-any.whl", hash = "sha256:daabda3f7ed9d1c60f52d563b1b854632fd90035bcf01443e234d3dc794e3b74"},
     {file = "pylint-2.12.2.tar.gz", hash = "sha256:9d945a73640e1fec07ee34b42f5669b770c759acd536ec7b16d7e4b87a9c9ff9"},
