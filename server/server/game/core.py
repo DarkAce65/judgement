@@ -4,7 +4,7 @@ from typing import Any, Generic, Type, TypeVar
 
 from pydantic import BaseModel, ValidationError, parse_obj_as
 
-from server.models.game import GamePhase, GamePlayer, GameState
+from server.models.game import GamePlayer, GameState, GameStatus
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +25,7 @@ class Game(Generic[Action], ABC):
 
     room_id: str
 
-    game_phase: GamePhase
+    status: GameStatus
     players: list[GamePlayer]
 
     def __init__(self, action_cls: Type[Action], room_id: str) -> None:
@@ -33,7 +33,7 @@ class Game(Generic[Action], ABC):
 
         self.room_id = room_id
 
-        self.game_phase = GamePhase.NOT_STARTED
+        self.status = GameStatus.NOT_STARTED
         self.players = []
 
     @abstractmethod
@@ -50,10 +50,10 @@ class Game(Generic[Action], ABC):
                 break
 
     async def start_game(self) -> None:
-        if self.game_phase != GamePhase.NOT_STARTED:
+        if self.status != GameStatus.NOT_STARTED:
             raise GameError("Game has already started")
 
-        self.game_phase = GamePhase.IN_PROGRESS
+        self.status = GameStatus.IN_PROGRESS
 
     async def process_raw_input(
         self, player_id: str, raw_game_input: dict[str, Any]
