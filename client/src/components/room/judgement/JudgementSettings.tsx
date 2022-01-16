@@ -1,32 +1,49 @@
-import { useCallback, useRef } from 'react';
+import { useCallback } from 'react';
 
-import { Button, InputNumber, Space } from 'antd';
+import { Button, Form, InputNumber } from 'antd';
 
-import { JudgementUpdateSettingsAction } from '../../../../generated_types/judgement';
+import {
+  JudgementGameState,
+  JudgementUpdateSettingsAction,
+} from '../../../../generated_types/judgement';
 import withGameSocket, { WithGameSocketProps } from '../../../game/withGameSocket';
+import useDraftValue from '../../../utils/useDraftValue';
 
-const JudgementSettings = ({ socket }: WithGameSocketProps) => {
-  const numRoundsRef = useRef<HTMLInputElement>(null);
+interface Props {
+  game: JudgementGameState;
+}
 
-  const setNumRounds = useCallback(
-    (numRounds) => {
-      const action: JudgementUpdateSettingsAction = { actionType: 'UPDATE_SETTINGS', numRounds };
-      socket.emit('game_input', action);
-    },
-    [socket]
-  );
+const JudgementSettings = ({ game, socket }: Props & WithGameSocketProps) => {
+  const [numRounds, setNumRounds, numRoundsChanged] = useDraftValue(game.settings.numRounds);
+  const [numDecks, setNumDecks, numDecksChanged] = useDraftValue(game.settings.numDecks);
+
+  const updateSettings = useCallback(() => {
+    const action: JudgementUpdateSettingsAction = { actionType: 'UPDATE_SETTINGS' };
+    if (numRoundsChanged) action.numRounds = numRounds;
+    if (numDecksChanged) action.numDecks = numDecks;
+
+    socket.emit('game_input', action);
+  }, [socket, numRoundsChanged, numRounds, numDecksChanged, numDecks]);
 
   return (
-    <Space direction="vertical">
-      <InputNumber ref={numRoundsRef} min={1} />
-      <Button
-        onClick={() => {
-          setNumRounds(numRoundsRef.current?.value);
-        }}
-      >
-        Set rounds
-      </Button>
-    </Space>
+    <Form>
+      <Form.Item label="Number of rounds">
+        <InputNumber value={numRounds} min={1} onChange={(value) => setNumRounds(value)} />
+      </Form.Item>
+      <Form.Item label="Number of decks">
+        <InputNumber value={numDecks} min={1} onChange={(value) => setNumDecks(value)} />
+      </Form.Item>
+      <Form.Item>
+        <Button
+          disabled={!numRoundsChanged && !numDecksChanged}
+          onClick={() => {
+            updateSettings();
+          }}
+        >
+          Update settings
+        </Button>
+      </Form.Item>
+    </Form>
   );
 };
 
