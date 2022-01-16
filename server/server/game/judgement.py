@@ -1,4 +1,3 @@
-import asyncio
 import logging
 
 from server.data import socket_messager
@@ -113,8 +112,8 @@ class JudgementGame(Game[JudgementAction]):
     def deal(self) -> None:
         num_cards_to_deal = self.get_num_tricks_for_round()
 
-        for player_id in self.player_states:
-            self.player_states[player_id].hand.extend(self.decks.draw(num_cards_to_deal))
+        for player_state in self.player_states.values():
+            player_state.hand.extend(self.decks.draw(num_cards_to_deal))
 
     async def handle_bid_action(
         self, player_id: str, action: JudgementBidHandsAction
@@ -152,9 +151,9 @@ class JudgementGame(Game[JudgementAction]):
         self.current_turn = 0
         self.pile = []
         self.phase = JudgementPhase.BIDDING
-        for player_id in self.player_states:
-            self.player_states[player_id].current_bid = None
-            self.player_states[player_id].current_hands = 0
+        for player_state in self.player_states.values():
+            player_state.current_bid = None
+            player_state.current_hands = 0
 
         self.deal()
 
@@ -178,12 +177,12 @@ class JudgementGame(Game[JudgementAction]):
         await socket_messager.emit_game_state(self)
 
     async def end_round(self) -> None:
-        for player_id, player_state in self.player_states.items():
+        for player_state in self.player_states.values():
             if player_state.current_bid == player_state.current_hands:
-                self.player_states[player_id].score += player_state.current_bid + 10
+                player_state.score += player_state.current_bid + 10
 
-            self.player_states[player_id].current_bid = None
-            self.player_states[player_id].current_hands = 0
+            player_state.current_bid = None
+            player_state.current_hands = 0
 
         if self.current_round < self.settings.num_rounds - 1:
             self.current_round += 1
