@@ -83,9 +83,12 @@ async def connect(client_id: str, _environ: dict, auth: dict) -> None:
 
 
 @sio.on("get_room")
+@require_player
 @supply_room_id
-async def handle_get_room(client_id: str, room_id: str) -> None:
-    await socket_messager.emit_room(room_manager.get_room(room_id), client_id)
+async def handle_get_room(_client_id: str, room_id: str, player: Player) -> None:
+    await socket_messager.emit_room_to_player(
+        room_manager.get_room(room_id), player.player_id
+    )
 
 
 @sio.on("join_room")
@@ -148,8 +151,6 @@ async def handle_game_input(
     except GameError as error:
         await socket_messager.emit_error(error, client_id)
         return
-
-    await socket_messager.emit_game_state(game, room_id)
 
 
 @sio.on("disconnect")

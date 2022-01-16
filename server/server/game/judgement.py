@@ -49,7 +49,7 @@ class JudgementGame(Game[JudgementAction]):
 
         self.player_states = {}
 
-    def build_game_state(self) -> JudgementGameState:
+    def build_game_state(self, player_id: str) -> JudgementGameState:
         return JudgementGameState(
             game_name=GameName.JUDGEMENT,
             status=self.status,
@@ -97,7 +97,7 @@ class JudgementGame(Game[JudgementAction]):
         elif isinstance(game_input, JudgementPlayCardAction):
             await self.handle_play_card_action(player_id, game_input)
 
-        await socket_messager.emit_game_state(self, self.room_id)
+        await socket_messager.emit_game_state(self)
 
     def assert_phase(self, phase: JudgementPhase) -> None:
         if self.phase != phase:
@@ -158,7 +158,7 @@ class JudgementGame(Game[JudgementAction]):
 
         self.deal()
 
-        await socket_messager.emit_game_state(self, self.room_id)
+        await socket_messager.emit_game_state(self)
 
     def start_trick(self) -> None:
         self.current_turn = 0
@@ -175,7 +175,7 @@ class JudgementGame(Game[JudgementAction]):
         else:
             await self.end_round()
 
-        await socket_messager.emit_game_state(self, self.room_id)
+        await socket_messager.emit_game_state(self)
 
     async def end_round(self) -> None:
         for player_id, player_state in self.player_states.items():
@@ -193,4 +193,4 @@ class JudgementGame(Game[JudgementAction]):
             logger.info("Game complete")
             self.status = GameStatus.COMPLETE
 
-        await socket_messager.emit_game_state(self, self.room_id)
+        await socket_messager.emit_game_state(self)

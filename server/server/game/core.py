@@ -41,7 +41,7 @@ class Game(Generic[Action], ABC):
         self.player_order = []
 
     @abstractmethod
-    def build_game_state(self) -> GameState:
+    def build_game_state(self, player_id: str) -> GameState:
         ...
 
     def convert_local_id(self, local_player_id: str) -> str:

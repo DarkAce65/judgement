@@ -21,30 +21,45 @@ async def emit_error(error: GameError, recipient: str) -> None:
     )
 
 
-async def emit_room(room: Room, recipient: Optional[str] = None) -> None:
-    if recipient is None:
-        recipient = room.room_id
+async def emit_room(room: Room) -> None:
+    player_names = [player.name or "" for player in room.players]
+    for player in room.players:
+        await sio.emit(
+            "room",
+            RoomMessage(
+                state=room.room_state,
+                players=player_names,
+                game_name=room.game_name,
+                game=cast(
+                    Optional[ConcreteGameState], room.get_game_state(player.player_id)
+                ),
+            ).dict(by_alias=True),
+            to=player.player_id,
+        )
 
+
+async def emit_room_to_player(room: Room, player_id: str) -> None:
     await sio.emit(
         "room",
         RoomMessage(
             state=room.room_state,
             players=[player.name or "" for player in room.players],
             game_name=room.game_name,
-            game=cast(Optional[ConcreteGameState], room.get_game_state()),
+            game=cast(Optional[ConcreteGameState], room.get_game_state(player_id)),
         ).dict(by_alias=True),
-        to=recipient,
+        to=player_id,
     )
 
 
-async def emit_game_state(game: Game, recipient: str) -> None:
-    await sio.emit(
-        "game_state",
-        GameStateMessage(state=cast(ConcreteGameState, game.build_game_state())).dict(
-            by_alias=True
-        ),
-        to=recipient,
-    )
+async def emit_game_state(game: Game) -> None:
+    for player_id in game.players.keys():
+        await sio.emit(
+            "game_state",
+            GameStateMessage(
+                state=cast(ConcreteGameState, game.build_game_state(player_id))
+            ).dict(by_alias=True),
+            to=player_id,
+        )
 
 
 async def emit_players(players_in_room: Iterable[Player], recipient: str) -> None:

@@ -54,5 +54,5 @@ class Room:
 
         return room
 
-    def get_game_state(self) -> Optional[GameState]:
-        return None if self.game is None else self.game.build_game_state()
+    def get_game_state(self, player_id: str) -> Optional[GameState]:
+        return None if self.game is None else self.game.build_game_state(player_id)
