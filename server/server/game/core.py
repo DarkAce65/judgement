@@ -26,7 +26,9 @@ class Game(Generic[Action], ABC):
     room_id: str
 
     status: GameStatus
-    players: list[GamePlayer]
+    players: dict[str, GamePlayer]
+    local_id_to_player_id: dict[str, str]
+    player_order: list[str]
 
     def __init__(self, action_cls: Type[Action], room_id: str) -> None:
         self._action_cls = action_cls
@@ -34,19 +36,29 @@ class Game(Generic[Action], ABC):
         self.room_id = room_id
 
         self.status = GameStatus.NOT_STARTED
-        self.players = []
+        self.players = {}
+        self.local_id_to_player_id = {}
+        self.player_order = []
 
     @abstractmethod
     def build_game_state(self) -> GameState:
         ...
 
+    def convert_local_id(self, local_player_id: str) -> str:
+        return self.local_id_to_player_id[local_player_id]
+
     def add_player(self, player_id: str) -> None:
-        self.players.append(GamePlayer(player_id))
+        game_player = GamePlayer(player_id)
+        self.players[player_id] = game_player
+        self.player_order.append(player_id)
+        self.local_id_to_player_id[player_id] = game_player.local_player_id
 
     def remove_player(self, player_id: str) -> None:
-        for index, player in enumerate(self.players):
+        for player in self.players.values():
             if player.player_id == player_id:
-                self.players.pop(index)
+                del self.players[player_id]
+                del self.local_id_to_player_id[player_id]
+                self.player_order.remove(player_id)
                 break
 
     async def start_game(self) -> None:
@@ -73,4 +85,4 @@ class Game(Generic[Action], ABC):
         ...
 
     def is_host(self, player_id: str) -> bool:
-        return len(self.players) > 0 and self.players[0].player_id == player_id
+        return len(self.players) > 0 and self.player_order[0] == player_id

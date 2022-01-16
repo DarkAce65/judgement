@@ -47,9 +47,7 @@ class JudgementGame(Game[JudgementAction]):
         self.current_trick = 0
         self.current_turn = 0
 
-        self.player_states = {
-            player.player_id: JudgementPlayerState() for player in self.players
-        }
+        self.player_states = {}
 
     def build_game_state(self) -> JudgementGameState:
         return JudgementGameState(
@@ -106,7 +104,7 @@ class JudgementGame(Game[JudgementAction]):
             raise GameError("You can't do that right now!")
 
     def assert_turn(self, player_id: str) -> None:
-        if self.players[self.current_turn].player_id != player_id:
+        if self.player_order[self.current_turn] != player_id:
             raise GameError("It is not your turn!")
 
     def get_num_tricks_for_round(self) -> int:
@@ -125,7 +123,7 @@ class JudgementGame(Game[JudgementAction]):
         self.assert_turn(player_id)
         self.player_states[player_id].current_bid = action.num_hands
 
-        if self.current_turn < len(self.players) - 1:
+        if self.current_turn < len(self.player_order) - 1:
             self.current_turn += 1
         else:
             self.phase = JudgementPhase.PLAYING
@@ -144,7 +142,7 @@ class JudgementGame(Game[JudgementAction]):
         self.player_states[player_id].hand.remove(card)
         self.pile.append(card)
 
-        if self.current_turn < len(self.players) - 1:
+        if self.current_turn < len(self.player_order) - 1:
             self.current_turn += 1
         else:
             await self.end_trick()
