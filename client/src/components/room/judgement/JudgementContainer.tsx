@@ -10,7 +10,7 @@ interface Props {
 const JudgementContainer = ({ game }: Props) => {
   return (
     <>
-      {game.status === 'NOT_STARTED' && <JudgementSettings />}
+      {game.status === 'NOT_STARTED' && <JudgementSettings game={game} />}
       {game.status === 'IN_PROGRESS' && <JudgementGame game={game} />}
     </>
   );
