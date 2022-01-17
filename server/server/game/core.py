@@ -86,3 +86,6 @@ class Game(Generic[Action], ABC):
 
     def is_host(self, player_id: str) -> bool:
         return len(self.players) > 0 and self.player_order[0] == player_id
+
+    def is_in_game(self, player_id: str) -> bool:
+        return player_id in self.players

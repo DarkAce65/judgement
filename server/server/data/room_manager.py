@@ -106,6 +106,9 @@ def add_player_to_room(player_id: str, room_id: str) -> None:
         (room_id, player_id, order_index),
     )
 
+    if room_id in games and not games[room_id].is_in_game(player_id):
+        games[room_id].add_player(player_id)
+
 
 def drop_player_from_room(player_id: str, room_id: str) -> None:
     if not room_exists(room_id) or not player_manager.player_exists(player_id):
@@ -120,6 +123,8 @@ def drop_player_from_room(player_id: str, room_id: str) -> None:
     cur.execute("SELECT 1 FROM room_players WHERE room_id = %s LIMIT 1", (room_id,))
     if cur.fetchone() is None:
         delete_room(room_id)
+    elif room_id in games and games[room_id].is_in_game(player_id):
+        games[room_id].remove_player(player_id)
 
 
 def set_game(room_id: str, game_name: GameName) -> None:
