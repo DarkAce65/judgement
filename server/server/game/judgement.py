@@ -14,11 +14,14 @@ from server.models.judgement import (
 )
 from server.utils.debug_encoder import dump_class
 
-from .card import Card
+from .card import Card, Suit
 from .core import Game, GameError
 from .decks import Decks
 
 logger = logging.getLogger(__name__)
+
+
+TRUMP_ORDER = [Suit.SPADES, Suit.DIAMONDS, Suit.CLUBS, Suit.HEARTS]
 
 
 class JudgementGame(Game[JudgementAction]):
@@ -117,6 +120,9 @@ class JudgementGame(Game[JudgementAction]):
 
     def get_num_tricks_for_round(self) -> int:
         return self.settings.num_rounds - self.current_round
+
+    def get_trump(self) -> Suit:
+        return TRUMP_ORDER[self.current_round % 4]
 
     def deal(self) -> None:
         num_cards_to_deal = self.get_num_tricks_for_round()
