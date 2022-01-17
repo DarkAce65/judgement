@@ -7,8 +7,6 @@ import {
   JudgementGameState,
   JudgementPlayCardAction,
 } from '../../../../generated_types/judgement';
-import { getPlayerId } from '../../../data/playerSlice';
-import { useAppSelector } from '../../../data/reduxHooks';
 import withGameSocket, { WithGameSocketProps } from '../../../game/withGameSocket';
 
 interface Props {
@@ -16,8 +14,6 @@ interface Props {
 }
 
 const JudgementGame = ({ game, socket }: Props & WithGameSocketProps) => {
-  const playerId = useAppSelector(getPlayerId)!;
-
   const [bidAmount, setBidAmount] = useState<number | null>(null);
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
 
@@ -69,7 +65,7 @@ const JudgementGame = ({ game, socket }: Props & WithGameSocketProps) => {
               }}
             >
               <Space direction="horizontal">
-                {game.playerStates?.[playerId]?.hand?.map((value, index) => (
+                {game.playerState.hand.map((value, index) => (
                   <Radio key={index} value={value.suit + value.rank}>
                     {value.suit + value.rank}
                   </Radio>
