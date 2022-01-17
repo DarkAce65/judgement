@@ -5,8 +5,7 @@ import CreateRoomButton from './CreateRoomButton';
 import JoinRoomInput from './JoinRoomInput';
 
 const CenteredBlock = styled.div`
-  width: 50%;
-  min-width: 400px;
+  max-width: 400px;
   margin: 0 auto;
   text-align: center;
 `;
