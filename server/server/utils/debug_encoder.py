@@ -1,6 +1,6 @@
 import inspect
 import json
-from typing import Any
+from typing import Any, Iterable
 
 from server.models.camel_model import CamelModel
 
@@ -11,18 +11,14 @@ class DebugEncoder(json.JSONEncoder):
             return o.__name__
         elif issubclass(type(o), CamelModel):
             return o.dict()
-        try:
-            iterable = iter(o)
-            return list(iterable)
-        except TypeError:
-            pass
-
         fns = {
             fn_name
             for (fn_name, _) in inspect.getmembers(type(o), predicate=inspect.isfunction)
         }
         if "__str__" in fns or "__repr__" in fns:
             return str(o)
+        elif isinstance(o, Iterable) and not isinstance(o, str):
+            return list(o)
 
         return vars(o)
 
