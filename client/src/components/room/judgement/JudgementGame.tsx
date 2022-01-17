@@ -42,16 +42,23 @@ const JudgementGame = ({ game, socket }: Props & WithGameSocketProps) => {
       {game.phase === 'BIDDING' && (
         <Typography.Paragraph>
           <Space direction="vertical">
-            <InputNumber
-              value={bidAmount || undefined}
-              min={0}
-              onChange={(bid) => {
-                setBidAmount(bid);
-              }}
-            />
-            <Button disabled={bidAmount === null} onClick={bidHands}>
-              Bid hands
-            </Button>
+            <Space direction="horizontal" size="large">
+              {game.playerState.hand.map((value, index) => (
+                <span key={index}>{value.suit + value.rank}</span>
+              ))}
+            </Space>
+            <Space direction="horizontal">
+              <InputNumber
+                value={bidAmount || undefined}
+                min={0}
+                onChange={(bid) => {
+                  setBidAmount(bid);
+                }}
+              />
+              <Button disabled={bidAmount === null} onClick={bidHands}>
+                Bid hands
+              </Button>
+            </Space>
           </Space>
         </Typography.Paragraph>
       )}
