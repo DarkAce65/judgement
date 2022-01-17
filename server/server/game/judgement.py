@@ -27,6 +27,7 @@ class JudgementGame(Game[JudgementAction]):
 
     decks: Decks
     pile: list[Card]
+    discard_pile: list[Card]
 
     current_round: int
     current_trick: int
@@ -42,6 +43,7 @@ class JudgementGame(Game[JudgementAction]):
 
         self.decks = Decks()
         self.pile = []
+        self.discard_pile = []
 
         self.current_round = 0
         self.current_trick = 0
@@ -153,18 +155,22 @@ class JudgementGame(Game[JudgementAction]):
     async def start_round(self) -> None:
         self.current_trick = 0
         self.current_turn = 0
+        self.decks.replace(self.discard_pile)
         self.pile = []
+        self.discard_pile = []
         self.phase = JudgementPhase.BIDDING
         for player_state in self.player_states.values():
             player_state.current_bid = None
             player_state.current_hands = 0
 
+        self.decks.shuffle()
         self.deal()
 
         await socket_messager.emit_game_state(self)
 
     def start_trick(self) -> None:
         self.current_turn = 0
+        self.discard_pile.extend(self.pile)
         self.pile = []
 
     async def end_trick(self) -> None:
