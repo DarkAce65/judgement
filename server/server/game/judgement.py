@@ -183,14 +183,14 @@ class JudgementGame(Game[JudgementAction]):
         self.player_states[player_id].hand.remove(card)
         self.pile.append(card)
 
-        if self.current_turn < len(self.player_order) - 1:
-            self.current_turn += 1
+        if len(self.pile) < len(self.player_order):
+            self.current_turn = (self.current_turn + 1) % len(self.player_order)
         else:
             await self.end_trick()
 
     async def start_round(self) -> None:
         self.current_trick = 0
-        self.current_turn = 0
+        self.current_turn = self.current_round % len(self.player_order)
         self.decks.replace(self.discard_pile)
         self.pile = []
         self.discard_pile = []
@@ -204,21 +204,20 @@ class JudgementGame(Game[JudgementAction]):
 
         await socket_messager.emit_game_state(self)
 
-    def start_trick(self) -> None:
-        self.current_turn = 0
+    def start_trick(self, start_player_index: int = 0) -> None:
+        self.current_turn = start_player_index
         self.discard_pile.extend(self.pile)
         self.pile = []
 
     async def end_trick(self) -> None:
-        winning_player_id = self.player_order[
-            compute_winning_card(self.pile, self.get_trump())
-        ]
+        winning_player_index = compute_winning_card(self.pile, self.get_trump())
+        winning_player_id = self.player_order[winning_player_index]
         self.player_states[winning_player_id].current_hands += 1
 
         tricks_left = self.get_num_tricks_for_round() - self.current_trick - 1
         if tricks_left > 0:
             self.current_trick += 1
-            self.start_trick()
+            self.start_trick(winning_player_index)
         else:
             await self.end_round()
 
