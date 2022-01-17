@@ -38,7 +38,7 @@ class JudgementGame(Game[JudgementAction]):
         super().__init__(JudgementAction, room_id)
 
         self.phase = JudgementPhase.NOT_STARTED
-        self.settings = JudgementSettings()
+        self.settings = JudgementSettings(num_decks=1, num_rounds=1)
 
         self.decks = Decks()
         self.pile = []
@@ -72,7 +72,9 @@ class JudgementGame(Game[JudgementAction]):
 
     def add_player(self, player_id: str) -> None:
         super().add_player(player_id)
-        self.player_states[player_id] = JudgementPlayerState()
+        self.player_states[player_id] = JudgementPlayerState(
+            score=0, current_hands=0, hand=[]
+        )
 
     def remove_player(self, player_id: str) -> None:
         raise NotImplementedError("Cannot remove a player from this game")

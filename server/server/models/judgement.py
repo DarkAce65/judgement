@@ -71,16 +71,16 @@ class JudgementPlayCardAction(JudgementAction, action_type=JudgementActionType.P
 
 
 class JudgementPlayerState(CamelModel):
-    score: int = 0
-    current_hands: int = 0
+    score: int
+    current_hands: int
     current_bid: Optional[int] = None
 
-    hand: list[Card] = []
+    hand: list[Card]
 
 
 class JudgementSettings(CamelModel):
-    num_decks: int = 1
-    num_rounds: int = 5
+    num_decks: int
+    num_rounds: int
 
 
 class JudgementGameState(GameState):
