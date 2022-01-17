@@ -92,4 +92,4 @@ class JudgementGameState(GameState):
     current_round: int
     current_trick: int
     current_turn: int
-    player_states: dict[str, JudgementPlayerState]
+    player_state: JudgementPlayerState

@@ -59,7 +59,7 @@ class JudgementGame(Game[JudgementAction]):
             current_round=self.current_round,
             current_trick=self.current_trick,
             current_turn=self.current_turn,
-            player_states=self.player_states,
+            player_state=self.player_states[player_id],
             full_state_do_not_use=dump_class(self),
         )
 
