@@ -24,6 +24,29 @@ logger = logging.getLogger(__name__)
 TRUMP_ORDER = [Suit.SPADES, Suit.DIAMONDS, Suit.CLUBS, Suit.HEARTS]
 
 
+def compute_winning_card(pile: list[Card], trump_suit: Suit) -> int:
+    if len(pile) == 0:
+        raise ValueError("Can't find the winner of an empty pile!")
+
+    winning_index = 0
+    trick_suit = pile[0].suit
+    for index, card in enumerate(pile[1:]):
+        if (
+            card.suit == trick_suit
+            and pile[winning_index].suit != trump_suit
+            and card.compare_rank(pile[winning_index]) > 0
+        ):
+            winning_index = index + 1
+        elif card.suit == trump_suit:
+            if (
+                pile[winning_index].suit != trump_suit
+                or card.compare_rank(pile[winning_index]) > 0
+            ):
+                winning_index = index + 1
+
+    return winning_index
+
+
 class JudgementGame(Game[JudgementAction]):
     phase: JudgementPhase
     settings: JudgementSettings
@@ -182,25 +205,10 @@ class JudgementGame(Game[JudgementAction]):
         self.discard_pile.extend(self.pile)
         self.pile = []
 
-    def compute_winning_card(self) -> int:
-        winning_index = 0
-        trick_suit = self.pile[0].suit
-        trump_suit = self.get_trump()
-        for index, card in enumerate(self.pile[1:]):
-            if card.suit == trick_suit:
-                if card.compare_rank(self.pile[winning_index]) > 0:
-                    winning_index = index + 1
-            elif card.suit == trump_suit:
-                if self.pile[winning_index].suit == trump_suit:
-                    if card.compare_rank(self.pile[winning_index]) > 0:
-                        winning_index = index + 1
-                else:
-                    winning_index = index + 1
-
-        return winning_index
-
     async def end_trick(self) -> None:
-        winning_player_id = self.player_order[self.compute_winning_card()]
+        winning_player_id = self.player_order[
+            compute_winning_card(self.pile, self.get_trump())
+        ]
         self.player_states[winning_player_id].current_hands += 1
 
         tricks_left = self.get_num_tricks_for_round() - self.current_trick - 1
