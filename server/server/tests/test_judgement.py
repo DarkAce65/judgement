@@ -112,3 +112,85 @@ class TestJudgement(TestCase):
             Card(suit=Suit.SPADES, rank=2),
         ]
         self.assertEqual(compute_winning_card(pile, Suit.SPADES), 3)
+
+    def test_computing_winning_card_with_first_duplicate_wins(self) -> None:
+        pile = [
+            Card(suit=Suit.SPADES, rank=4),
+            Card(suit=Suit.SPADES, rank=6),
+            Card(suit=Suit.SPADES, rank=5),
+            Card(suit=Suit.SPADES, rank=6),
+        ]
+        self.assertEqual(compute_winning_card(pile, Suit.SPADES, False), 1)
+
+        pile = [
+            Card(suit=Suit.SPADES, rank=4),
+            Card(suit=Suit.SPADES, rank=6),
+            Card(suit=Suit.SPADES, rank=1),
+            Card(suit=Suit.SPADES, rank=1),
+        ]
+        self.assertEqual(compute_winning_card(pile, Suit.SPADES, False), 2)
+
+        pile = [
+            Card(suit=Suit.HEARTS, rank=4),
+            Card(suit=Suit.HEARTS, rank=6),
+            Card(suit=Suit.HEARTS, rank=5),
+            Card(suit=Suit.HEARTS, rank=6),
+        ]
+        self.assertEqual(compute_winning_card(pile, Suit.SPADES, False), 1)
+
+        pile = [
+            Card(suit=Suit.HEARTS, rank=4),
+            Card(suit=Suit.HEARTS, rank=6),
+            Card(suit=Suit.HEARTS, rank=1),
+            Card(suit=Suit.HEARTS, rank=1),
+        ]
+        self.assertEqual(compute_winning_card(pile, Suit.SPADES, False), 2)
+
+    def test_computing_winning_card_with_last_duplicate_wins(self) -> None:
+        pile = [
+            Card(suit=Suit.SPADES, rank=4),
+            Card(suit=Suit.SPADES, rank=6),
+            Card(suit=Suit.SPADES, rank=5),
+            Card(suit=Suit.SPADES, rank=6),
+        ]
+        self.assertEqual(compute_winning_card(pile, Suit.SPADES, True), 3)
+
+        pile = [
+            Card(suit=Suit.SPADES, rank=4),
+            Card(suit=Suit.SPADES, rank=6),
+            Card(suit=Suit.SPADES, rank=1),
+            Card(suit=Suit.SPADES, rank=1),
+        ]
+        self.assertEqual(compute_winning_card(pile, Suit.SPADES, True), 3)
+
+        pile = [
+            Card(suit=Suit.HEARTS, rank=4),
+            Card(suit=Suit.HEARTS, rank=6),
+            Card(suit=Suit.HEARTS, rank=5),
+            Card(suit=Suit.HEARTS, rank=6),
+        ]
+        self.assertEqual(compute_winning_card(pile, Suit.SPADES, True), 3)
+
+        pile = [
+            Card(suit=Suit.HEARTS, rank=4),
+            Card(suit=Suit.HEARTS, rank=6),
+            Card(suit=Suit.HEARTS, rank=1),
+            Card(suit=Suit.HEARTS, rank=1),
+        ]
+        self.assertEqual(compute_winning_card(pile, Suit.SPADES, True), 3)
+
+        pile = [
+            Card(suit=Suit.HEARTS, rank=4),
+            Card(suit=Suit.SPADES, rank=6),
+            Card(suit=Suit.HEARTS, rank=5),
+            Card(suit=Suit.SPADES, rank=6),
+        ]
+        self.assertEqual(compute_winning_card(pile, Suit.SPADES, True), 3)
+
+        pile = [
+            Card(suit=Suit.HEARTS, rank=4),
+            Card(suit=Suit.SPADES, rank=6),
+            Card(suit=Suit.HEARTS, rank=1),
+            Card(suit=Suit.SPADES, rank=6),
+        ]
+        self.assertEqual(compute_winning_card(pile, Suit.SPADES, True), 3)

@@ -24,14 +24,18 @@ logger = logging.getLogger(__name__)
 TRUMP_ORDER = [Suit.SPADES, Suit.DIAMONDS, Suit.CLUBS, Suit.HEARTS]
 
 
-def compute_winning_card(pile: list[Card], trump_suit: Suit) -> int:
+def compute_winning_card(
+    pile: list[Card], trump_suit: Suit, last_duplicate_wins: bool = False
+) -> int:
     if len(pile) == 0:
         raise ValueError("Can't find the winner of an empty pile!")
 
     winning_index = 0
     trick_suit = pile[0].suit
     for index, card in enumerate(pile[1:]):
-        if (
+        if card == pile[winning_index] and last_duplicate_wins:
+            winning_index = index + 1
+        elif (
             card.suit == trick_suit
             and pile[winning_index].suit != trump_suit
             and card.compare_rank(pile[winning_index]) > 0
