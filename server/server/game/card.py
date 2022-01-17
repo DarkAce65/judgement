@@ -20,6 +20,12 @@ class Card(BaseModel):
     class Config:
         frozen = True
 
+    def compare_rank(self, other: Card, ace_high: bool = True) -> int:
+        rank1 = 14 if ace_high and self.rank == 1 else self.rank
+        rank2 = 14 if ace_high and other.rank == 1 else other.rank
+
+        return rank1 - rank2
+
     @staticmethod
     def from_str(card_string: str) -> Card:
         if len(card_string) < 2 or 3 < len(card_string):
