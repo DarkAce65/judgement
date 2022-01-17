@@ -12,6 +12,7 @@ from server.models.judgement import (
     JudgementSettings,
     JudgementUpdateSettingsAction,
 )
+from server.utils.debug_encoder import dump_class
 
 from .card import Card
 from .core import Game, GameError
@@ -59,6 +60,7 @@ class JudgementGame(Game[JudgementAction]):
             current_trick=self.current_trick,
             current_turn=self.current_turn,
             player_states=self.player_states,
+            full_state_do_not_use=dump_class(self),
         )
 
     async def start_game(self) -> None:

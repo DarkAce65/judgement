@@ -1,6 +1,7 @@
 import uuid
 from abc import ABC
 from enum import Enum, unique
+from typing import Any
 
 from .camel_model import CamelModel
 
@@ -29,3 +30,5 @@ class GamePlayer:
 class GameState(CamelModel, ABC):
     game_name: GameName
     status: GameStatus
+
+    full_state_do_not_use: dict[str, Any]
