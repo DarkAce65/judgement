@@ -108,6 +108,10 @@ class JudgementGame(Game[JudgementAction]):
             score=0, current_hands=0, hand=[]
         )
 
+        max_rounds = math.ceil(self.settings.num_decks * 52 / len(self.player_order))
+        if self.settings.num_rounds > max_rounds:
+            self.settings.num_rounds = max_rounds
+
     def remove_player(self, player_id: str) -> None:
         if self.status != GameStatus.NOT_STARTED:
             raise NotImplementedError("Cannot remove a player from this game")
