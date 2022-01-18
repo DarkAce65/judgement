@@ -116,6 +116,7 @@ class JudgementGame(Game[JudgementAction]):
         if self.status != GameStatus.NOT_STARTED:
             raise NotImplementedError("Cannot remove a player from this game")
 
+        super().remove_player(player_id)
         del self.player_states[player_id]
 
     async def process_input(self, player_id: str, game_input: JudgementAction) -> None:
