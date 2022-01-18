@@ -1,4 +1,5 @@
 import logging
+import math
 
 from server.data import socket_messager
 from server.models.game import GameName, GameStatus
@@ -69,7 +70,7 @@ class JudgementGame(Game[JudgementAction]):
         super().__init__(JudgementAction, room_id)
 
         self.phase = JudgementPhase.NOT_STARTED
-        self.settings = JudgementSettings(num_decks=1, num_rounds=1)
+        self.settings = JudgementSettings(num_decks=1, num_rounds=13)
 
         self.decks = Decks()
         self.pile = []
