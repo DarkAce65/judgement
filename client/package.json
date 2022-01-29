@@ -6,7 +6,7 @@
     "prepare": "cd .. && husky install client/.husky",
     "eslint:fix": "eslint --fix \"*.config.js\" \"src/**/*.{ts,tsx}\"",
     "prettier:write": "prettier --write .eslintrc.js \"*.config.js\" tsconfig.json \"public/**/*.html\" \"src/**/*.{ts,tsx,css,less}\"",
-    "start": "nodemon -w craco.config.js -w ./src/antd.customize.less --exec \"craco start\"",
+    "start": "nodemon -w craco.config.js -w ./src/antd.customize.less --exec \"BROWSER=none craco start\"",
     "build": "craco build",
     "test": "craco test"
   },
