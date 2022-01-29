@@ -1,5 +1,5 @@
 from enum import Enum, unique
-from typing import Optional
+from typing import Mapping, Optional
 
 from server.game.core import Game
 
@@ -54,5 +54,5 @@ class Room:
 
         return room
 
-    def get_game_state(self, player_id: str) -> Optional[GameState]:
-        return None if self.game is None else self.game.build_game_state(player_id)
+    def get_game_states(self, player_ids: set[str]) -> Optional[Mapping[str, GameState]]:
+        return None if self.game is None else self.game.build_game_states(player_ids)

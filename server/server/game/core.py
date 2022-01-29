@@ -1,6 +1,6 @@
 import logging
 from abc import ABC, abstractmethod
-from typing import Any, Generic, Type, TypeVar
+from typing import Any, Generic, Mapping, Type, TypeVar
 
 from pydantic import BaseModel, ValidationError, parse_obj_as
 
@@ -41,7 +41,7 @@ class Game(Generic[Action], ABC):
         self.player_order = []
 
     @abstractmethod
-    def build_game_state(self, player_id: str) -> GameState:
+    def build_game_states(self, player_ids: set[str]) -> Mapping[str, GameState]:
         ...
 
     def convert_local_id(self, local_player_id: str) -> str:

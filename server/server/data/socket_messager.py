@@ -23,6 +23,8 @@ async def emit_error(error: GameError, recipient: str) -> None:
 
 async def emit_room(room: Room) -> None:
     player_names = [player.name or "" for player in room.players]
+    game_states = room.get_game_states({player.player_id for player in room.players})
+
     for player in room.players:
         await sio.emit(
             "room",
@@ -30,34 +32,37 @@ async def emit_room(room: Room) -> None:
                 state=room.room_state,
                 players=player_names,
                 game_name=room.game_name,
-                game=cast(
-                    Optional[ConcreteGameState], room.get_game_state(player.player_id)
-                ),
+                game=None
+                if game_states is None
+                else cast(ConcreteGameState, game_states[player.player_id]),
             ).dict(by_alias=True),
             to=player.player_id,
         )
 
 
 async def emit_room_to_player(room: Room, player_id: str) -> None:
+    game_states = room.get_game_states(set([player_id]))
+    game_state = None if game_states is None else game_states[player_id]
     await sio.emit(
         "room",
         RoomMessage(
             state=room.room_state,
             players=[player.name or "" for player in room.players],
             game_name=room.game_name,
-            game=cast(Optional[ConcreteGameState], room.get_game_state(player_id)),
+            game=cast(Optional[ConcreteGameState], game_state),
         ).dict(by_alias=True),
         to=player_id,
     )
 
 
 async def emit_game_state(game: Game) -> None:
+    game_states = game.build_game_states(set(game.players.keys()))
     for player_id in game.players.keys():
         await sio.emit(
             "game_state",
-            GameStateMessage(
-                state=cast(ConcreteGameState, game.build_game_state(player_id))
-            ).dict(by_alias=True),
+            GameStateMessage(state=cast(ConcreteGameState, game_states[player_id])).dict(
+                by_alias=True
+            ),
             to=player_id,
         )
 

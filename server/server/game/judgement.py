@@ -1,5 +1,6 @@
 import logging
 import math
+from typing import Mapping
 
 from server.data import socket_messager
 from server.models.game import GameName, GameStatus
@@ -82,19 +83,22 @@ class JudgementGame(Game[JudgementAction]):
 
         self.player_states = {}
 
-    def build_game_state(self, player_id: str) -> JudgementGameState:
-        return JudgementGameState(
-            game_name=GameName.JUDGEMENT,
-            status=self.status,
-            settings=self.settings,
-            phase=self.phase,
-            pile=self.pile,
-            current_round=self.current_round,
-            current_trick=self.current_trick,
-            current_turn=self.current_turn,
-            player_state=self.player_states[player_id],
-            full_state_do_not_use=dump_class(self),
-        )
+    def build_game_states(self, player_ids: set[str]) -> Mapping[str, JudgementGameState]:
+        return {
+            player_id: JudgementGameState(
+                game_name=GameName.JUDGEMENT,
+                status=self.status,
+                settings=self.settings,
+                phase=self.phase,
+                pile=self.pile,
+                current_round=self.current_round,
+                current_trick=self.current_trick,
+                current_turn=self.current_turn,
+                player_state=self.player_states[player_id],
+                full_state_do_not_use=dump_class(self),
+            )
+            for player_id in player_ids
+        }
 
     async def start_game(self) -> None:
         await super().start_game()
