@@ -104,12 +104,16 @@ const Room = ({ roomId, socket, namespace }: Props & WithGameSocketProps) => {
       {players.map((player, index) => (
         <Typography.Paragraph key={index}>{player}</Typography.Paragraph>
       ))}
-      <Typography.Paragraph>
-        <Space direction="horizontal">
+      {!game && (
+        <Typography.Paragraph>
           <Button onClick={handleGameInit}>Init game</Button>
+        </Typography.Paragraph>
+      )}
+      {game && game.status === 'NOT_STARTED' && (
+        <Typography.Paragraph>
           <Button onClick={handleGameStart}>Start game</Button>
-        </Space>
-      </Typography.Paragraph>
+        </Typography.Paragraph>
+      )}
       {renderedGame}
       <Typography.Paragraph>
         <Space direction="vertical" style={{ width: '100%' }}>
