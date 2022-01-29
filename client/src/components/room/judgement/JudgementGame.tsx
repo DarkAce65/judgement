@@ -65,6 +65,12 @@ const JudgementGame = ({ game, socket }: Props & WithGameSocketProps) => {
       {game.phase === 'PLAYING' && (
         <Typography.Paragraph>
           <Space direction="vertical">
+            <Space direction="horizontal" size="large">
+              Pile:
+              {game.pile.map((value, index) => (
+                <span key={index}>{value.suit + value.rank}</span>
+              ))}
+            </Space>
             <Radio.Group
               value={selectedCard}
               onChange={(evt) => {
