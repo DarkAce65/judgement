@@ -245,8 +245,6 @@ class JudgementGame(Game[JudgementAction]):
             self.current_round += 1
             await self.start_round()
         else:
-            # TODO: Handle end game
-            logger.info("Game complete")
             self.status = GameStatus.COMPLETE
 
         await socket_messager.emit_game_state(self)
