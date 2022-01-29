@@ -87,7 +87,7 @@ class GameSocket {
     resetConnectionAttempts?: () => void
   ): Socket {
     const socket = buildSocket({
-      auth: (auth) => auth({ player_id: Cookies.get(PLAYER_ID_COOKIE) }),
+      auth: (auth) => auth({ player_auth_id: Cookies.get(PLAYER_ID_COOKIE) }),
       autoConnect: false,
     });
     this.socket = socket;

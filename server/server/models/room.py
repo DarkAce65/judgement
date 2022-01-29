@@ -54,5 +54,5 @@ class Room:
 
         return room
 
-    def get_game_states(self, player_ids: set[str]) -> Optional[Mapping[str, GameState]]:
+    def get_game_states(self, player_ids: set[int]) -> Optional[Mapping[int, GameState]]:
         return None if self.game is None else self.game.build_game_states(player_ids)

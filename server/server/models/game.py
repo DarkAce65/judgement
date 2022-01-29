@@ -1,4 +1,3 @@
-import uuid
 from abc import ABC
 from enum import Enum, unique
 from typing import Any
@@ -19,12 +18,10 @@ class GameStatus(str, Enum):
 
 
 class GamePlayer:
-    player_id: str
-    local_player_id: str
+    player_id: int
 
-    def __init__(self, player_id: str) -> None:
+    def __init__(self, player_id: int) -> None:
         self.player_id = player_id
-        self.local_player_id = str(uuid.uuid4())
 
 
 class GameState(CamelModel, ABC):

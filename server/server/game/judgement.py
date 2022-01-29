@@ -65,7 +65,7 @@ class JudgementGame(Game[JudgementAction]):
     current_trick: int
     current_turn: int
 
-    player_states: dict[str, JudgementPlayerState]
+    player_states: dict[int, JudgementPlayerState]
 
     def __init__(self, room_id: str) -> None:
         super().__init__(JudgementAction, room_id)
@@ -83,7 +83,7 @@ class JudgementGame(Game[JudgementAction]):
 
         self.player_states = {}
 
-    def build_game_states(self, player_ids: set[str]) -> Mapping[str, JudgementGameState]:
+    def build_game_states(self, player_ids: set[int]) -> Mapping[int, JudgementGameState]:
         return {
             player_id: JudgementGameState(
                 game_name=GameName.JUDGEMENT,
@@ -107,7 +107,7 @@ class JudgementGame(Game[JudgementAction]):
 
         await self.start_round()
 
-    def add_player(self, player_id: str) -> None:
+    def add_player(self, player_id: int) -> None:
         super().add_player(player_id)
         self.player_states[player_id] = JudgementPlayerState(
             score=0, current_hands=0, hand=[]
@@ -117,14 +117,14 @@ class JudgementGame(Game[JudgementAction]):
         if self.settings.num_rounds > max_rounds:
             self.settings.num_rounds = max_rounds
 
-    def remove_player(self, player_id: str) -> None:
+    def remove_player(self, player_id: int) -> None:
         if self.status != GameStatus.NOT_STARTED:
             raise NotImplementedError("Cannot remove a player from this game")
 
         super().remove_player(player_id)
         del self.player_states[player_id]
 
-    async def process_input(self, player_id: str, game_input: JudgementAction) -> None:
+    async def process_input(self, player_id: int, game_input: JudgementAction) -> None:
         logger.debug("player_id: %s, action: %s", player_id, repr(game_input))
 
         if isinstance(game_input, JudgementUpdateSettingsAction):
@@ -151,7 +151,7 @@ class JudgementGame(Game[JudgementAction]):
         if self.phase != phase:
             raise GameError("You can't do that right now!")
 
-    def assert_turn(self, player_id: str) -> None:
+    def assert_turn(self, player_id: int) -> None:
         if self.player_order[self.current_turn] != player_id:
             raise GameError("It is not your turn!")
 
@@ -168,7 +168,7 @@ class JudgementGame(Game[JudgementAction]):
             player_state.hand.extend(self.decks.draw(num_cards_to_deal))
 
     async def handle_bid_action(
-        self, player_id: str, action: JudgementBidHandsAction
+        self, player_id: int, action: JudgementBidHandsAction
     ) -> None:
         self.assert_phase(JudgementPhase.BIDDING)
         self.assert_turn(player_id)
@@ -181,7 +181,7 @@ class JudgementGame(Game[JudgementAction]):
             self.start_trick()
 
     async def handle_play_card_action(
-        self, player_id: str, action: JudgementPlayCardAction
+        self, player_id: int, action: JudgementPlayCardAction
     ) -> None:
         self.assert_phase(JudgementPhase.PLAYING)
         self.assert_turn(player_id)

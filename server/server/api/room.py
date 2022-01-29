@@ -35,10 +35,12 @@ async def join_room(
     request: EnsurePlayerRequest,
     response: Response,
     room_id: str = Path(..., alias="room_id"),
-    player_id: Optional[str] = Cookie(None, alias="player_id"),
+    player_auth_id: Optional[str] = Cookie(None, alias="player_auth_id"),
 ) -> None:
     if not room_manager.room_exists(room_id):
         raise HTTPException(status_code=404, detail="Room not found")
 
-    player = await ensure_player_and_set_cookie(response, player_id, request.player_name)
+    player = await ensure_player_and_set_cookie(
+        response, player_auth_id, request.player_name
+    )
     room_manager.add_player_to_room(player.player_id, room_id)

@@ -27,13 +27,13 @@ def set_client_room(client_id: str, room_id: Optional[str]) -> None:
     )
 
 
-def get_player_id_for_client(client_id: str) -> str:
+def get_player_id_for_client(client_id: str) -> int:
     cur = db.get_cursor()
     cur.execute(
         "SELECT player_id FROM client_player_room WHERE client_id = %s", (client_id,)
     )
 
-    result = cast(Optional[tuple[str]], cur.fetchone())
+    result = cast(Optional[tuple[int]], cur.fetchone())
     if result is None:
         raise ValueError(f"Invalid client id: {client_id}")
 
@@ -41,7 +41,7 @@ def get_player_id_for_client(client_id: str) -> str:
     return player_id
 
 
-def get_client_ids_for_player(player_id: str) -> set[str]:
+def get_client_ids_for_player(player_id: int) -> set[str]:
     if not player_manager.player_exists(player_id):
         raise ValueError(f"Invalid player id: {player_id}")
 
@@ -53,7 +53,7 @@ def get_client_ids_for_player(player_id: str) -> set[str]:
     return {client_id for (client_id,) in results}
 
 
-def get_client_ids_for_players(player_ids: set[str]) -> set[str]:
+def get_client_ids_for_players(player_ids: set[int]) -> set[str]:
     cur = db.get_cursor()
     cur.execute(
         "SELECT client_id FROM client_player_room WHERE player_id = ANY(%s)",
@@ -63,16 +63,16 @@ def get_client_ids_for_players(player_ids: set[str]) -> set[str]:
     return {client_id for (client_id,) in results}
 
 
-def connect_player_client(player_id: str, client_id: str) -> None:
+def connect_player_client(player_id: int, client_id: str) -> None:
     cur = db.get_cursor()
     cur.execute(
         "INSERT INTO client_player_room(client_id, player_id) VALUES(%s, %s)",
         (client_id, player_id),
     )
-    sio.enter_room(client_id, player_id)
+    sio.enter_room(client_id, str(player_id))
 
 
-async def propagate_name_change(player_id: str) -> None:
+async def propagate_name_change(player_id: int) -> None:
     cur = db.get_cursor()
     cur.execute(
         "SELECT DISTINCT room_id FROM client_player_room "

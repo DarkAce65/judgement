@@ -1,19 +1,38 @@
 import uuid
 from typing import Collection, Optional, Tuple, cast
 
-from server.models.player import Player
+from server.models.player import Player, PlayerWithAuth
 
 from . import db
 
 
-def player_exists(player_id: str) -> bool:
+def player_exists_for_auth(player_auth_id: str) -> bool:
+    cur = db.get_cursor()
+    cur.execute("SELECT 1 FROM players WHERE auth_id = %s", (player_auth_id,))
+
+    return cur.fetchone() is not None
+
+
+def get_player_with_auth(player_auth_id: str) -> PlayerWithAuth:
+    cur = db.get_cursor()
+    cur.execute("SELECT id, name FROM players WHERE auth_id = %s", (player_auth_id,))
+    result = cast(Optional[tuple[int, str]], cur.fetchone())
+
+    if result is None:
+        raise ValueError(f"Invalid player_auth_id: {player_auth_id}")
+
+    (player_id, player_name) = result
+    return PlayerWithAuth(player_id, player_name, player_auth_id)
+
+
+def player_exists(player_id: int) -> bool:
     cur = db.get_cursor()
     cur.execute("SELECT 1 FROM players WHERE id = %s", (player_id,))
 
     return cur.fetchone() is not None
 
 
-def get_player(player_id: str) -> Player:
+def get_player(player_id: int) -> Player:
     cur = db.get_cursor()
     cur.execute("SELECT name FROM players WHERE id = %s", (player_id,))
     result = cast(Optional[tuple[str]], cur.fetchone())
@@ -26,19 +45,19 @@ def get_player(player_id: str) -> Player:
     return Player(player_id, player_name)
 
 
-def get_players(player_ids: Collection[str]) -> dict[str, Player]:
+def get_players(player_ids: Collection[int]) -> dict[int, Player]:
     cur = db.get_cursor()
     cur.execute("SELECT id, name FROM players WHERE id = ANY(%s)", (list(player_ids),))
 
-    results = cast(list[tuple[str, str]], cur.fetchall())
-    players: dict[str, Player] = {}
+    results = cast(list[tuple[int, str]], cur.fetchall())
+    players: dict[int, Player] = {}
     for (player_id, player_name) in results:
         players[player_id] = Player(player_id, player_name)
 
     return players
 
 
-def get_player_ids_for_room(room_id: str) -> list[str]:
+def get_player_ids_for_room(room_id: str) -> list[int]:
     cur = db.get_cursor()
     cur.execute(
         "SELECT players.id FROM players "
@@ -49,8 +68,8 @@ def get_player_ids_for_room(room_id: str) -> list[str]:
         (room_id,),
     )
 
-    results = cast(list[tuple[str]], cur.fetchall())
-    player_ids: list[str] = []
+    results = cast(list[tuple[int]], cur.fetchall())
+    player_ids: list[int] = []
     for (player_id,) in results:
         player_ids.append(player_id)
 
@@ -68,7 +87,7 @@ def get_players_for_room(room_id: str) -> list[Player]:
         (room_id,),
     )
 
-    results = cast(list[tuple[str, str]], cur.fetchall())
+    results = cast(list[tuple[int, str]], cur.fetchall())
     players: list[Player] = []
     for (player_id, player_name) in results:
         players.append(Player(player_id, player_name))
@@ -76,33 +95,35 @@ def get_players_for_room(room_id: str) -> list[Player]:
     return players
 
 
-def create_player(player_name: Optional[str]) -> Player:
-    player = Player(str(uuid.uuid4()), player_name)
-
+def create_player(player_name: Optional[str]) -> PlayerWithAuth:
+    player_auth_id = str(uuid.uuid4())
     cur = db.get_cursor()
     cur.execute(
-        "INSERT INTO players(id, name) VALUES(%s, %s)", (player.player_id, player.name)
+        "INSERT INTO players(auth_id, name) VALUES(%s, %s) RETURNING id",
+        (player_auth_id, player_name),
     )
+    result = cast(tuple[int], cur.fetchone())
+    player = PlayerWithAuth(result[0], player_name, player_auth_id)
 
     return player
 
 
-def set_player_name(player_id: str, player_name: Optional[str]) -> None:
+def set_player_name(player_id: int, player_name: Optional[str]) -> None:
     cur = db.get_cursor()
     cur.execute("UPDATE players SET name=%s WHERE id = %s", (player_name, player_id))
 
 
 def ensure_player_with_name(
-    player_id: Optional[str] = None, player_name: Optional[str] = None
-) -> Tuple[Player, bool]:
+    player_auth_id: Optional[str] = None, player_name: Optional[str] = None
+) -> Tuple[PlayerWithAuth, bool]:
     should_propagate_name_change = False
-    if player_id is None or not player_exists(player_id):
+    if player_auth_id is None or not player_exists_for_auth(player_auth_id):
         player = create_player(player_name)
     else:
-        player = get_player(player_id)
-        if player.name != player_name:
-            set_player_name(player_id, player_name)
-            player = get_player(player_id)
+        player = get_player_with_auth(player_auth_id)
+        if player_name is not None and player.name != player_name:
+            set_player_name(player.player_id, player_name)
+            player.name = player_name
             should_propagate_name_change = True
 
     return (player, should_propagate_name_change)

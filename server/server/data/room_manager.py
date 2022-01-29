@@ -68,7 +68,7 @@ def delete_room(room_id: str) -> None:
         del games[room_id]
 
 
-def get_player_ids_in_room(room_id: str) -> list[str]:
+def get_player_ids_in_room(room_id: str) -> list[int]:
     cur = db.get_cursor()
     cur.execute(
         "SELECT player_id FROM room_players "
@@ -76,16 +76,16 @@ def get_player_ids_in_room(room_id: str) -> list[str]:
         "ORDER BY order_index DESC",
         (room_id,),
     )
-    results = cast(list[tuple[str]], cur.fetchall())
+    results = cast(list[tuple[int]], cur.fetchall())
     return [player_id for (player_id,) in results]
 
 
-def get_players_in_room(room_id: str) -> dict[str, Player]:
+def get_players_in_room(room_id: str) -> dict[int, Player]:
     player_ids = get_player_ids_in_room(room_id)
     return player_manager.get_players(player_ids)
 
 
-def add_player_to_room(player_id: str, room_id: str) -> None:
+def add_player_to_room(player_id: int, room_id: str) -> None:
     if not room_exists(room_id) or not player_manager.player_exists(player_id):
         raise ValueError(f"Invalid player id ({player_id}) or room id ({room_id})")
 
@@ -110,7 +110,7 @@ def add_player_to_room(player_id: str, room_id: str) -> None:
         games[room_id].add_player(player_id)
 
 
-def drop_player_from_room(player_id: str, room_id: str) -> None:
+def drop_player_from_room(player_id: int, room_id: str) -> None:
     if not room_exists(room_id) or not player_manager.player_exists(player_id):
         raise ValueError(f"Invalid player id ({player_id}) or room id ({room_id})")
 

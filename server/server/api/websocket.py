@@ -24,16 +24,9 @@ def require_player(socket_handler: Fn) -> Fn:
     @functools.wraps(socket_handler)
     async def wrapper(client_id: str, *args: Any, **kwargs: Any) -> None:
         session = await sio.get_session(client_id)
-        player_id = session["player_id"]
+        player_id = int(session["player_id"]) if "player_id" in session else None
 
-        try:
-            player_exists = (
-                False if player_id is None else player_manager.player_exists(player_id)
-            )
-        except ValueError:
-            player_exists = False
-
-        if not player_exists:
+        if player_id is None or not player_manager.player_exists(player_id):
             await sio.disconnect(client_id)
             return
 
@@ -73,13 +66,17 @@ def supply_room_id(socket_handler: Fn) -> Fn:
 
 @sio.on("connect")
 async def connect(client_id: str, _environ: dict, auth: dict) -> None:
-    player_id = None if auth is None else auth["player_id"]
-
-    if player_id is None or not player_manager.player_exists(player_id):
+    player_auth_id = None if auth is None else str(auth["player_auth_id"])
+    if player_auth_id is None:
         raise ConnectionRefusedError("unknown_player_id")
 
-    connection_manager.connect_player_client(player_id, client_id)
-    await sio.save_session(client_id, {"player_id": player_id})
+    try:
+        player = player_manager.get_player_with_auth(player_auth_id)
+    except ValueError as err:
+        raise ConnectionRefusedError("unknown_player_id") from err
+
+    connection_manager.connect_player_client(player.player_id, client_id)
+    await sio.save_session(client_id, {"player_id": player.player_id})
 
 
 @sio.on("get_room")
