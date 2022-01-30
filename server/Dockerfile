@@ -10,7 +10,6 @@ ENV PYTHONUNBUFFERED=1 \
 RUN apk add --no-cache \
   curl \
   gcc \
-  git \
   libc-dev \
   make \
   musl-dev \
