@@ -93,7 +93,7 @@ async def handle_get_room(_client_id: str, room_id: str, player: Player) -> None
 
 @sio.on("join_room")
 @require_player
-async def handle_join_room(client_id: str, room_id: str, player: Player) -> None:
+async def handle_join_room(client_id: str, room_id: str) -> None:
     connection_manager.add_player_client_to_room(client_id, room_id)
     room = room_manager.get_room(room_id)
     await socket_messager.emit_room(room)

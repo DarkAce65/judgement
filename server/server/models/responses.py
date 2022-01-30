@@ -9,7 +9,7 @@ class RoomIdResponse(CamelModel):
 
 
 class RoomResponse(RoomIdResponse):
-    room_state: RoomStatus = Field(title="The state of the room")
+    room_status: RoomStatus = Field(title="The state of the room")
     ordered_player_ids: list[int] = Field(title="The ids of the players in the room")
 
     @staticmethod
