@@ -3,7 +3,7 @@ from typing import Optional
 from .camel_model import CamelModel
 from .game import GameName
 from .judgement import JudgementGameState
-from .room import RoomState
+from .room import RoomStatus
 
 ConcreteGameState = JudgementGameState
 
@@ -13,7 +13,7 @@ class GameErrorMessage(CamelModel):
 
 
 class RoomMessage(CamelModel):
-    state: RoomState
+    status: RoomStatus
     players: list[str]
     game_name: Optional[GameName]
     game: Optional[ConcreteGameState]

@@ -29,7 +29,7 @@ async def emit_room(room: Room) -> None:
         await sio.emit(
             "room",
             RoomMessage(
-                state=room.room_state,
+                status=room.room_status,
                 players=player_names,
                 game_name=room.game_name,
                 game=None
@@ -46,7 +46,7 @@ async def emit_room_to_player(room: Room, player_id: int) -> None:
     await sio.emit(
         "room",
         RoomMessage(
-            state=room.room_state,
+            status=room.room_status,
             players=[player.name or "" for player in room.players],
             game_name=room.game_name,
             game=cast(Optional[ConcreteGameState], game_state),

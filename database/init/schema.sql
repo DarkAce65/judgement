@@ -8,7 +8,7 @@ CREATE TABLE players(
 
 CREATE TABLE rooms(
   id ROOM_ID PRIMARY KEY NOT NULL,
-  room_state VARCHAR(20) NOT NULL,
+  room_status VARCHAR(20) NOT NULL,
   game_name VARCHAR(20)
 );
 

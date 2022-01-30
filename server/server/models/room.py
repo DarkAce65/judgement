@@ -8,14 +8,14 @@ from .player import Player
 
 
 @unique
-class RoomState(str, Enum):
+class RoomStatus(str, Enum):
     LOBBY = "LOBBY"
     GAME = "GAME"
 
 
 class Room:
     room_id: str
-    room_state: RoomState
+    room_status: RoomStatus
     players: list[Player]
 
     game_name: Optional[GameName]
@@ -24,11 +24,11 @@ class Room:
     def __init__(
         self,
         room_id: str,
-        room_state: RoomState = RoomState.LOBBY,
+        room_status: RoomStatus = RoomStatus.LOBBY,
         players: Optional[list[Player]] = None,
     ) -> None:
         self.room_id = room_id
-        self.room_state = room_state
+        self.room_status = room_status
         self.players = players or []
 
         self.game_name = None
@@ -41,12 +41,12 @@ class Room:
     @staticmethod
     def from_db(
         room_id: str,
-        room_state: str,
+        room_status: str,
         players: list[Player],
         game_name: Optional[str],
         game: Optional[Game],
     ) -> "Room":
-        room = Room(room_id, RoomState(room_state), players)
+        room = Room(room_id, RoomStatus(room_status), players)
         if game_name is not None:
             room.game_name = GameName(game_name)
         if game is not None:

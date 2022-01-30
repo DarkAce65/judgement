@@ -16,14 +16,14 @@ import type { RootState } from './store';
 
 interface RoomState {
   roomId: string | null;
-  state: RoomMessage['state'];
+  roomStatus: RoomMessage['status'];
   players: string[];
   gameName: RoomMessage['gameName'];
 }
 
 const initialState: RoomState = {
   roomId: null,
-  state: 'LOBBY',
+  roomStatus: 'LOBBY',
   players: [],
   gameName: undefined,
 };
@@ -64,7 +64,7 @@ const roomSlice = createSlice({
   initialState,
   reducers: {
     loadRoomState(state, { payload }: PayloadAction<RoomMessage>) {
-      state.state = payload.state;
+      state.roomStatus = payload.status;
       state.players = payload.players;
       state.gameName = payload.gameName;
     },

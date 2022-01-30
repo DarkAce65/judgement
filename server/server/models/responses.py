@@ -1,7 +1,7 @@
 from pydantic import Field
 
 from .camel_model import CamelModel
-from .room import Room, RoomState
+from .room import Room, RoomStatus
 
 
 class RoomIdResponse(CamelModel):
@@ -9,13 +9,13 @@ class RoomIdResponse(CamelModel):
 
 
 class RoomResponse(RoomIdResponse):
-    room_state: RoomState = Field(title="The state of the room")
+    room_state: RoomStatus = Field(title="The state of the room")
     player_ids: list[int] = Field(title="The ids of the players in the room")
 
     @staticmethod
     def from_room(room: Room) -> "RoomResponse":
         return RoomResponse(
             room_id=room.room_id,
-            room_state=room.room_state,
+            room_status=room.room_status,
             player_ids=[player.player_id for player in room.players],
         )

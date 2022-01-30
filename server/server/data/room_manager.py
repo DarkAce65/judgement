@@ -6,7 +6,7 @@ from server.game.core import Game
 from server.game.judgement import JudgementGame
 from server.models.game import GameName
 from server.models.player import Player
-from server.models.room import Room, RoomState
+from server.models.room import Room, RoomStatus
 
 from . import ROOM_ID_LENGTH, db, player_manager
 
@@ -30,17 +30,17 @@ def get_game_for_room(room_id: str) -> Optional[Game]:
 
 def get_room(room_id: str) -> Room:
     cur = db.get_cursor()
-    cur.execute("SELECT id, room_state, game_name FROM rooms WHERE id = %s", (room_id,))
+    cur.execute("SELECT id, room_status, game_name FROM rooms WHERE id = %s", (room_id,))
     result = cast(Optional[tuple[str, str, Optional[str]]], cur.fetchone())
 
     if result is None:
         raise ValueError(f"Invalid room id: {room_id}")
 
-    room_id, room_state, game_name = result
+    room_id, room_status, game_name = result
     players = player_manager.get_players_for_room(room_id)
     game = get_game_for_room(room_id)
 
-    return Room.from_db(room_id, room_state, players, game_name, game)
+    return Room.from_db(room_id, room_status, players, game_name, game)
 
 
 def create_room() -> str:
@@ -53,8 +53,8 @@ def create_room() -> str:
     room = Room.new(room_id)
 
     cur.execute(
-        "INSERT INTO rooms(id, room_state) VALUES(%s, %s)",
-        (room.room_id, room.room_state),
+        "INSERT INTO rooms(id, room_status) VALUES(%s, %s)",
+        (room.room_id, room.room_status),
     )
 
     return room.room_id
@@ -130,11 +130,11 @@ def drop_player_from_room(player_id: int, room_id: str) -> None:
 def set_game(room_id: str, game_name: GameName) -> None:
     cur = db.get_cursor()
 
-    cur.execute("SELECT room_state FROM rooms WHERE id = %s", (room_id,))
+    cur.execute("SELECT room_status FROM rooms WHERE id = %s", (room_id,))
     result = cast(Optional[tuple[str]], cur.fetchone())
     if result is None:
         raise ValueError(f"Invalid room id ({room_id})")
-    if RoomState(result[0]) != RoomState.LOBBY:
+    if RoomStatus(result[0]) != RoomStatus.LOBBY:
         raise ValueError("Cannot change the game for a room which has already started")
 
     cur.execute(
@@ -162,7 +162,9 @@ def initialize_game(room_id: str) -> None:
 
     games[room_id] = game
     cur = db.get_cursor()
-    cur.execute("UPDATE rooms SET room_state=%s WHERE id = %s", (RoomState.GAME, room_id))
+    cur.execute(
+        "UPDATE rooms SET room_status=%s WHERE id = %s", (RoomStatus.GAME, room_id)
+    )
 
 
 async def start_game(room_id: str) -> None:
