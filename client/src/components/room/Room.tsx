@@ -12,9 +12,9 @@ import {
   SetGameMessage,
 } from '../../../generated_types/websocket';
 import { getGame, loadGameState } from '../../data/gameSlice';
-import { getPlayerId } from '../../data/playerSlice';
+import { getPlayerId, loadPlayers } from '../../data/playerSlice';
 import { useAppDispatch, useAppSelector } from '../../data/reduxHooks';
-import { getGameName, getPlayers, loadPlayers, loadRoomState } from '../../data/roomSlice';
+import { getGameName, getOrderedPlayerNames, loadRoomState } from '../../data/roomSlice';
 import GameSocket from '../../game/GameSocket';
 import withGameSocket, { WithGameSocketProps } from '../../game/withGameSocket';
 import PlayerNameInput from '../PlayerNameInput';
@@ -33,7 +33,7 @@ const Room = ({ roomId, socket, namespace }: Props & WithGameSocketProps) => {
 
   const playerId = useAppSelector(getPlayerId)!;
   const gameName = useAppSelector(getGameName);
-  const players = useAppSelector(getPlayers);
+  const playerNames = useAppSelector(getOrderedPlayerNames);
   const game = useAppSelector(getGame);
 
   useEffect(() => {
@@ -101,8 +101,8 @@ const Room = ({ roomId, socket, namespace }: Props & WithGameSocketProps) => {
         style={{ width: '100%', maxWidth: 250 }}
       />
       <Typography.Paragraph>{playerId}</Typography.Paragraph>
-      {players.map((player, index) => (
-        <Typography.Paragraph key={index}>{player}</Typography.Paragraph>
+      {playerNames.map((playerName, index) => (
+        <Typography.Paragraph key={index}>{playerName}</Typography.Paragraph>
       ))}
       {!game && (
         <Typography.Paragraph>

@@ -8,10 +8,10 @@ import {
 
 import { EnsurePlayerRequest } from '../../generated_types/requests';
 import { RoomIdResponse } from '../../generated_types/responses';
-import { PlayersMessage, RoomMessage } from '../../generated_types/websocket';
+import { RoomMessage } from '../../generated_types/websocket';
 import { fetchAPI, makeJSONBodyWithContentType } from '../api/client';
 
-import { getPlayerName } from './playerSlice';
+import { getPlayerName, getPlayerNames } from './playerSlice';
 import type { RootState } from './store';
 
 interface RoomState {
@@ -31,6 +31,7 @@ const initialState: RoomState = {
 const getRoomState = (state: RootState): RoomState => state.room;
 
 export const getRoomId = createSelector([getRoomState], (state) => state.roomId);
+export const getRoomStatus = createSelector([getRoomState], (state) => state.roomStatus);
 export const getOrderedPlayerNames = createSelector(
   [getRoomState, getPlayerNames],
   (state, playerNames): (string | null)[] =>
@@ -68,12 +69,10 @@ const roomSlice = createSlice({
   initialState,
   reducers: {
     loadRoomState(state, { payload }: PayloadAction<RoomMessage>) {
+      state.roomId = payload.roomId;
       state.roomStatus = payload.status;
       state.orderedPlayerIds = payload.orderedPlayerIds;
       state.gameName = payload.gameName;
-    },
-    loadPlayers(state, { payload }: PayloadAction<PlayersMessage>) {
-      state.players = payload.players;
     },
   },
   extraReducers: (builder) => {
@@ -87,6 +86,6 @@ const roomSlice = createSlice({
   },
 });
 
-export const { loadRoomState, loadPlayers } = roomSlice.actions;
+export const { loadRoomState } = roomSlice.actions;
 
 export default roomSlice.reducer;

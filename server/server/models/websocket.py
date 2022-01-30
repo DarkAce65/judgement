@@ -21,7 +21,7 @@ class RoomMessage(CamelModel):
 
 
 class PlayersMessage(CamelModel):
-    players: list[str]
+    player_names: dict[int, str]
 
 
 class GameStateMessage(CamelModel):

@@ -18,7 +18,7 @@ async def ensure_player_and_set_cookie(
     )
 
     if should_propagate_name_change:
-        await connection_manager.propagate_name_change(player.player_id)
+        await connection_manager.propagate_name_change(player)
 
     if player_auth_id is None or player_auth_id != player.player_auth_id:
         response.set_cookie(

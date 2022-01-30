@@ -1,5 +1,6 @@
 from typing import Optional, cast
 
+from server.models.player import Player
 from server.sio_app import sio
 
 from . import db, player_manager, room_manager, socket_messager
@@ -72,20 +73,17 @@ def connect_player_client(player_id: int, client_id: str) -> None:
     sio.enter_room(client_id, str(player_id))
 
 
-async def propagate_name_change(player_id: int) -> None:
+async def propagate_name_change(player: Player) -> None:
     cur = db.get_cursor()
     cur.execute(
         "SELECT DISTINCT room_id FROM client_player_room "
         "WHERE player_id = %s AND room_id IS NOT NULL",
-        (player_id,),
+        (player.player_id,),
     )
     results = cast(list[tuple[str]], cur.fetchall())
-    room_ids = {room_id for (room_id,) in results}
+    room_ids = [room_id for (room_id,) in results]
 
-    for room_id in room_ids:
-        await socket_messager.emit_players(
-            room_manager.get_players_in_room(room_id).values(), room_id
-        )
+    await socket_messager.emit_players([player], room_ids)
 
 
 def add_player_client_to_room(client_id: str, room_id: str) -> None:
