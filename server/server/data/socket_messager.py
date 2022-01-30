@@ -1,4 +1,4 @@
-from typing import Iterable, Optional, cast
+from typing import Iterable, Optional, Union, cast
 
 from server.game.core import Game, GameError
 from server.models.player import Player
@@ -22,21 +22,21 @@ async def emit_error(error: GameError, recipient: str) -> None:
 
 
 async def emit_room(room: Room) -> None:
-    player_names = [player.name or "" for player in room.players]
-    game_states = room.get_game_states({player.player_id for player in room.players})
+    game_states = room.get_game_states(set(room.ordered_player_ids))
 
-    for player in room.players:
+    for player_id in room.ordered_player_ids:
         await sio.emit(
             "room",
             RoomMessage(
+                room_id=room.room_id,
                 status=room.room_status,
-                players=player_names,
+                ordered_player_ids=room.ordered_player_ids,
                 game_name=room.game_name,
                 game=None
                 if game_states is None
-                else cast(ConcreteGameState, game_states[player.player_id]),
+                else cast(ConcreteGameState, game_states[player_id]),
             ).dict(by_alias=True),
-            to=str(player.player_id),
+            to=str(player_id),
         )
 
 
@@ -46,8 +46,9 @@ async def emit_room_to_player(room: Room, player_id: int) -> None:
     await sio.emit(
         "room",
         RoomMessage(
+            room_id=room.room_id,
             status=room.room_status,
-            players=[player.name or "" for player in room.players],
+            ordered_player_ids=room.ordered_player_ids,
             game_name=room.game_name,
             game=cast(Optional[ConcreteGameState], game_state),
         ).dict(by_alias=True),
@@ -67,11 +68,16 @@ async def emit_game_state(game: Game) -> None:
         )
 
 
-async def emit_players(players_in_room: Iterable[Player], recipient: str) -> None:
+async def emit_players(
+    players: Iterable[Player], recipient: Union[list[str], str]
+) -> None:
+    player_names: dict[int, str] = {}
+    for player in players:
+        if player.name is not None:
+            player_names[player.player_id] = player.name
+
     await sio.emit(
         "players",
-        PlayersMessage(players=[player.name or "" for player in players_in_room]).dict(
-            by_alias=True
-        ),
+        PlayersMessage(player_names=player_names).dict(by_alias=True),
         to=recipient,
     )

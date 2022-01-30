@@ -10,12 +10,12 @@ class RoomIdResponse(CamelModel):
 
 class RoomResponse(RoomIdResponse):
     room_state: RoomStatus = Field(title="The state of the room")
-    player_ids: list[int] = Field(title="The ids of the players in the room")
+    ordered_player_ids: list[int] = Field(title="The ids of the players in the room")
 
     @staticmethod
     def from_room(room: Room) -> "RoomResponse":
         return RoomResponse(
             room_id=room.room_id,
             room_status=room.room_status,
-            player_ids=[player.player_id for player in room.players],
+            ordered_player_ids=room.ordered_player_ids,
         )

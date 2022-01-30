@@ -83,25 +83,30 @@ async def connect(client_id: str, _environ: dict, auth: dict) -> None:
 @require_player
 @supply_room_id
 async def handle_get_room(_client_id: str, room_id: str, player: Player) -> None:
-    await socket_messager.emit_room_to_player(
-        room_manager.get_room(room_id), player.player_id
+    room = room_manager.get_room(room_id)
+    await socket_messager.emit_room_to_player(room, player.player_id)
+    await socket_messager.emit_players(
+        player_manager.get_players(room.ordered_player_ids).values(),
+        str(player.player_id),
     )
 
 
 @sio.on("join_room")
 @require_player
-async def handle_join_room(client_id: str, room_id: str) -> None:
+async def handle_join_room(client_id: str, room_id: str, player: Player) -> None:
     connection_manager.add_player_client_to_room(client_id, room_id)
-    await socket_messager.emit_room(room_manager.get_room(room_id))
+    room = room_manager.get_room(room_id)
+    await socket_messager.emit_room(room)
+    await socket_messager.emit_players(
+        player_manager.get_players(room.ordered_player_ids).values(), room_id
+    )
 
 
 @sio.on("leave_room")
 @require_player
 async def handle_leave_room(client_id: str, room_id: str) -> None:
     connection_manager.remove_player_client_from_room(client_id, room_id)
-    await socket_messager.emit_players(
-        room_manager.get_players_in_room(room_id).values(), room_id
-    )
+    await socket_messager.emit_room(room_manager.get_room(room_id))
 
 
 @sio.on("set_game")

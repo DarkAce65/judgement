@@ -37,10 +37,10 @@ def get_room(room_id: str) -> Room:
         raise ValueError(f"Invalid room id: {room_id}")
 
     room_id, room_status, game_name = result
-    players = player_manager.get_players_for_room(room_id)
+    player_ids = player_manager.get_player_ids_for_room(room_id)
     game = get_game_for_room(room_id)
 
-    return Room.from_db(room_id, room_status, players, game_name, game)
+    return Room.from_db(room_id, room_status, player_ids, game_name, game)
 
 
 def create_room() -> str:
@@ -157,8 +157,8 @@ def initialize_game(room_id: str) -> None:
     else:
         raise ValueError(f"Unrecognized game name ({room.game_name})")
 
-    for player in room.players:
-        game.add_player(player.player_id)
+    for player_id in room.ordered_player_ids:
+        game.add_player(player_id)
 
     games[room_id] = game
     cur = db.get_cursor()

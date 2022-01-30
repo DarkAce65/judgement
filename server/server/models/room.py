@@ -4,7 +4,6 @@ from typing import Mapping, Optional
 from server.game.core import Game
 
 from .game import GameName, GameState
-from .player import Player
 
 
 @unique
@@ -16,7 +15,7 @@ class RoomStatus(str, Enum):
 class Room:
     room_id: str
     room_status: RoomStatus
-    players: list[Player]
+    ordered_player_ids: list[int]
 
     game_name: Optional[GameName]
     game: Optional[Game]
@@ -25,11 +24,11 @@ class Room:
         self,
         room_id: str,
         room_status: RoomStatus = RoomStatus.LOBBY,
-        players: Optional[list[Player]] = None,
+        ordered_player_ids: Optional[list[int]] = None,
     ) -> None:
         self.room_id = room_id
         self.room_status = room_status
-        self.players = players or []
+        self.ordered_player_ids = ordered_player_ids or []
 
         self.game_name = None
         self.game = None
@@ -42,11 +41,11 @@ class Room:
     def from_db(
         room_id: str,
         room_status: str,
-        players: list[Player],
+        ordered_player_ids: list[int],
         game_name: Optional[str],
         game: Optional[Game],
     ) -> "Room":
-        room = Room(room_id, RoomStatus(room_status), players)
+        room = Room(room_id, RoomStatus(room_status), ordered_player_ids)
         if game_name is not None:
             room.game_name = GameName(game_name)
         if game is not None:

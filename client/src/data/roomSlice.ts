@@ -17,21 +17,25 @@ import type { RootState } from './store';
 interface RoomState {
   roomId: string | null;
   roomStatus: RoomMessage['status'];
-  players: string[];
+  orderedPlayerIds: number[];
   gameName: RoomMessage['gameName'];
 }
 
 const initialState: RoomState = {
   roomId: null,
   roomStatus: 'LOBBY',
-  players: [],
+  orderedPlayerIds: [],
   gameName: undefined,
 };
 
 const getRoomState = (state: RootState): RoomState => state.room;
 
 export const getRoomId = createSelector([getRoomState], (state) => state.roomId);
-export const getPlayers = createSelector([getRoomState], (state) => state.players);
+export const getOrderedPlayerNames = createSelector(
+  [getRoomState, getPlayerNames],
+  (state, playerNames): (string | null)[] =>
+    state.orderedPlayerIds.map((playerId) => playerNames[playerId] || null)
+);
 export const getGameName = createSelector([getRoomState], (state) => state.gameName);
 
 export const createRoom = createAsyncThunk<string, void, { state: RootState }>(
@@ -65,7 +69,7 @@ const roomSlice = createSlice({
   reducers: {
     loadRoomState(state, { payload }: PayloadAction<RoomMessage>) {
       state.roomStatus = payload.status;
-      state.players = payload.players;
+      state.orderedPlayerIds = payload.orderedPlayerIds;
       state.gameName = payload.gameName;
     },
     loadPlayers(state, { payload }: PayloadAction<PlayersMessage>) {
@@ -73,11 +77,11 @@ const roomSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(createRoom.fulfilled, (state, action: PayloadAction<string>) => {
-      state.roomId = action.payload;
+    builder.addCase(createRoom.fulfilled, (state, { payload }: PayloadAction<string>) => {
+      state.roomId = payload;
     });
-    builder.addCase(joinRoom.fulfilled, (state, action: PayloadAction<string>) => {
-      state.roomId = action.payload;
+    builder.addCase(joinRoom.fulfilled, (state, { payload }: PayloadAction<string>) => {
+      state.roomId = payload;
     });
     builder.addMatcher(isAnyOf(createRoom.pending, joinRoom.pending), () => initialState);
   },

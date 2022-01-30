@@ -13,8 +13,9 @@ class GameErrorMessage(CamelModel):
 
 
 class RoomMessage(CamelModel):
+    room_id: str
     status: RoomStatus
-    players: list[str]
+    ordered_player_ids: list[int]
     game_name: Optional[GameName]
     game: Optional[ConcreteGameState]
 
