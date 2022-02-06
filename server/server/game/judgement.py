@@ -127,18 +127,7 @@ class JudgementGame(Game[JudgementAction]):
         logger.debug("player_id: %s, action: %s", player_id, repr(game_input))
 
         if isinstance(game_input, JudgementUpdateSettingsAction):
-            if not self.is_host(player_id):
-                raise GameError("Only the host may change settings!")
-
-            if self.status != GameStatus.NOT_STARTED:
-                raise GameError(
-                    "Cannot change settings after the game has already started!"
-                )
-
-            if game_input.num_decks:
-                self.settings.num_decks = game_input.num_decks
-            if game_input.num_rounds:
-                self.settings.num_rounds = game_input.num_rounds
+            self.handle_update_settings_action(player_id, game_input)
         elif isinstance(game_input, JudgementBidHandsAction):
             await self.handle_bid_action(player_id, game_input)
         elif isinstance(game_input, JudgementPlayCardAction):
@@ -146,25 +135,19 @@ class JudgementGame(Game[JudgementAction]):
 
         await socket_messager.emit_game_state(self)
 
-    def assert_phase(self, phase: JudgementPhase) -> None:
-        if self.phase != phase:
-            raise GameError("You can't do that right now!")
+    def handle_update_settings_action(
+        self, player_id: int, action: JudgementUpdateSettingsAction
+    ) -> None:
+        if not self.is_host(player_id):
+            raise GameError("Only the host may change settings!")
 
-    def assert_turn(self, player_id: int) -> None:
-        if self.player_order[self.current_turn] != player_id:
-            raise GameError("It is not your turn!")
+        if self.status != GameStatus.NOT_STARTED:
+            raise GameError("Cannot change settings after the game has already started!")
 
-    def get_num_tricks_for_round(self) -> int:
-        return self.settings.num_rounds - self.current_round
-
-    def get_trump(self) -> Suit:
-        return TRUMP_ORDER[self.current_round % 4]
-
-    def deal(self) -> None:
-        num_cards_to_deal = self.get_num_tricks_for_round()
-
-        for player_state in self.player_states.values():
-            player_state.hand.extend(self.decks.draw(num_cards_to_deal))
+        if action.num_decks is not None:
+            self.settings.num_decks = action.num_decks
+        if action.num_rounds is not None:
+            self.settings.num_rounds = action.num_rounds
 
     async def handle_bid_action(
         self, player_id: int, action: JudgementBidHandsAction
@@ -196,6 +179,26 @@ class JudgementGame(Game[JudgementAction]):
             self.current_turn = (self.current_turn + 1) % len(self.player_order)
         else:
             await self.end_trick()
+
+    def assert_phase(self, phase: JudgementPhase) -> None:
+        if self.phase != phase:
+            raise GameError("You can't do that right now!")
+
+    def assert_turn(self, player_id: int) -> None:
+        if self.player_order[self.current_turn] != player_id:
+            raise GameError("It is not your turn!")
+
+    def get_num_tricks_for_round(self) -> int:
+        return self.settings.num_rounds - self.current_round
+
+    def get_trump(self) -> Suit:
+        return TRUMP_ORDER[self.current_round % 4]
+
+    def deal(self) -> None:
+        num_cards_to_deal = self.get_num_tricks_for_round()
+
+        for player_state in self.player_states.values():
+            player_state.hand.extend(self.decks.draw(num_cards_to_deal))
 
     async def start_round(self) -> None:
         self.current_trick = 0
