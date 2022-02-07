@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC
 from enum import Enum, unique
-from typing import Any, Literal, Optional
+from typing import Any, Callable, Generator, Literal, Optional
 
 from server.game.card import Card, Suit
 from server.game.core import GameError
@@ -36,7 +36,7 @@ class JudgementAction(CamelModel, ABC):
         cls._types[action_type] = cls
 
     @classmethod
-    def __get_validators__(cls):  # type: ignore
+    def __get_validators__(cls) -> Generator[Callable[..., Any], None, None]:
         yield cls.validate
 
     @classmethod
