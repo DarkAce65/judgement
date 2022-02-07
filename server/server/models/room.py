@@ -25,19 +25,19 @@ class Room:
     def __init__(
         self,
         room_id: str,
-        room_status: RoomStatus = RoomStatus.LOBBY,
-        ordered_player_ids: Optional[list[int]] = None,
+        room_status: RoomStatus,
+        ordered_player_ids: list[int],
     ) -> None:
         self.room_id = room_id
         self.room_status = room_status
-        self.ordered_player_ids = ordered_player_ids or []
+        self.ordered_player_ids = ordered_player_ids
 
         self.game_name = None
         self.game = None
 
     @staticmethod
     def new(room_id: str) -> Room:
-        return Room(room_id)
+        return Room(room_id, RoomStatus.LOBBY, [])
 
     @staticmethod
     def from_db(
