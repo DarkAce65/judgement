@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from abc import ABC
 from enum import Enum, unique
 from typing import Any, Literal, Optional
@@ -38,7 +40,7 @@ class JudgementAction(CamelModel, ABC):
         yield cls.validate
 
     @classmethod
-    def validate(cls, value: dict[str, Any]) -> "JudgementAction":
+    def validate(cls, value: dict[str, Any]) -> JudgementAction:
         try:
             action_type = value["actionType"]
             return cls._types[action_type](**value)

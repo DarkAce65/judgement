@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from enum import Enum, unique
 from typing import Mapping, Optional
 
@@ -34,7 +36,7 @@ class Room:
         self.game = None
 
     @staticmethod
-    def new(room_id: str) -> "Room":
+    def new(room_id: str) -> Room:
         return Room(room_id)
 
     @staticmethod
@@ -44,7 +46,7 @@ class Room:
         ordered_player_ids: list[int],
         game_name: Optional[str],
         game: Optional[Game],
-    ) -> "Room":
+    ) -> Room:
         room = Room(room_id, RoomStatus(room_status), ordered_player_ids)
         if game_name is not None:
             room.game_name = GameName(game_name)

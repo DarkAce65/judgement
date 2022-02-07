@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from pydantic import Field
 
 from .camel_model import CamelModel
@@ -13,7 +15,7 @@ class RoomResponse(RoomIdResponse):
     ordered_player_ids: list[int] = Field(title="The ids of the players in the room")
 
     @staticmethod
-    def from_room(room: Room) -> "RoomResponse":
+    def from_room(room: Room) -> RoomResponse:
         return RoomResponse(
             room_id=room.room_id,
             room_status=room.room_status,
