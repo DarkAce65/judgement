@@ -114,7 +114,7 @@ class JudgementGame(Game[JudgementAction]):
         )
 
         max_rounds = math.ceil(self.settings.num_decks * 52 / len(self.player_order))
-        self.settings.num_rounds = max(self.settings.num_rounds, max_rounds)
+        self.settings.num_rounds = min(self.settings.num_rounds, max_rounds)
 
     def remove_player(self, player_id: int) -> None:
         if self.status != GameStatus.NOT_STARTED:
