@@ -4,7 +4,7 @@ from typing import Any, Generic, Mapping, Type, TypeVar
 
 from pydantic import BaseModel, ValidationError, parse_obj_as
 
-from server.models.game import GamePlayer, GameState, GameStatus
+from server.models.game import GamePlayer, GamePlayerType, GameState, GameStatus
 
 logger = logging.getLogger(__name__)
 
@@ -42,17 +42,23 @@ class Game(Generic[Action], ABC):
     def build_game_states(self, player_ids: set[int]) -> Mapping[int, GameState]:
         ...
 
-    def add_player(self, player_id: int) -> None:
-        game_player = GamePlayer(player_id)
+    def add_player(
+        self, player_id: int, player_type: GamePlayerType = GamePlayerType.PLAYER
+    ) -> None:
+        game_player = GamePlayer(player_id, player_type)
         self.players[player_id] = game_player
-        self.player_order.append(player_id)
+
+        if player_type == GamePlayerType.PLAYER:
+            self.player_order.append(player_id)
 
     def remove_player(self, player_id: int) -> None:
-        for player in self.players.values():
-            if player.player_id == player_id:
-                del self.players[player_id]
-                self.player_order.remove(player_id)
-                break
+        if player_id not in self.players:
+            raise ValueError(f"Player {player_id} is not in the game")
+
+        player = self.players[player_id]
+        if player.player_type == GamePlayerType.PLAYER:
+            self.player_order.remove(player_id)
+        del self.players[player_id]
 
     async def start_game(self) -> None:
         if self.status == GameStatus.IN_PROGRESS:

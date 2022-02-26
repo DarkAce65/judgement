@@ -3,7 +3,7 @@ import math
 from typing import Mapping
 
 from server.data import socket_messager
-from server.models.game import GameName, GameStatus
+from server.models.game import GameName, GamePlayerType, GameState, GameStatus
 from server.models.judgement import (
     JudgementAction,
     JudgementBidHandsAction,
@@ -107,21 +107,28 @@ class JudgementGame(Game[JudgementAction]):
 
         await self.start_round()
 
-    def add_player(self, player_id: int) -> None:
-        super().add_player(player_id)
-        self.player_states[player_id] = JudgementPlayerState(
-            score=0, current_hands=0, hand=[]
-        )
+    def add_player(
+        self, player_id: int, player_type: GamePlayerType = GamePlayerType.PLAYER
+    ) -> None:
+        if self.phase != JudgementPhase.NOT_STARTED:
+            player_type = GamePlayerType.SPECTATOR
 
-        max_rounds = math.ceil(self.settings.num_decks * 52 / len(self.player_order))
-        self.settings.num_rounds = min(self.settings.num_rounds, max_rounds)
+        super().add_player(player_id, player_type)
+
+        if player_type == GamePlayerType.PLAYER:
+            self.player_states[player_id] = JudgementPlayerState(
+                score=0, current_hands=0, hand=[]
+            )
+
+            max_rounds = math.ceil(self.settings.num_decks * 52 / len(self.player_order))
+            self.settings.num_rounds = min(self.settings.num_rounds, max_rounds)
 
     def remove_player(self, player_id: int) -> None:
         if self.status != GameStatus.NOT_STARTED:
             raise NotImplementedError("Cannot remove a player from this game")
 
-        super().remove_player(player_id)
         del self.player_states[player_id]
+        super().remove_player(player_id)
 
     async def process_input(self, player_id: int, game_input: JudgementAction) -> None:
         logger.debug("player_id: %s, action: %s", player_id, repr(game_input))
