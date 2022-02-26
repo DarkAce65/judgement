@@ -4,10 +4,6 @@ version = "0.1.0"
 description = ""
 authors = []
 
-[tool.isort]
-profile = "black"
-src_paths = ["model_generator", "server", "main.py"]
-
 [tool.black]
 line-length = 90
 include = '\.pyi?$'
@@ -19,6 +15,32 @@ exclude = '''
   | \.venv
 )/
 '''
+
+[tool.isort]
+profile = "black"
+src_paths = ["model_generator", "server", "main.py"]
+
+[tool.mypy]
+plugins = ["pydantic.mypy"]
+
+follow_imports = "silent"
+ignore_missing_imports = true
+no_implicit_reexport = true
+
+warn_redundant_casts = true
+warn_unused_ignores = true
+no_implicit_optional = true
+
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+
+warn_required_dynamic_aliases = true
+warn_untyped_fields = true
+
 
 [tool.pylint.messages_control]
 disable = [
