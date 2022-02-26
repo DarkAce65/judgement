@@ -33,6 +33,8 @@ class GamePlayer:
 
 
 class GameState(CamelModel, ABC):
+    player_type: GamePlayerType
+
     game_name: GameName
     status: GameStatus
 

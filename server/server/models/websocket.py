@@ -1,11 +1,11 @@
-from typing import Optional
+from typing import Optional, Union
 
 from .camel_model import CamelModel
 from .game import GameName
-from .judgement import JudgementGameState
+from .judgement import JudgementGameState, JudgementSpectatorGameState
 from .room import RoomStatus
 
-ConcreteGameState = JudgementGameState
+ConcreteGameState = Union[JudgementGameState, JudgementSpectatorGameState]
 
 
 class GameErrorMessage(CamelModel):

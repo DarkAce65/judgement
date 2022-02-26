@@ -12,6 +12,7 @@ from server.models.judgement import (
     JudgementPlayCardAction,
     JudgementPlayerState,
     JudgementSettings,
+    JudgementSpectatorGameState,
     JudgementUpdateSettingsAction,
 )
 from server.utils.debug_encoder import dump_class
@@ -83,22 +84,39 @@ class JudgementGame(Game[JudgementAction]):
 
         self.player_states = {}
 
-    def build_game_states(self, player_ids: set[int]) -> Mapping[int, JudgementGameState]:
-        return {
-            player_id: JudgementGameState(
-                game_name=GameName.JUDGEMENT,
-                status=self.status,
-                settings=self.settings,
-                phase=self.phase,
-                pile=self.pile,
-                current_round=self.current_round,
-                current_trick=self.current_trick,
-                current_turn=self.current_turn,
-                player_state=self.player_states[player_id],
-                full_state_do_not_use=dump_class(self),
-            )
-            for player_id in player_ids
-        }
+    def build_game_states(self, player_ids: set[int]) -> Mapping[int, GameState]:
+        game_states: dict[int, GameState] = {}
+
+        for player_id in player_ids:
+            if self.players[player_id].player_type == GamePlayerType.PLAYER:
+                game_states[player_id] = JudgementGameState(
+                    player_type=GamePlayerType.PLAYER,
+                    game_name=GameName.JUDGEMENT,
+                    status=self.status,
+                    settings=self.settings,
+                    phase=self.phase,
+                    pile=self.pile,
+                    current_round=self.current_round,
+                    current_trick=self.current_trick,
+                    current_turn=self.current_turn,
+                    player_state=self.player_states[player_id],
+                    full_state_do_not_use=dump_class(self),
+                )
+            elif self.players[player_id].player_type == GamePlayerType.SPECTATOR:
+                game_states[player_id] = JudgementSpectatorGameState(
+                    player_type=GamePlayerType.SPECTATOR,
+                    game_name=GameName.JUDGEMENT,
+                    status=self.status,
+                    settings=self.settings,
+                    phase=self.phase,
+                    pile=self.pile,
+                    current_round=self.current_round,
+                    current_trick=self.current_trick,
+                    current_turn=self.current_turn,
+                    full_state_do_not_use=dump_class(self),
+                )
+
+        return game_states
 
     async def start_game(self) -> None:
         await super().start_game()

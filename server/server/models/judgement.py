@@ -8,7 +8,7 @@ from server.game.card import Card, Suit
 from server.game.core import GameError
 
 from .camel_model import CamelModel
-from .game import GameState
+from .game import GameName, GamePlayerType, GameState
 
 SUIT_ORDER = [Suit.SPADES, Suit.HEARTS, Suit.CLUBS, Suit.DIAMONDS]
 
@@ -86,6 +86,10 @@ class JudgementSettings(CamelModel):
 
 
 class JudgementGameState(GameState):
+    player_type: Literal[GamePlayerType.PLAYER]
+
+    game_name: Literal[GameName.JUDGEMENT]
+
     settings: JudgementSettings
     phase: JudgementPhase
 
@@ -95,3 +99,18 @@ class JudgementGameState(GameState):
     current_trick: int
     current_turn: int
     player_state: JudgementPlayerState
+
+
+class JudgementSpectatorGameState(GameState):
+    player_type: Literal[GamePlayerType.SPECTATOR]
+
+    game_name: Literal[GameName.JUDGEMENT]
+
+    settings: JudgementSettings
+    phase: JudgementPhase
+
+    pile: list[Card]
+
+    current_round: int
+    current_trick: int
+    current_turn: int
