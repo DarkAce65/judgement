@@ -71,7 +71,7 @@ generate_watch = "python -m model_generator.watcher --out_dir ../client/generate
 [tool.poetry.dependencies]
 python = "^3.9"
 debugpy = { version = "^1.2.1", optional = true }
-fastapi = "^0.73.0"
+fastapi = "^0.74.0"
 psycopg2 = "^2.9.3"
 pydantic-to-typescript = { version = "^1.0.8", optional = true }
 python-socketio = "^5.5.0"
