@@ -1,13 +1,13 @@
 import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit';
 
-import { JudgementGameState } from '../../generated_types/judgement';
+import { JudgementGameState, JudgementSpectatorGameState } from '../../generated_types/judgement';
 import { GameStateMessage } from '../../generated_types/websocket';
 
 import { loadRoomState } from './roomSlice';
 import type { RootState } from './store';
 
 interface GameState {
-  state: JudgementGameState | null;
+  state: JudgementGameState | JudgementSpectatorGameState | null;
 }
 
 const initialState: GameState = { state: null };

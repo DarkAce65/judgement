@@ -4,13 +4,14 @@ import { Button, Form, InputNumber } from 'antd';
 
 import {
   JudgementGameState,
+  JudgementSpectatorGameState,
   JudgementUpdateSettingsAction,
 } from '../../../../generated_types/judgement';
 import withGameSocket, { WithGameSocketProps } from '../../../game/withGameSocket';
 import useDraftValue from '../../../utils/useDraftValue';
 
 interface Props {
-  game: JudgementGameState;
+  game: JudgementGameState | JudgementSpectatorGameState;
 }
 
 const JudgementSettings = ({ game, socket }: Props & WithGameSocketProps) => {
