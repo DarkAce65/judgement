@@ -8,6 +8,7 @@ import {
   JudgementPlayCardAction,
 } from '../../../../generated_types/judgement';
 import withGameSocket, { WithGameSocketProps } from '../../../game/withGameSocket';
+import Card from '../../game/Card';
 
 interface Props {
   game: JudgementGameState;
@@ -44,7 +45,7 @@ const JudgementGame = ({ game, socket }: Props & WithGameSocketProps) => {
           <Space direction="vertical">
             <Space direction="horizontal" size="large">
               {game.playerState.hand.map((value, index) => (
-                <span key={index}>{value.suit + value.rank}</span>
+                <Card key={index} suit={value.suit} rank={value.rank} />
               ))}
             </Space>
             <Space direction="horizontal">
@@ -68,7 +69,7 @@ const JudgementGame = ({ game, socket }: Props & WithGameSocketProps) => {
             <Space direction="horizontal" size="large">
               Pile:
               {game.pile.map((value, index) => (
-                <span key={index}>{value.suit + value.rank}</span>
+                <Card key={index} suit={value.suit} rank={value.rank} />
               ))}
             </Space>
             <Radio.Group
@@ -79,8 +80,8 @@ const JudgementGame = ({ game, socket }: Props & WithGameSocketProps) => {
             >
               <Space direction="horizontal">
                 {game.playerState.hand.map((value, index) => (
-                  <Radio key={index} value={value.suit + value.rank}>
-                    {value.suit + value.rank}
+                  <Radio key={index} value={`${value.suit}${value.rank}`}>
+                    <Card key={index} suit={value.suit} rank={value.rank} />
                   </Radio>
                 ))}
               </Space>
