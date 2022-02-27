@@ -53,6 +53,8 @@ import Spades7 from '!file-loader!../../assets/cards/SPADE-7.svg';
 import Spades8 from '!file-loader!../../assets/cards/SPADE-8.svg';
 import Spades9 from '!file-loader!../../assets/cards/SPADE-9.svg';
 
+export { default as CARD_BACK } from '!file-loader!../../assets/cards/BACK-RED.svg';
+
 export type Suit = 'S' | 'H' | 'D' | 'C';
 
 export const CARD_FRONTS: {

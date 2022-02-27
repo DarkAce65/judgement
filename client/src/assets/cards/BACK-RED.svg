@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="63mm"
+   height="88mm"
+   viewBox="0 0 63 88"
+   version="1.1"
+   id="svg37343"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   sodipodi:docname="BACK-RED.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview37345"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:pageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="0.64765011"
+     inkscape:cx="187.6013"
+     inkscape:cy="231.60654"
+     inkscape:window-width="1259"
+     inkscape:window-height="1355"
+     inkscape:window-x="1279"
+     inkscape:window-y="18"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs37340" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-77.52926,-39.712124)">
+    <g
+       id="g33556"
+       transform="translate(-281.67863,19.383844)">
+      <g
+         id="g33552"
+         transform="translate(359.20789,-188.67172)"
+         inkscape:export-filename="G:\DOWNLOADS\WAVES.png"
+         inkscape:export-xdpi="219.61"
+         inkscape:export-ydpi="219.61">
+        <rect
+           ry="3"
+           rx="3"
+           y="209"
+           x="0"
+           height="88"
+           width="63"
+           id="rect33546"
+           style="opacity:1;vector-effect:none;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal" />
+        <g
+           style="stroke:#aa0000;stroke-width:1.56036;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           id="g33550"
+           transform="matrix(0.87368701,0,0,0.90959541,-1.4121447,16.987181)">
+          <rect
+             style="opacity:1;vector-effect:none;fill:#aa0000;fill-opacity:1;stroke:#aa0000;stroke-width:1.56036;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+             id="rect33548"
+             width="63"
+             height="88"
+             x="6.1704063"
+             y="215.47011" />
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>
