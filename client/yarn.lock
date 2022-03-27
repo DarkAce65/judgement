@@ -3671,6 +3671,11 @@ clone@^2.1.2:
   resolved "https://registry.yarnpkg.com/clone/-/clone-2.1.2.tgz#1b7f4b9f591f1e8f83670401600345a02887435f"
   integrity sha1-G39Ln1kfHo+DZwQBYANFoCiHQ18=
 
+clsx@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/clsx/-/clsx-1.1.1.tgz#98b3134f9abbdf23b2663491ace13c5c03a73188"
+  integrity sha512-6/bPho624p3S2pMyvP5kKBPXnI3ufHLObBFCfgx+LkeR5lg2XYy2hqZqUf45ypD8COn2bhgGJSUE+l5dhNBieA==
+
 co@^4.6.0:
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/co/-/co-4.6.0.tgz#6ea6bdf3d853ae54ccb8e47bfa0bf3f9031fb184"
@@ -9760,6 +9765,15 @@ prompts@^2.0.1:
     kleur "^3.0.3"
     sisteransi "^1.0.5"
 
+prop-types@^15.6.0:
+  version "15.8.1"
+  resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.8.1.tgz#67d87bf1a694f48435cf332c24af10214a3140b5"
+  integrity sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==
+  dependencies:
+    loose-envify "^1.4.0"
+    object-assign "^4.1.1"
+    react-is "^16.13.1"
+
 prop-types@^15.7.2:
   version "15.8.0"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.8.0.tgz#d237e624c45a9846e469f5f31117f970017ff588"
@@ -10338,6 +10352,14 @@ react-dom@^17.0.2:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
     scheduler "^0.20.2"
+
+react-draggable@^4.4.4:
+  version "4.4.4"
+  resolved "https://registry.yarnpkg.com/react-draggable/-/react-draggable-4.4.4.tgz#5b26d9996be63d32d285a426f41055de87e59b2f"
+  integrity sha512-6e0WdcNLwpBx/YIDpoyd2Xb04PB0elrDrulKUgdrIlwuYvxh5Ok9M+F8cljm8kPXXs43PmMzek9RrB1b7mLMqA==
+  dependencies:
+    clsx "^1.1.1"
+    prop-types "^15.6.0"
 
 react-error-overlay@6.0.9, react-error-overlay@^6.0.9:
   version "6.0.9"

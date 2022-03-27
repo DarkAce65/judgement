@@ -1,14 +1,30 @@
+import { CSSProperties } from 'react';
+
 import { CARD_BACK, CARD_FRONTS, Suit } from './cardAssets';
 
-interface Props {
+export interface CardType {
   suit: Suit;
   rank: number;
 }
 
-const Card = ({ suit, rank }: Props) => (
-  <img src={CARD_FRONTS[suit][rank]} alt={`${suit}${rank}`} width={100} />
+interface Props {
+  card: CardType;
+  onClick?: () => void;
+  style?: CSSProperties;
+}
+
+const Card = ({ card: { suit, rank }, onClick, style }: Props) => (
+  <img
+    src={CARD_FRONTS[suit][rank]}
+    alt={`${suit}${rank}`}
+    draggable={false}
+    onClick={onClick}
+    style={{ width: '100%', ...style }}
+  />
 );
 
-export const CardBack = () => <img src={CARD_BACK} alt="Unknown card" width={100} />;
+export const CardBack = ({ style }: { style?: CSSProperties }) => (
+  <img src={CARD_BACK} alt="Unknown card" draggable={false} style={{ width: '100%', ...style }} />
+);
 
 export default Card;
