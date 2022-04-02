@@ -1,117 +1,109 @@
 import { useMemo, useState } from 'react';
 
-import Draggable, { ControlPosition } from 'react-draggable';
-import styled from 'styled-components';
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 
 import useWindowSize from '../../utils/useWindowSize';
 
 import Card, { CardType } from './Card';
 
-const HandContainer = styled.div`
-  .react-draggable-dragging {
-    z-index: 1;
-  }
-`;
-
-const DraggableCard = ({
-  card,
-  cardWidth,
-  onSelect,
-}: {
-  card: CardType;
-  cardWidth: number;
-  onSelect: (c: CardType) => void;
-}) => {
-  const cardHeight = useMemo(() => cardWidth * 1.39683, [cardWidth]);
-  const [position, setPosition] = useState<ControlPosition>({ x: 0, y: 0 });
-  const [centerOffset, setCenterOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-
-  return (
-    <Draggable
-      position={position}
-      positionOffset={centerOffset}
-      bounds={{ bottom: 0 }}
-      onMouseDown={(event) => {
-        const boundingRect = (event.currentTarget as HTMLElement).getBoundingClientRect();
-        setCenterOffset({
-          x: event.clientX - boundingRect.x - cardWidth / 2,
-          y: event.clientY - boundingRect.y - cardHeight / 2,
-        });
-      }}
-      onStop={(_, { x, y }) => {
-        console.log({ x, y }, centerOffset);
-        if (-y - centerOffset.y < cardHeight) {
-          setPosition({ x: 0, y: 0 });
-          setCenterOffset({ x: 0, y: 0 });
-        } else {
-          setPosition({ x: 0, y });
-          setCenterOffset({ x: 0, y: centerOffset.y });
-          onSelect(card);
-        }
-      }}
-    >
-      <div style={{ display: 'inline-block', width: 0.13 * cardWidth }}>
-        <Card card={card} style={{ width: cardWidth }} />
-      </div>
-    </Draggable>
-  );
-};
-
 interface Props {
   cards: CardType[];
+  onSetCards?: (cards: CardType[]) => void;
   onSelect?: (index: number) => void;
 }
 
-const Hand = ({ cards }: Props) => {
+const Hand = ({ cards, onSetCards }: Props) => {
   const { width } = useWindowSize();
   const cardWidth = useMemo(() => Math.max(100, width / 6), [width]);
+
+  const handId = useMemo(() => `hand-${Math.random().toString(16).slice(2, 8)}`, []);
 
   const [selected, setSelected] = useState<CardType | null>(null);
 
   return (
     <>
-      <HandContainer
-        style={{
-          display: 'flex',
-          justifyContent: 'space-evenly',
-          paddingRight: 0.87 * cardWidth,
+      <DragDropContext
+        onDragEnd={(result) => {
+          if (!onSetCards || !result.destination) {
+            return;
+          }
+
+          const movedCard = cards[result.source.index];
+          const newCards = [
+            ...cards.slice(0, result.source.index),
+            ...cards.slice(result.source.index + 1),
+          ];
+          newCards.splice(result.destination.index, 0, movedCard);
+
+          onSetCards(newCards);
         }}
       >
-        {cards
-          .filter(
-            (card) => !selected || (card.rank !== selected.rank && card.suit !== selected.suit)
-          )
-          .map((card, index) => (
-            <DraggableCard
-              key={index}
-              card={card}
-              cardWidth={cardWidth}
-              onSelect={() => {
-                setSelected(card);
+        <Droppable droppableId={handId} direction="horizontal">
+          {(droppableProvided) => (
+            <div
+              ref={droppableProvided.innerRef}
+              {...droppableProvided.droppableProps}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                paddingRight: `calc(${cardWidth}px - ${100 / cards.length}%)`,
               }}
-            />
-          ))}
-      </HandContainer>
+            >
+              {cards.map((card, index) => (
+                <Draggable
+                  key={`${index}${card.suit}${card.rank}`}
+                  draggableId={`${index}${card.suit}${card.rank}`}
+                  index={index}
+                >
+                  {(draggableProvided, snapshot) => (
+                    <div
+                      ref={draggableProvided.innerRef}
+                      {...draggableProvided.draggableProps}
+                      {...draggableProvided.dragHandleProps}
+                      style={{
+                        ...draggableProvided.draggableProps.style,
+                        display: 'inline-block',
+                        width: snapshot.isDragging ? cardWidth : `${100 / cards.length}%`,
+                        minWidth: 0.13 * cardWidth,
+                        textAlign: 'center',
+                      }}
+                    >
+                      <Card card={card} style={{ width: cardWidth }} />
+                    </div>
+                  )}
+                </Draggable>
+              ))}
+              {droppableProvided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
       {selected && (
         <div
           style={{
-            position: 'absolute',
+            position: 'fixed',
+            display: 'flex',
             zIndex: 100,
             top: 0,
             left: 0,
             width: '100%',
             height: '100%',
-            background: '#cccccccc',
-            textAlign: 'center',
+            background: '#00000044',
+            boxShadow: 'inset 0 0 100px black',
+            alignItems: 'center',
           }}
         >
-          <Card
-            card={selected}
-            onClick={() => {
-              setSelected(null);
-            }}
-            style={{ width: cardWidth }}
-          />
+          <div style={{ flexGrow: 1 }} />
+          <div style={{ flex: '0 0 auto' }}>
+            <Card
+              card={selected}
+              onClick={() => {
+                setSelected(null);
+              }}
+              style={{ width: cardWidth }}
+            />
+          </div>
+          <div style={{ flexGrow: 1 }} />
         </div>
       )}
     </>
