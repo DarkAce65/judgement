@@ -59,7 +59,6 @@ const Hand = ({ cards, onSetCards }: Props) => {
                     <div
                       ref={draggableProvided.innerRef}
                       {...draggableProvided.draggableProps}
-                      {...draggableProvided.dragHandleProps}
                       style={{
                         ...draggableProvided.draggableProps.style,
                         display: 'inline-block',
@@ -68,7 +67,11 @@ const Hand = ({ cards, onSetCards }: Props) => {
                         textAlign: 'center',
                       }}
                     >
-                      <Card card={card} style={{ width: cardWidth }} />
+                      <Card
+                        {...draggableProvided.dragHandleProps}
+                        card={card}
+                        style={{ width: cardWidth }}
+                      />
                     </div>
                   )}
                 </Draggable>

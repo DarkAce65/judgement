@@ -13,13 +13,14 @@ interface Props {
   style?: CSSProperties;
 }
 
-const Card = ({ card: { suit, rank }, onClick, style }: Props) => (
+const Card = ({ card: { suit, rank }, onClick, style, ...passthroughProps }: Props) => (
   <img
     src={CARD_FRONTS[suit][rank]}
     alt={`${suit}${rank}`}
     draggable={false}
     onClick={onClick}
     style={{ width: '100%', ...style }}
+    {...passthroughProps}
   />
 );
 
