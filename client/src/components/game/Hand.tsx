@@ -63,7 +63,7 @@ const Hand = ({ cards, onSetCards }: Props) => {
                       style={{
                         ...draggableProvided.draggableProps.style,
                         display: 'inline-block',
-                        width: snapshot.isDragging ? cardWidth : `${100 / cards.length}%`,
+                        ...(!snapshot.isDragging && { width: `${100 / cards.length}%` }),
                         minWidth: 0.13 * cardWidth,
                         textAlign: 'center',
                       }}
