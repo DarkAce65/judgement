@@ -15,6 +15,13 @@ interface Props {
 const Hand = ({ cards, onSetCards }: Props) => {
   const { width } = useWindowSize();
   const cardWidth = useMemo(() => Math.max(100, width / 6), [width]);
+  const paddingRight = useMemo(
+    () =>
+      `calc(${100 - 100 * (cards.length / (cards.length - 1))}% + ${
+        cardWidth * (cards.length / (cards.length - 1))
+      }px)`,
+    [cardWidth, cards.length]
+  );
 
   const handId = useMemo(() => `hand-${Math.random().toString(16).slice(2, 8)}`, []);
 
@@ -43,11 +50,7 @@ const Hand = ({ cards, onSetCards }: Props) => {
             <div
               ref={droppableProvided.innerRef}
               {...droppableProvided.droppableProps}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                paddingRight: `calc(${cardWidth}px - ${100 / cards.length}%)`,
-              }}
+              style={{ display: 'flex', justifyContent: 'center', paddingRight }}
             >
               {cards.map((card, index) => (
                 <Draggable
@@ -64,6 +67,7 @@ const Hand = ({ cards, onSetCards }: Props) => {
                         display: 'inline-block',
                         ...(!snapshot.isDragging && { width: `${100 / cards.length}%` }),
                         minWidth: 0.13 * cardWidth,
+                        maxWidth: cardWidth + 10,
                         textAlign: 'center',
                       }}
                     >

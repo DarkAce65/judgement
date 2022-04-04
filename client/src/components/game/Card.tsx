@@ -1,4 +1,4 @@
-import { CSSProperties } from 'react';
+import { ImgHTMLAttributes } from 'react';
 
 import { CARD_BACK, CARD_FRONTS, Suit } from './cardAssets';
 
@@ -9,23 +9,29 @@ export interface CardType {
 
 interface Props {
   card: CardType;
-  onClick?: () => void;
-  style?: CSSProperties;
 }
 
-const Card = ({ card: { suit, rank }, onClick, style, ...passthroughProps }: Props) => (
+const Card = ({
+  card: { suit, rank },
+  ...passthroughProps
+}: Props & ImgHTMLAttributes<HTMLImageElement>) => (
   <img
+    {...passthroughProps}
     src={CARD_FRONTS[suit][rank]}
     alt={`${suit}${rank}`}
     draggable={false}
-    onClick={onClick}
-    style={{ width: '100%', ...style }}
-    {...passthroughProps}
+    style={{ width: '100%', ...passthroughProps.style }}
   />
 );
 
-export const CardBack = ({ style }: { style?: CSSProperties }) => (
-  <img src={CARD_BACK} alt="Unknown card" draggable={false} style={{ width: '100%', ...style }} />
+export const CardBack = ({ ...passthroughProps }: ImgHTMLAttributes<HTMLImageElement>) => (
+  <img
+    {...passthroughProps}
+    src={CARD_BACK}
+    alt="Unknown card"
+    draggable={false}
+    style={{ width: '100%', ...passthroughProps.style }}
+  />
 );
 
 export default Card;
