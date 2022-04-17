@@ -1,21 +1,26 @@
 import { Layout } from 'antd';
+import { Provider } from 'react-redux';
 import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+
+import store from '../data/store';
 
 import Home from './Home';
 import RoomContainer from './room/RoomContainer';
 
 const App = () => (
-  <Router>
-    <Layout style={{ minHeight: '100vh' }}>
-      <Layout.Content>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/room/:roomId" element={<RoomContainer />} />
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
-      </Layout.Content>
-    </Layout>
-  </Router>
+  <Provider store={store}>
+    <Router>
+      <Layout style={{ minHeight: '100vh' }}>
+        <Layout.Content>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/room/:roomId" element={<RoomContainer />} />
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        </Layout.Content>
+      </Layout>
+    </Router>
+  </Provider>
 );
 
 export default App;
