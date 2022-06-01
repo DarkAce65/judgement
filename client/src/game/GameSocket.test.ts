@@ -1,43 +1,42 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import type GameSocketType from './GameSocket';
 
 const mockSocket = {
-  connect: jest
+  connect: vi
     .fn(() => {
       mockSocket.connected = true;
       mockSocket.disconnected = false;
     })
     .mockName('connect'),
-  disconnect: jest
+  disconnect: vi
     .fn(() => {
       mockSocket.connected = false;
       mockSocket.disconnected = true;
     })
     .mockName('disconnect'),
-  on: jest.fn().mockName('on'),
-  once: jest.fn().mockName('once'),
-  off: jest.fn().mockName('off'),
-  onAny: jest.fn().mockName('onAny'),
-  offAny: jest.fn().mockName('offAny'),
+  on: vi.fn().mockName('on'),
+  once: vi.fn().mockName('once'),
+  off: vi.fn().mockName('off'),
+  onAny: vi.fn().mockName('onAny'),
+  offAny: vi.fn().mockName('offAny'),
 
   connected: false,
   disconnected: true,
 };
 
-const onConnectionError = jest.fn();
-const resetAttempts = jest.fn();
+const onConnectionError = vi.fn();
+const resetAttempts = vi.fn();
 
-jest.mock('../api/client', () => ({
-  __esModule: true,
-  buildSocket: jest.fn(() => mockSocket),
-}));
+vi.mock('../api/client', () => ({ buildSocket: vi.fn(() => mockSocket) }));
 
 describe('GameSocket', () => {
   let GameSocket: typeof GameSocketType;
 
-  beforeEach(() => {
-    jest.resetModules();
+  beforeEach(async () => {
+    vi.resetModules();
 
-    GameSocket = require('./GameSocket').default;
+    GameSocket = (await import('./GameSocket')).default;
     mockSocket.connected = false;
     mockSocket.disconnected = true;
   });
@@ -54,7 +53,7 @@ describe('GameSocket', () => {
     it('adds a catch-all listener', () => {
       expect(GameSocket['socket']).toBe(null);
 
-      const listener = jest.fn();
+      const listener = vi.fn();
 
       expect(GameSocket.initializeSocket(onConnectionError, resetAttempts)).toBe(mockSocket);
       const { namespace } = GameSocket.attach();
@@ -70,7 +69,7 @@ describe('GameSocket', () => {
       expect(GameSocket['socket']).toBe(null);
 
       expect(() => {
-        const listener = jest.fn();
+        const listener = vi.fn();
         GameSocket.onAnyNamespaced('test-ns', listener);
       }).toThrowError('Socket not initialized');
     });
@@ -78,10 +77,10 @@ describe('GameSocket', () => {
     it('fails to add a catch-all listener with an unknown namespace', () => {
       expect(GameSocket.initializeSocket(onConnectionError, resetAttempts)).toBe(mockSocket);
 
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockReturnValue();
 
       const namespace = 'unknown-namespace';
-      const listener = jest.fn();
+      const listener = vi.fn();
       GameSocket.onNamespaced(namespace, 'event', listener);
 
       expect(consoleErrorSpy).toBeCalledWith(
@@ -96,7 +95,7 @@ describe('GameSocket', () => {
       expect(GameSocket.initializeSocket(onConnectionError, resetAttempts)).toBe(mockSocket);
 
       const { namespace } = GameSocket.attach();
-      const listener = jest.fn();
+      const listener = vi.fn();
       GameSocket.onNamespaced(namespace, 'test_event', listener);
 
       expect(GameSocket['socket']).toBe(mockSocket);
@@ -109,7 +108,7 @@ describe('GameSocket', () => {
       expect(GameSocket['socket']).toBe(null);
 
       expect(() => {
-        const listener = jest.fn();
+        const listener = vi.fn();
         GameSocket.onNamespaced('test-ns', 'test_event', listener);
       }).toThrowError('Socket not initialized');
     });
@@ -117,10 +116,10 @@ describe('GameSocket', () => {
     it('fails to add an event listener with an unknown namespace', () => {
       expect(GameSocket.initializeSocket(onConnectionError, resetAttempts)).toBe(mockSocket);
 
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockReturnValue();
 
       const namespace = 'unknown-namespace';
-      const listener = jest.fn();
+      const listener = vi.fn();
       GameSocket.onNamespaced(namespace, 'event', listener);
 
       expect(consoleErrorSpy).toBeCalledWith(
@@ -135,7 +134,7 @@ describe('GameSocket', () => {
       expect(GameSocket.initializeSocket(onConnectionError, resetAttempts)).toBe(mockSocket);
 
       const { namespace } = GameSocket.attach();
-      const listener = jest.fn();
+      const listener = vi.fn();
       GameSocket.onceNamespaced(namespace, 'test_event', listener);
 
       expect(GameSocket['socket']).toBe(mockSocket);
@@ -154,7 +153,7 @@ describe('GameSocket', () => {
       expect(GameSocket['socket']).toBe(null);
 
       expect(() => {
-        const listener = jest.fn();
+        const listener = vi.fn();
         GameSocket.onceNamespaced('test-ns', 'test_event', listener);
       }).toThrowError('Socket not initialized');
     });
@@ -162,10 +161,10 @@ describe('GameSocket', () => {
     it('fails to add a single firing event listener with an unknown namespace', () => {
       expect(GameSocket.initializeSocket(onConnectionError, resetAttempts)).toBe(mockSocket);
 
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockReturnValue();
 
       const namespace = 'unknown-namespace';
-      const listener = jest.fn();
+      const listener = vi.fn();
       GameSocket.onceNamespaced(namespace, 'event', listener);
 
       expect(consoleErrorSpy).toBeCalledWith(
@@ -176,19 +175,19 @@ describe('GameSocket', () => {
   });
 
   it('registers multiple event listeners', () => {
-    const anyListener1 = jest.fn();
-    const anyListener2 = jest.fn();
-    const anyListener3 = jest.fn();
+    const anyListener1 = vi.fn();
+    const anyListener2 = vi.fn();
+    const anyListener3 = vi.fn();
 
-    const listener1 = jest.fn();
-    const listener2 = jest.fn();
-    const listener3 = jest.fn();
-    const listener4 = jest.fn();
+    const listener1 = vi.fn();
+    const listener2 = vi.fn();
+    const listener3 = vi.fn();
+    const listener4 = vi.fn();
 
-    const onceListener1 = jest.fn();
-    const onceListener2 = jest.fn();
-    const onceListener3 = jest.fn();
-    const onceListener4 = jest.fn();
+    const onceListener1 = vi.fn();
+    const onceListener2 = vi.fn();
+    const onceListener3 = vi.fn();
+    const onceListener4 = vi.fn();
 
     expect(GameSocket.initializeSocket(onConnectionError, resetAttempts)).toBe(mockSocket);
     const { namespace: namespace1 } = GameSocket.attach();
@@ -276,16 +275,16 @@ describe('GameSocket', () => {
     });
 
     describe('catch-all listeners', () => {
-      const anyListener1 = jest.fn();
-      const anyListener2 = jest.fn();
-      const anyListener3 = jest.fn();
+      const anyListener1 = vi.fn();
+      const anyListener2 = vi.fn();
+      const anyListener3 = vi.fn();
 
       beforeEach(() => {
         GameSocket.onAnyNamespaced(namespace1, anyListener1);
         GameSocket.onAnyNamespaced(namespace1, anyListener2);
         GameSocket.onAnyNamespaced(namespace2, anyListener3);
 
-        jest.clearAllMocks();
+        vi.clearAllMocks();
       });
 
       it('removes a catch-all listener', () => {
@@ -328,10 +327,10 @@ describe('GameSocket', () => {
     });
 
     describe('standard listeners', () => {
-      const listener1 = jest.fn();
-      const listener2 = jest.fn();
-      const listener3 = jest.fn();
-      const listener4 = jest.fn();
+      const listener1 = vi.fn();
+      const listener2 = vi.fn();
+      const listener3 = vi.fn();
+      const listener4 = vi.fn();
 
       beforeEach(() => {
         GameSocket.onNamespaced(namespace1, 'test_event', listener1);
@@ -340,7 +339,7 @@ describe('GameSocket', () => {
 
         GameSocket.onNamespaced(namespace2, 'test_event', listener4);
 
-        jest.clearAllMocks();
+        vi.clearAllMocks();
       });
 
       it('removes an event listener', () => {
@@ -431,10 +430,10 @@ describe('GameSocket', () => {
     });
 
     describe('once listeners', () => {
-      const onceListener1 = jest.fn();
-      const onceListener2 = jest.fn();
-      const onceListener3 = jest.fn();
-      const onceListener4 = jest.fn();
+      const onceListener1 = vi.fn();
+      const onceListener2 = vi.fn();
+      const onceListener3 = vi.fn();
+      const onceListener4 = vi.fn();
 
       let onceListener1Actual: () => void;
       let onceListener2Actual: () => void;
@@ -453,7 +452,7 @@ describe('GameSocket', () => {
         onceListener3Actual = GameSocket['onceListenersMapping'].get(onceListener3)!;
         onceListener4Actual = GameSocket['onceListenersMapping'].get(onceListener4)!;
 
-        jest.clearAllMocks();
+        vi.clearAllMocks();
       });
 
       it('removes a single firing event listener', () => {
@@ -574,7 +573,7 @@ describe('GameSocket', () => {
     beforeEach(() => {
       GameSocket.initializeSocket(onConnectionError, resetAttempts);
 
-      jest.clearAllMocks();
+      vi.clearAllMocks();
     });
 
     it('attaches, connecting the socket if not already connected', () => {
@@ -585,7 +584,7 @@ describe('GameSocket', () => {
 
     it('attaches to a connected socket', () => {
       GameSocket['connect']();
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       const { namespace } = GameSocket.attach();
       expect(mockSocket.connect).toBeCalledTimes(0);
@@ -594,30 +593,30 @@ describe('GameSocket', () => {
   });
 
   describe('detach', () => {
-    const anyListener1 = jest.fn();
-    const anyListener2 = jest.fn();
-    const anyListener3 = jest.fn();
+    const anyListener1 = vi.fn();
+    const anyListener2 = vi.fn();
+    const anyListener3 = vi.fn();
 
-    const listener1 = jest.fn();
-    const listener2 = jest.fn();
-    const listener3 = jest.fn();
-    const listener4 = jest.fn();
+    const listener1 = vi.fn();
+    const listener2 = vi.fn();
+    const listener3 = vi.fn();
+    const listener4 = vi.fn();
 
-    const onceListener1 = jest.fn();
-    const onceListener2 = jest.fn();
-    const onceListener3 = jest.fn();
-    const onceListener4 = jest.fn();
+    const onceListener1 = vi.fn();
+    const onceListener2 = vi.fn();
+    const onceListener3 = vi.fn();
+    const onceListener4 = vi.fn();
 
     beforeEach(() => {
       GameSocket.initializeSocket(onConnectionError, resetAttempts);
 
-      jest.clearAllMocks();
+      vi.clearAllMocks();
     });
 
     it('detaches and disconnects from a socket with nothing attached and no listeners', () => {
       const { namespace: namespace1 } = GameSocket.attach();
 
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       GameSocket.detach(namespace1);
 
@@ -633,7 +632,7 @@ describe('GameSocket', () => {
       const { namespace: namespace1 } = GameSocket.attach();
       const { namespace: namespace2 } = GameSocket.attach();
 
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       GameSocket.detach(namespace1);
 
@@ -652,7 +651,7 @@ describe('GameSocket', () => {
       GameSocket.onNamespaced(namespace2, 'test_event', listener4);
       GameSocket.onceNamespaced(namespace2, 'test_event', onceListener4);
 
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       GameSocket.detach(namespace1);
 
@@ -685,7 +684,7 @@ describe('GameSocket', () => {
       GameSocket.onNamespaced(namespace2, 'test_event', listener4);
       GameSocket.onceNamespaced(namespace2, 'test_event', onceListener4);
 
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       GameSocket.detach(namespace1);
 
@@ -719,7 +718,7 @@ describe('GameSocket', () => {
       GameSocket.onceNamespaced(namespace1, 'test_event', onceListener2);
       GameSocket.onceNamespaced(namespace1, 'test_event2', onceListener3);
 
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       GameSocket.detach(namespace1);
 

@@ -1,10 +1,9 @@
 import { Socket, io } from 'socket.io-client';
 
-import isDev from '../utils/isDev';
 import { join } from '../utils/url';
 
-const API_HOST = process.env.REACT_APP_API_HOST?.replace(/\/+$/, '') ?? '';
-const API_ROOT = process.env.REACT_APP_API_ROOT?.replace(/\/+$/, '') ?? '';
+const API_HOST = import.meta.env.VITE_APP_API_HOST?.replace(/\/+$/, '') ?? '';
+const API_ROOT = import.meta.env.VITE_APP_API_ROOT?.replace(/\/+$/, '') ?? '';
 
 const API_BASE = join(API_HOST, API_ROOT);
 
@@ -16,7 +15,7 @@ export const buildSocket = (params?: SocketParams, namespace = ''): Socket => {
   const socketParams: SocketParams = {
     path: WEBSOCKET_PATH,
     ...params,
-    ...(isDev && { withCredentials: true }),
+    ...(import.meta.env.DEV && { withCredentials: true }),
   };
 
   let socket;
@@ -52,7 +51,7 @@ export const fetchAPI = (
 ): Promise<Response> => {
   const requestPath = buildRequestPath(path);
   const requestInit: RequestInit = {
-    ...(isDev && { credentials: 'include' }),
+    ...(import.meta.env.DEV && { credentials: 'include' }),
     ...init,
   };
 

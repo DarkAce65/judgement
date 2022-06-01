@@ -16,9 +16,11 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
 
+    "useDefineForClassFields": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "generated_types"]
+  "include": ["src", "generated_types"],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

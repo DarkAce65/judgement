@@ -6,8 +6,8 @@ module.exports = {
   plugins: ['prettier', 'react', 'import'],
   extends: [
     'plugin:react/recommended',
-    'react-app',
     'plugin:@typescript-eslint/recommended',
+    'plugin:react-hooks/recommended',
     'prettier',
     'plugin:prettier/recommended',
   ],
@@ -52,7 +52,11 @@ module.exports = {
       {
         'newlines-between': 'always',
         groups: ['builtin', 'external', ['internal', 'parent'], 'sibling', 'index'],
-        pathGroups: [{ pattern: '{react,react-dom}', group: 'external', position: 'before' }],
+        pathGroups: [
+          { pattern: 'vite', group: 'external', position: 'before' },
+          { pattern: 'vitest', group: 'external', position: 'before' },
+          { pattern: '{react,react-dom,react-dom/*}', group: 'external', position: 'before' },
+        ],
         pathGroupsExcludedImportTypes: ['builtin'],
         alphabetize: { order: 'asc', caseInsensitive: false },
       },

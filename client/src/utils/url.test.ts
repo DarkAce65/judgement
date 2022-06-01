@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest';
+
 import { join } from './url';
 
 describe('empty segments', () => {

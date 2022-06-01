@@ -43,10 +43,10 @@ WORKDIR /client
 COPY client/package.json client/yarn.lock ./
 RUN yarn
 
-ARG REACT_APP_API_HOST
-ARG REACT_APP_API_ROOT
-ENV REACT_APP_API_HOST="$REACT_APP_API_HOST" \
-  REACT_APP_API_ROOT="$REACT_APP_API_ROOT"
+ARG VITE_APP_API_HOST
+ARG VITE_APP_API_ROOT
+ENV VITE_APP_API_HOST="$VITE_APP_API_HOST" \
+  VITE_APP_API_ROOT="$VITE_APP_API_ROOT"
 
 COPY client ./
 COPY --from=model_generator /poetryuser/generated_types ./generated_types/
@@ -58,4 +58,4 @@ FROM nginx
 EXPOSE 80
 
 COPY proxy/templates /etc/nginx/templates/
-COPY --from=client_builder /client/build /usr/share/nginx/html/
+COPY --from=client_builder /client/dist /usr/share/nginx/html/

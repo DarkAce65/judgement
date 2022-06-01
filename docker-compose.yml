@@ -8,8 +8,8 @@ services:
       context: .
       dockerfile: ./proxy/Dockerfile
       args:
-        - "REACT_APP_API_HOST=$API_HOST"
-        - "REACT_APP_API_ROOT=$API_ROOT"
+        - "VITE_APP_API_HOST=$API_HOST"
+        - "VITE_APP_API_ROOT=$API_ROOT"
     restart: on-failure
     env_file: .env
     networks:

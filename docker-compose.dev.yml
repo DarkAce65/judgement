@@ -15,10 +15,8 @@ services:
   client:
     build: ./client
     environment:
-      CHOKIDAR_USEPOLLING: "true"
-      REACT_APP_ENV: development
-      REACT_APP_API_HOST: "http://localhost:8000"
-      REACT_APP_API_ROOT: "/"
+      VITE_APP_API_HOST: "http://localhost:8000"
+      VITE_APP_API_ROOT: "/"
     ports:
       - 3000:3000
     volumes:

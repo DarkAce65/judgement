@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom/client';
 
 import { unwrapResult } from '@reduxjs/toolkit';
 import { Button, message } from 'antd';
@@ -9,7 +9,7 @@ import { ensurePlayer, getPlayerName } from './data/playerSlice';
 import store from './data/store';
 import GameSocket, { isConnectionError } from './game/GameSocket';
 
-import './index.less';
+import 'antd/dist/antd.less';
 
 const initializeGameSocket = () => {
   let socketRetries = 0;
@@ -52,11 +52,10 @@ const initializeGameSocket = () => {
 };
 
 const render = () => {
-  ReactDOM.render(
+  ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
       <App />
-    </React.StrictMode>,
-    document.getElementById('root')
+    </React.StrictMode>
   );
 };
 
