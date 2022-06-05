@@ -19,9 +19,11 @@ const Hand = ({ cards, onReorderCards, onSelect }: Props) => {
   const cardWidth = useMemo(() => Math.max(100, width / 6), [width]);
   const paddingRight = useMemo(
     () =>
-      `calc(${100 - 100 * (cards.length / (cards.length - 1))}% + ${
-        cardWidth * (cards.length / (cards.length - 1))
-      }px)`,
+      cards.length < 2
+        ? 0
+        : `calc(${100 - 100 * (cards.length / (cards.length - 1))}% + ${
+            cardWidth * (cards.length / (cards.length - 1))
+          }px)`,
     [cardWidth, cards.length]
   );
 
