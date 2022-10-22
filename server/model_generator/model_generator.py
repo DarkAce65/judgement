@@ -37,6 +37,6 @@ if __name__ == "__main__":
     for module_name in module_names:
         base_name = module_name.rsplit(".", maxsplit=1)[-1]
         out_filename = (out_dir / base_name).with_suffix(".ts")
-        generate_typescript_defs(module_name, out_filename, json2ts_cmd=json2ts_path)
+        generate_typescript_defs(module_name, out_filename, json2ts_cmd=str(json2ts_path))
 
         logger.info("Wrote interfaces for %s to %s", module_name, out_filename)

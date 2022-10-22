@@ -1,11 +1,10 @@
 # Model generator container
-FROM python:3.9-alpine as model_generator
+FROM python:3.10-alpine as model_generator
 
 ENV PYTHONUNBUFFERED=1 \
   PYTHONDONTWRITEBYTECODE=1 \
-  POETRY_VERSION=1.1.12 \
-  POETRY_HOME="/opt/poetry" \
-  POETRY_NO_INTERACTION=1
+  POETRY_VERSION=1.2.2 \
+  POETRY_HOME="/opt/poetry"
 
 RUN apk add --no-cache \
   curl \
@@ -15,7 +14,7 @@ RUN apk add --no-cache \
   musl-dev \
   postgresql-dev \
   yarn \
-  && (curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -) \
+  && (curl -sSL https://install.python-poetry.org | python3 -) \
   && chmod -R +x "$POETRY_HOME/bin"
 ENV PATH="$POETRY_HOME/bin:$PATH"
 
@@ -29,13 +28,13 @@ RUN yarn
 
 WORKDIR /server
 COPY server/pyproject.toml server/poetry.lock ./
-RUN poetry install --no-dev -E generator --no-interaction
+RUN poetry install --only main,generator --no-interaction
 
 COPY server .
 RUN poetry run python -m model_generator.model_generator --out_dir /poetryuser/generated_types
 
 # Client builder stage
-FROM node:16 as client_builder
+FROM node:18 as client_builder
 
 USER node
 WORKDIR /client

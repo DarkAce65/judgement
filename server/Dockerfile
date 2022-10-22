@@ -1,11 +1,10 @@
 # Python image with poetry and non-root user
-FROM python:3.9-alpine as python_poetry
+FROM python:3.10-alpine as python_poetry
 
 ENV PYTHONUNBUFFERED=1 \
   PYTHONDONTWRITEBYTECODE=1 \
-  POETRY_VERSION=1.1.12 \
-  POETRY_HOME="/opt/poetry" \
-  POETRY_NO_INTERACTION=1
+  POETRY_VERSION=1.2.2 \
+  POETRY_HOME="/opt/poetry"
 
 RUN apk add --no-cache \
   curl \
@@ -14,7 +13,7 @@ RUN apk add --no-cache \
   make \
   musl-dev \
   postgresql-dev \
-  && (curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -) \
+  && (curl -sSL https://install.python-poetry.org | python3 -) \
   && chmod -R +x "$POETRY_HOME/bin"
 ENV PATH="$POETRY_HOME/bin:$PATH"
 
@@ -28,12 +27,12 @@ USER poetryuser
 WORKDIR /server
 
 COPY pyproject.toml poetry.lock ./
-RUN poetry install --no-dev --no-interaction
+RUN poetry install --only main --no-interaction
 
 # Debug/hot-reloading container
 FROM base_server_deps as debug
 EXPOSE "$API_PORT"
-RUN poetry install --no-dev -E debug --no-interaction
+RUN poetry install --only main,debug --no-interaction
 COPY . .
 CMD ["sh", "-c", "poetry run python -m debugpy --listen 0.0.0.0:5678 -m uvicorn main:app --host 0.0.0.0 --port $API_PORT --use-colors --log-config logging.config.json --reload --reload-dir server"]
 
@@ -55,7 +54,7 @@ COPY model_generator/package.json model_generator/yarn.lock ./
 RUN yarn
 
 WORKDIR /server
-RUN poetry install --no-dev -E generator --no-interaction
+RUN poetry install --only main,generator --no-interaction
 
 COPY . .
 CMD ["sh", "-c", "poetry run python -m model_generator.watcher --out_dir \"$GENERATED_TYPES_OUT_DIR\""]

@@ -69,27 +69,33 @@ generate = "python -m model_generator.model_generator --out_dir ../client/genera
 generate_watch = "python -m model_generator.watcher --out_dir ../client/generated_types"
 
 [tool.poetry.dependencies]
-python = "^3.9"
-debugpy = { version = "^1.2.1", optional = true }
-fastapi = "^0.74.0"
+python = "^3.10"
+fastapi = "^0.85.1"
 psycopg2 = "^2.9.3"
-pydantic-to-typescript = { version = "^1.0.8", optional = true }
 python-socketio = "^5.5.0"
-uvicorn = { version = "^0.17.0", extras = ["standard"] }
-watchgod = { version = "^0.7", optional = true }
+uvicorn = { version = "^0.19.0", extras = ["standard"] }
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.debug]
+optional = true
+
+[tool.poetry.group.debug.dependencies]
+debugpy = "^1.2.1"
+
+[tool.poetry.group.generator]
+optional = true
+
+[tool.poetry.group.generator.dependencies]
+pydantic-to-typescript = "^1.0.8"
+watchgod = "^0.8.2"
+
+[tool.poetry.group.dev.dependencies]
 black = "^22.1.0"
 isort = "^5.10.1"
-mypy = "^0.931"
+mypy = "^0.982"
 pylint = "^2.12.2"
 taskipy = "^1.6.0"
 types-psycopg2 = "^2.9.5"
 
-[tool.poetry.extras]
-debug = ["debugpy"]
-generator = ["pydantic-to-typescript", "watchgod"]
-
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
