@@ -2,6 +2,6 @@
   "name": "model_converter",
   "private": true,
   "dependencies": {
-    "json-schema-to-typescript": "^10.1.5"
+    "json-schema-to-typescript": "^11.0.2"
   }
 }
