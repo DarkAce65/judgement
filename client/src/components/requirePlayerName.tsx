@@ -1,4 +1,4 @@
-import { ComponentType, useState } from 'react';
+import { ComponentType, useRef } from 'react';
 
 import { PageHeader } from 'antd';
 import Cookies from 'js-cookie';
@@ -28,24 +28,24 @@ const SetPlayerNamePage = () => (
   </PageHeader>
 );
 
-const requirePlayerName = <P,>(WrappedComponent: ComponentType<P>) => {
+const requirePlayerName = <P extends object>(WrappedComponent: ComponentType<P>) => {
   const RequirePlayerName = (props: P) => {
     const dispatch = useAppDispatch();
 
     const playerName = useSelector(getPlayerName);
-    const [renewingCookie, setRenewingCookie] = useState(false);
+    const renewingCookie = useRef(false);
     const ensurePlayerFetchStatus = useSelector(getEnsurePlayerFetchStatus);
 
     if (!playerName) {
       return <SetPlayerNamePage />;
     }
 
-    if (!renewingCookie && !Cookies.get(PLAYER_ID_COOKIE)) {
-      setRenewingCookie(true);
+    if (!renewingCookie.current && !Cookies.get(PLAYER_ID_COOKIE)) {
+      renewingCookie.current = true;
       dispatch(ensurePlayer(playerName));
     }
 
-    if (renewingCookie) {
+    if (renewingCookie.current) {
       if (ensurePlayerFetchStatus === 'uninitialized' || ensurePlayerFetchStatus === 'pending') {
         return <LoadingPage />;
       } else if (ensurePlayerFetchStatus === 'failed') {
