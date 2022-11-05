@@ -16,12 +16,13 @@
     "*.{ts,tsx,css,html}": "prettier --list-different"
   },
   "dependencies": {
+    "@dnd-kit/core": "^6.0.5",
+    "@dnd-kit/sortable": "^7.0.1",
     "@reduxjs/toolkit": "^1.8.6",
     "antd": "^4.23.6",
     "js-cookie": "^3.0.1",
     "lodash-es": "^4.17.21",
     "react": "^18.2.0",
-    "react-beautiful-dnd": "^13.1.1",
     "react-dom": "^18.2.0",
     "react-redux": "^8.0.4",
     "react-router-dom": "^6.4.2",
@@ -33,7 +34,6 @@
     "@types/js-cookie": "^3.0.2",
     "@types/lodash-es": "^4.17.6",
     "@types/react": "^18.0.21",
-    "@types/react-beautiful-dnd": "^13.1.2",
     "@types/react-dom": "^18.0.6",
     "@types/react-redux": "^7.1.24",
     "@types/react-router-dom": "^5.3.3",

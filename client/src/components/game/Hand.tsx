@@ -1,10 +1,52 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
-import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import { DragOverlay, useDndMonitor } from '@dnd-kit/core';
+import { SortableContext, horizontalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 import useWindowSize from '../../utils/useWindowSize';
 
 import Card, { CardType } from './Card';
+
+const DraggableCard = ({
+  sortableId,
+  cardWidth,
+  numCards,
+  card,
+  onClick,
+}: {
+  sortableId: string;
+  cardWidth: number;
+  numCards: number;
+  card: CardType;
+  onClick?: () => void;
+}) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: sortableId,
+    data: { card },
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{
+        visibility: isDragging ? 'hidden' : undefined,
+        width: `${100 / numCards}%`,
+        minWidth: 0.13 * cardWidth,
+        maxWidth: cardWidth + 10,
+        textAlign: 'center',
+        transform: CSS.Transform.toString(transform),
+        transition,
+        touchAction: 'none',
+      }}
+      {...attributes}
+      {...listeners}
+      onClick={onClick}
+    >
+      <Card card={card} style={{ width: cardWidth }} />
+    </div>
+  );
+};
 
 interface Props {
   cards: CardType[];
@@ -13,8 +55,6 @@ interface Props {
 }
 
 const Hand = ({ cards, onReorderCards, onSelect }: Props) => {
-  const handId = useMemo(() => `hand-${Math.random().toString(16).slice(2, 8)}`, []);
-
   const { width } = useWindowSize();
   const cardWidth = useMemo(() => Math.max(100, width / 6), [width]);
   const paddingRight = useMemo(
@@ -27,61 +67,68 @@ const Hand = ({ cards, onReorderCards, onSelect }: Props) => {
     [cardWidth, cards.length]
   );
 
-  return (
-    <DragDropContext
-      onDragEnd={(result) => {
-        if (!onReorderCards || !result.destination) {
-          return;
-        }
+  const cardsWithId: (CardType & { id: string })[] = useMemo(() => {
+    const counter: Record<string, number> = {};
+    return cards.map((card) => {
+      const cardId = `${card.suit}${card.rank}`;
+      if (!counter[cardId]) {
+        counter[cardId] = 0;
+      }
+      const num = counter[cardId];
+      counter[cardId] += 1;
 
-        onReorderCards(result.source.index, result.destination.index);
-      }}
-    >
-      <Droppable droppableId={handId} direction="horizontal">
-        {(droppableProvided) => (
-          <div
-            ref={droppableProvided.innerRef}
-            {...droppableProvided.droppableProps}
-            style={{ display: 'flex', justifyContent: 'center', paddingRight }}
-          >
-            {cards.map((card, index) => (
-              <Draggable
-                key={`${index}${card.suit}${card.rank}`}
-                draggableId={`${index}${card.suit}${card.rank}`}
-                index={index}
-              >
-                {(draggableProvided, snapshot) => (
-                  <div
-                    ref={draggableProvided.innerRef}
-                    {...draggableProvided.draggableProps}
-                    onClick={() => {
-                      if (onSelect) {
-                        onSelect(index);
-                      }
-                    }}
-                    style={{
-                      ...draggableProvided.draggableProps.style,
-                      display: 'inline-block',
-                      ...(!snapshot.isDragging && { width: `${100 / cards.length}%` }),
-                      minWidth: 0.13 * cardWidth,
-                      maxWidth: cardWidth + 10,
-                      textAlign: 'center',
-                    }}
-                  >
-                    <Card
-                      {...draggableProvided.dragHandleProps}
-                      card={card}
-                      style={{ width: cardWidth }}
-                    />
-                  </div>
-                )}
-              </Draggable>
-            ))}
-            {droppableProvided.placeholder}
-          </div>
-        )}
-      </Droppable>
-    </DragDropContext>
+      return { ...card, id: `${num}${cardId}` };
+    });
+  }, [cards]);
+  const cardOrder = useMemo(() => cardsWithId.map((card) => card.id), [cardsWithId]);
+
+  const [activeCard, setActiveCard] = useState<CardType | null>(null);
+  useDndMonitor({
+    onDragStart: (event) => {
+      setActiveCard(event.active.data.current!.card as CardType);
+    },
+    onDragCancel: () => {
+      setActiveCard(null);
+    },
+    onDragEnd: (event) => {
+      if (onReorderCards) {
+        const { active, over } = event;
+        if (over && active.id !== over.id) {
+          const oldIndex = cardOrder.indexOf(active.id as string);
+          const newIndex = cardOrder.indexOf(over.id as string);
+          onReorderCards(oldIndex, newIndex);
+        }
+      }
+      setActiveCard(null);
+    },
+  });
+
+  return (
+    <div style={{ display: 'flex', justifyContent: 'center', paddingRight }}>
+      <SortableContext items={cardOrder} strategy={horizontalListSortingStrategy}>
+        {cardsWithId.map((card, index) => (
+          <DraggableCard
+            key={card.id}
+            sortableId={card.id}
+            cardWidth={cardWidth}
+            numCards={cards.length}
+            card={card}
+            {...(onSelect && {
+              onClick: () => {
+                onSelect(index);
+              },
+            })}
+          />
+        ))}
+        <DragOverlay>
+          {activeCard && (
+            <div style={{ textAlign: 'center' }}>
+              <Card card={activeCard} style={{ width: cardWidth }} />
+            </div>
+          )}
+        </DragOverlay>
+      </SortableContext>
+    </div>
   );
 };
 
