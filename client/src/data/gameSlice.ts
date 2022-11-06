@@ -4,7 +4,7 @@ import { JudgementGameState, JudgementSpectatorGameState } from '../../generated
 import { GameStateMessage } from '../../generated_types/websocket';
 
 import { loadRoomState } from './roomSlice';
-import type { RootState } from './store';
+import { RootState } from './store';
 
 interface GameState {
   state: JudgementGameState | JudgementSpectatorGameState | null;

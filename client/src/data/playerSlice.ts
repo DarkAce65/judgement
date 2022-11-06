@@ -7,7 +7,7 @@ import { FetchStatus } from '../api/FetchStatus';
 import { fetchAPI, makeJSONBodyWithContentType } from '../api/client';
 import { PLAYER_ID_COOKIE } from '../constants';
 
-import type { RootState } from './store';
+import { RootState } from './store';
 
 interface PlayerState {
   ensurePlayerStatus: FetchStatus;

@@ -12,7 +12,7 @@ import { RoomMessage } from '../../generated_types/websocket';
 import { fetchAPI, makeJSONBodyWithContentType } from '../api/client';
 
 import { getPlayerName, getPlayerNames } from './playerSlice';
-import type { RootState } from './store';
+import { RootState } from './store';
 
 interface RoomState {
   roomId: string | null;

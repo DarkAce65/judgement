@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type GameSocketType from './GameSocket';
+import GameSocketType from './GameSocket';
 
 const mockSocket = {
   connect: vi
