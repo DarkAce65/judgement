@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 
-import { Button, Form, InputNumber } from 'antd';
+import { Button, Form, InputNumber, message } from 'antd';
 
 import {
   JudgementGameState,
@@ -14,17 +14,27 @@ interface Props {
   game: JudgementGameState | JudgementSpectatorGameState;
 }
 
-const JudgementSettings = ({ game, socket }: Props & WithGameSocketProps) => {
-  const [numRounds, setNumRounds, numRoundsChanged] = useDraftValue(game.settings.numRounds);
-  const [numDecks, setNumDecks, numDecksChanged] = useDraftValue(game.settings.numDecks);
+const JudgementSettings = ({ game: { settings }, socket }: Props & WithGameSocketProps) => {
+  const [numRounds, setNumRounds, numRoundsChanged] = useDraftValue<number | null>(
+    settings.numRounds
+  );
+  const [numDecks, setNumDecks, numDecksChanged] = useDraftValue<number | null>(settings.numDecks);
+
+  const canUpdateSettings =
+    numRounds !== null && numDecks !== null && (numRoundsChanged || numDecksChanged);
 
   const updateSettings = useCallback(() => {
+    if (!canUpdateSettings) {
+      message.error('Unable to update settings');
+      return;
+    }
+
     const action: JudgementUpdateSettingsAction = { actionType: 'UPDATE_SETTINGS' };
     if (numRoundsChanged) action.numRounds = numRounds;
     if (numDecksChanged) action.numDecks = numDecks;
 
     socket.emit('game_input', action);
-  }, [socket, numRoundsChanged, numRounds, numDecksChanged, numDecks]);
+  }, [canUpdateSettings, numRoundsChanged, numRounds, numDecksChanged, numDecks, socket]);
 
   return (
     <Form>
@@ -36,7 +46,7 @@ const JudgementSettings = ({ game, socket }: Props & WithGameSocketProps) => {
       </Form.Item>
       <Form.Item>
         <Button
-          disabled={!numRoundsChanged && !numDecksChanged}
+          disabled={!canUpdateSettings}
           onClick={() => {
             updateSettings();
           }}
