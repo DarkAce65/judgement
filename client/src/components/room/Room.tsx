@@ -20,6 +20,7 @@ import withGameSocket, { WithGameSocketProps } from '../../game/withGameSocket';
 import PlayerNameInput from '../PlayerNameInput';
 import requirePlayerName from '../requirePlayerName';
 
+import DebugGameState from './DebugGameState';
 import LeaveRoomButton from './LeaveRoomButton';
 import JudgementContainer from './judgement/JudgementContainer';
 
@@ -132,9 +133,7 @@ const Room = ({ roomId, socket, namespace }: Props & WithGameSocketProps) => {
           <LeaveRoomButton roomId={roomId} />
         </Space>
       </Typography.Paragraph>
-      <Typography.Paragraph style={{ fontSize: '0.7em' }}>
-        <pre>{JSON.stringify(game, null, 2)}</pre>
-      </Typography.Paragraph>
+      <DebugGameState />
     </PageHeader>
   );
 };
