@@ -48,10 +48,10 @@ const DraggableCard = ({
 interface Props {
   cards: CardType[];
   onReorderCards?: (sourceIndex: number, destinationIndex: number) => void;
-  onSelect?: (index: number) => void;
+  onClick?: (index: number, card: CardType) => void;
 }
 
-const Hand = ({ cards, onReorderCards, onSelect }: Props) => {
+const Hand = ({ cards, onReorderCards, onClick }: Props) => {
   const cardWidth = useCardWidth();
   const paddingRight = useMemo(
     () =>
@@ -125,9 +125,9 @@ const Hand = ({ cards, onReorderCards, onSelect }: Props) => {
               minWidth: 0.13 * cardWidth,
               maxWidth: cardWidth + 10,
             }}
-            {...(onSelect && {
+            {...(onClick && {
               onClick: () => {
-                onSelect(index);
+                onClick(index, cardsWithId[index]);
               },
             })}
           />
