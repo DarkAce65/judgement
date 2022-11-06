@@ -44,7 +44,6 @@ warn_untyped_fields = true
 
 [tool.pylint.messages_control]
 disable = [
-  "misplaced-comparison-constant",
   "missing-class-docstring",
   "missing-function-docstring",
   "missing-module-docstring",
