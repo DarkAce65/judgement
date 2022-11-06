@@ -58,7 +58,7 @@ class BiMap<K, V> {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type Listener = (...args: any[]) => void;
+export type Listener = (...args: any[]) => void;
 
 interface ConnectionError extends Error {
   message: 'unknown_player_id';

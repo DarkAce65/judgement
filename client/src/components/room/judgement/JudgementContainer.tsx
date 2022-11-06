@@ -3,7 +3,8 @@ import {
   JudgementSpectatorGameState,
 } from '../../../../generated_types/judgement';
 
-import JudgementGame from './JudgementGame';
+import JudgementGameBidding from './JudgementGameBidding';
+import JudgementGamePlaying from './JudgementGamePlaying';
 import JudgementSettings from './JudgementSettings';
 
 interface Props {
@@ -11,14 +12,22 @@ interface Props {
 }
 
 const JudgementContainer = ({ game }: Props) => {
-  return (
-    <>
-      {game.status === 'NOT_STARTED' && <JudgementSettings game={game} />}
-      {game.status === 'IN_PROGRESS' && game.playerType === 'PLAYER' && (
-        <JudgementGame game={game} />
-      )}
-    </>
-  );
+  if (game.status === 'NOT_STARTED') {
+    return <JudgementSettings game={game} />;
+  }
+
+  if (game.status === 'IN_PROGRESS' && game.playerType === 'PLAYER') {
+    switch (game.phase) {
+      case 'BIDDING':
+        return <JudgementGameBidding game={game} />;
+      case 'PLAYING':
+        return <JudgementGamePlaying game={game} />;
+      default:
+        return null;
+    }
+  }
+
+  return null;
 };
 
 export default JudgementContainer;
