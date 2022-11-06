@@ -15,7 +15,7 @@ import { getGame, loadGameState } from '../../data/gameSlice';
 import { getPlayerId, loadPlayers } from '../../data/playerSlice';
 import { useAppDispatch, useAppSelector } from '../../data/reduxHooks';
 import { getGameName, getOrderedPlayerNames, loadRoomState } from '../../data/roomSlice';
-import GameSocket from '../../game/GameSocket';
+import GameSocket, { Listener } from '../../game/GameSocket';
 import withGameSocket, { WithGameSocketProps } from '../../game/withGameSocket';
 import PlayerNameInput from '../PlayerNameInput';
 import requirePlayerName from '../requirePlayerName';
@@ -44,18 +44,29 @@ const Room = ({ roomId, socket, namespace }: Props & WithGameSocketProps) => {
   }, [socket, namespace, roomId]);
 
   useEffect(() => {
-    GameSocket.onNamespaced(namespace, 'room', (roomMessage: RoomMessage) => {
-      dispatch(loadRoomState(roomMessage));
-    });
-    GameSocket.onNamespaced(namespace, 'players', (playersMessage: PlayersMessage) => {
-      dispatch(loadPlayers(playersMessage));
-    });
-    GameSocket.onNamespaced(namespace, 'game_state', (gameStateMessage: GameStateMessage) => {
-      dispatch(loadGameState(gameStateMessage));
-    });
-    GameSocket.onNamespaced(namespace, 'invalid_input', (error: GameErrorMessage) => {
-      message.error(error.errorMessage);
-    });
+    const listeners: { [event: string]: Listener } = {
+      ['room']: (roomMessage: RoomMessage) => {
+        dispatch(loadRoomState(roomMessage));
+      },
+      ['players']: (playersMessage: PlayersMessage) => {
+        dispatch(loadPlayers(playersMessage));
+      },
+      ['game_state']: (gameStateMessage: GameStateMessage) => {
+        dispatch(loadGameState(gameStateMessage));
+      },
+      ['invalid_input']: (error: GameErrorMessage) => {
+        message.error(error.errorMessage);
+      },
+    };
+    for (const [event, listener] of Object.entries(listeners)) {
+      GameSocket.onNamespaced(namespace, event, listener);
+    }
+
+    return () => {
+      for (const [event, listener] of Object.entries(listeners)) {
+        GameSocket.offNamespaced(namespace, event, listener);
+      }
+    };
   }, [dispatch, namespace]);
 
   const handleGameChange = useCallback(
