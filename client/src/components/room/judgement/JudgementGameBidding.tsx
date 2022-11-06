@@ -3,7 +3,11 @@ import { useCallback, useState } from 'react';
 import { DndContext } from '@dnd-kit/core';
 import { Button, InputNumber, Space, Typography } from 'antd';
 
-import { JudgementBidHandsAction, JudgementGameState } from '../../../../generated_types/judgement';
+import {
+  JudgementBidHandsAction,
+  JudgementGameState,
+  JudgementOrderCardsAction,
+} from '../../../../generated_types/judgement';
 import withGameSocket, { WithGameSocketProps } from '../../../game/withGameSocket';
 import { useConfiguredSensors } from '../../../utils/useConfiguredSensors';
 import Hand from '../../game/Hand';
@@ -16,6 +20,14 @@ const JudgementGameBidding = ({ game, socket }: Props & WithGameSocketProps) => 
   const sensors = useConfiguredSensors();
 
   const [bidAmount, setBidAmount] = useState<number | null>(null);
+
+  const reorderCards = useCallback(
+    (fromIndex: number, toIndex: number) => {
+      const action: JudgementOrderCardsAction = { actionType: 'ORDER_CARDS', fromIndex, toIndex };
+      socket.emit('game_input', action);
+    },
+    [socket]
+  );
 
   const bidHands = useCallback(() => {
     if (bidAmount === null) {
@@ -31,7 +43,7 @@ const JudgementGameBidding = ({ game, socket }: Props & WithGameSocketProps) => 
     <Typography.Paragraph>
       <Space direction="vertical" style={{ display: 'flex' }}>
         <DndContext sensors={sensors}>
-          <Hand cards={game.playerState.hand} />
+          <Hand cards={game.playerState.hand} onReorderCards={reorderCards} />
         </DndContext>
         <Space direction="horizontal">
           <InputNumber

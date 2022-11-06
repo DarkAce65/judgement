@@ -23,6 +23,7 @@ class JudgementPhase(str, Enum):
 @unique
 class JudgementActionType(str, Enum):
     UPDATE_SETTINGS = "UPDATE_SETTINGS"
+    ORDER_CARDS = "ORDER_CARDS"
     BID_HANDS = "BID_HANDS"
     PLAY_CARD = "PLAY_CARD"
 
@@ -54,6 +55,14 @@ class JudgementUpdateSettingsAction(
     action_type: Literal[JudgementActionType.UPDATE_SETTINGS]
     num_decks: Optional[int]
     num_rounds: Optional[int]
+
+
+class JudgementOrderCardsAction(
+    JudgementAction, action_type=JudgementActionType.ORDER_CARDS
+):
+    action_type: Literal[JudgementActionType.ORDER_CARDS]
+    from_index: int
+    to_index: int
 
 
 class JudgementBidHandsAction(JudgementAction, action_type=JudgementActionType.BID_HANDS):

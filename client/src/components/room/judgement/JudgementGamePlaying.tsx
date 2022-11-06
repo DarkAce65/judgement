@@ -3,7 +3,11 @@ import { useCallback, useState } from 'react';
 import { DndContext } from '@dnd-kit/core';
 import { Button, Radio, Space, Typography } from 'antd';
 
-import { JudgementGameState, JudgementPlayCardAction } from '../../../../generated_types/judgement';
+import {
+  JudgementGameState,
+  JudgementOrderCardsAction,
+  JudgementPlayCardAction,
+} from '../../../../generated_types/judgement';
 import withGameSocket, { WithGameSocketProps } from '../../../game/withGameSocket';
 import { useConfiguredSensors } from '../../../utils/useConfiguredSensors';
 import Card, { CardType } from '../../game/Card';
@@ -17,6 +21,14 @@ const JudgementGamePlaying = ({ game, socket }: Props & WithGameSocketProps) => 
   const sensors = useConfiguredSensors();
 
   const [selectedCard, setSelectedCard] = useState<CardType | null>(null);
+
+  const reorderCards = useCallback(
+    (fromIndex: number, toIndex: number) => {
+      const action: JudgementOrderCardsAction = { actionType: 'ORDER_CARDS', fromIndex, toIndex };
+      socket.emit('game_input', action);
+    },
+    [socket]
+  );
 
   const playCard = useCallback(() => {
     if (!selectedCard) {
@@ -48,6 +60,7 @@ const JudgementGamePlaying = ({ game, socket }: Props & WithGameSocketProps) => 
             <Space direction="horizontal">
               <Hand
                 cards={game.playerState.hand}
+                onReorderCards={reorderCards}
                 onSelect={(index) => setSelectedCard(game.playerState.hand[index])}
               />
             </Space>

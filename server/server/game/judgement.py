@@ -8,6 +8,7 @@ from server.models.judgement import (
     JudgementAction,
     JudgementBidHandsAction,
     JudgementGameState,
+    JudgementOrderCardsAction,
     JudgementPhase,
     JudgementPlayCardAction,
     JudgementPlayerState,
@@ -153,6 +154,8 @@ class JudgementGame(Game[JudgementAction]):
 
         if isinstance(game_input, JudgementUpdateSettingsAction):
             self.handle_update_settings_action(player_id, game_input)
+        elif isinstance(game_input, JudgementOrderCardsAction):
+            await self.handle_order_cards_action(player_id, game_input)
         elif isinstance(game_input, JudgementBidHandsAction):
             await self.handle_bid_action(player_id, game_input)
         elif isinstance(game_input, JudgementPlayCardAction):
@@ -173,6 +176,18 @@ class JudgementGame(Game[JudgementAction]):
             self.settings.num_decks = action.num_decks
         if action.num_rounds is not None:
             self.settings.num_rounds = action.num_rounds
+
+    async def handle_order_cards_action(
+        self, player_id: int, action: JudgementOrderCardsAction
+    ) -> None:
+        player_hand = self.player_states[player_id].hand
+        moved_card = player_hand.pop(action.from_index)
+        if action.to_index == len(player_hand) - 1:
+            player_hand.append(moved_card)
+        else:
+            player_hand.insert(action.to_index, moved_card)
+
+        await socket_messager.emit_game_state(self)
 
     async def handle_bid_action(
         self, player_id: int, action: JudgementBidHandsAction
