@@ -19,14 +19,25 @@ const gameSlice = createSlice({
     loadGameState(_, { payload }: PayloadAction<GameStateMessage>) {
       return payload.state ?? null;
     },
+    optimisticallyReorderCards(
+      state,
+      { payload: { fromIndex, toIndex } }: PayloadAction<{ fromIndex: number; toIndex: number }>
+    ) {
+      if (fromIndex === toIndex || state === null || state.playerType === 'SPECTATOR') {
+        return;
+      }
+
+      const movedCard = state.playerState.hand.splice(fromIndex, 1)[0];
+      state.playerState.hand.splice(toIndex, 0, movedCard);
+    },
   },
   extraReducers: (builder) => {
-    builder.addCase(loadRoomState, (state, { payload }) => {
+    builder.addCase(loadRoomState, (_, { payload }) => {
       return payload.game ?? null;
     });
   },
 });
 
-export const { loadGameState } = gameSlice.actions;
+export const { loadGameState, optimisticallyReorderCards } = gameSlice.actions;
 
 export default gameSlice.reducer;

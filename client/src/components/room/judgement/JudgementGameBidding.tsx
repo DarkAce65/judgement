@@ -8,6 +8,8 @@ import {
   JudgementGameState,
   JudgementOrderCardsAction,
 } from '../../../../generated_types/judgement';
+import { optimisticallyReorderCards } from '../../../data/gameSlice';
+import { useAppDispatch } from '../../../data/reduxHooks';
 import withGameSocket, { WithGameSocketProps } from '../../../game/withGameSocket';
 import { useConfiguredSensors } from '../../../utils/useConfiguredSensors';
 import Hand from '../../game/Hand';
@@ -17,6 +19,7 @@ interface Props {
 }
 
 const JudgementGameBidding = ({ game, socket }: Props & WithGameSocketProps) => {
+  const dispatch = useAppDispatch();
   const sensors = useConfiguredSensors();
 
   const [bidAmount, setBidAmount] = useState<number | null>(null);
@@ -25,10 +28,10 @@ const JudgementGameBidding = ({ game, socket }: Props & WithGameSocketProps) => 
     (fromIndex: number, toIndex: number) => {
       const action: JudgementOrderCardsAction = { actionType: 'ORDER_CARDS', fromIndex, toIndex };
       socket.emit('game_input', action);
+      dispatch(optimisticallyReorderCards({ fromIndex, toIndex }));
     },
-    [socket]
+    [dispatch, socket]
   );
-
   const bidHands = useCallback(() => {
     if (bidAmount === null) {
       return;
