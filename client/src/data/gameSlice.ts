@@ -1,4 +1,4 @@
-import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit';
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
 import { JudgementGameState, JudgementSpectatorGameState } from '../../generated_types/judgement';
 import { GameStateMessage } from '../../generated_types/websocket';
@@ -6,27 +6,23 @@ import { GameStateMessage } from '../../generated_types/websocket';
 import { loadRoomState } from './roomSlice';
 import { RootState } from './store';
 
-interface GameState {
-  state: JudgementGameState | JudgementSpectatorGameState | null;
-}
+type GameState = JudgementGameState | JudgementSpectatorGameState | null;
 
-const initialState: GameState = { state: null };
+const initialState = null as GameState;
 
-const getGameState = (state: RootState): GameState => state.game;
-
-export const getGame = createSelector([getGameState], (state) => state.state);
+export const getGame = (state: RootState): GameState => state.game;
 
 const gameSlice = createSlice({
   name: 'game',
   initialState,
   reducers: {
-    loadGameState(state, { payload }: PayloadAction<GameStateMessage>) {
-      state.state = payload.state ?? null;
+    loadGameState(_, { payload }: PayloadAction<GameStateMessage>) {
+      return payload.state ?? null;
     },
   },
   extraReducers: (builder) => {
     builder.addCase(loadRoomState, (state, { payload }) => {
-      state.state = payload.game ?? null;
+      return payload.game ?? null;
     });
   },
 });
