@@ -1,24 +1,23 @@
-import { useMemo, useState } from 'react';
+import { CSSProperties, useMemo, useState } from 'react';
 
 import { DragOverlay, useDndMonitor } from '@dnd-kit/core';
 import { SortableContext, horizontalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-import useWindowSize from '../../utils/useWindowSize';
-
 import Card, { CardType } from './Card';
+import { useCardWidth } from './useCardWidth';
 
 const DraggableCard = ({
   sortableId,
   cardWidth,
-  numCards,
   card,
+  containerStyle,
   onClick,
 }: {
   sortableId: string;
   cardWidth: number;
-  numCards: number;
   card: CardType;
+  containerStyle?: CSSProperties;
   onClick?: () => void;
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -30,10 +29,8 @@ const DraggableCard = ({
     <div
       ref={setNodeRef}
       style={{
+        ...containerStyle,
         visibility: isDragging ? 'hidden' : undefined,
-        width: `${100 / numCards}%`,
-        minWidth: 0.13 * cardWidth,
-        maxWidth: cardWidth + 10,
         textAlign: 'center',
         transform: CSS.Transform.toString(transform),
         transition,
@@ -55,8 +52,7 @@ interface Props {
 }
 
 const Hand = ({ cards, onReorderCards, onSelect }: Props) => {
-  const { width } = useWindowSize();
-  const cardWidth = useMemo(() => Math.max(100, width / 6), [width]);
+  const cardWidth = useCardWidth();
   const paddingRight = useMemo(
     () =>
       cards.length < 2
@@ -82,24 +78,36 @@ const Hand = ({ cards, onReorderCards, onSelect }: Props) => {
   }, [cards]);
   const cardOrder = useMemo(() => cardsWithId.map((card) => card.id), [cardsWithId]);
 
-  const [activeCard, setActiveCard] = useState<CardType | null>(null);
+  const [draggedCard, setDraggedCard] = useState<CardType | null>(null);
   useDndMonitor({
     onDragStart: (event) => {
-      setActiveCard(event.active.data.current!.card as CardType);
+      const { active } = event;
+      if (typeof active.id === 'string' && cardOrder.includes(active.id)) {
+        setDraggedCard(active.data.current!.card as CardType);
+      }
     },
-    onDragCancel: () => {
-      setActiveCard(null);
+    onDragCancel: (event) => {
+      const { active } = event;
+      if (typeof active.id === 'string' && cardOrder.includes(active.id)) {
+        setDraggedCard(null);
+      }
     },
     onDragEnd: (event) => {
-      if (onReorderCards) {
-        const { active, over } = event;
-        if (over && active.id !== over.id) {
-          const oldIndex = cardOrder.indexOf(active.id as string);
-          const newIndex = cardOrder.indexOf(over.id as string);
+      const { active, over } = event;
+      let oldIndex: number;
+      let newIndex: number;
+      if (typeof active.id === 'string' && (oldIndex = cardOrder.indexOf(active.id)) !== -1) {
+        if (
+          onReorderCards &&
+          over &&
+          active.id !== over.id &&
+          typeof over.id === 'string' &&
+          (newIndex = cardOrder.indexOf(over.id)) !== -1
+        ) {
           onReorderCards(oldIndex, newIndex);
         }
+        setDraggedCard(null);
       }
-      setActiveCard(null);
     },
   });
 
@@ -111,8 +119,12 @@ const Hand = ({ cards, onReorderCards, onSelect }: Props) => {
             key={card.id}
             sortableId={card.id}
             cardWidth={cardWidth}
-            numCards={cards.length}
             card={card}
+            containerStyle={{
+              width: `${100 / cardsWithId.length}%`,
+              minWidth: 0.13 * cardWidth,
+              maxWidth: cardWidth + 10,
+            }}
             {...(onSelect && {
               onClick: () => {
                 onSelect(index);
@@ -121,9 +133,9 @@ const Hand = ({ cards, onReorderCards, onSelect }: Props) => {
           />
         ))}
         <DragOverlay>
-          {activeCard && (
+          {draggedCard && (
             <div style={{ textAlign: 'center' }}>
-              <Card card={activeCard} style={{ width: cardWidth }} />
+              <Card card={draggedCard} style={{ width: cardWidth }} />
             </div>
           )}
         </DragOverlay>
