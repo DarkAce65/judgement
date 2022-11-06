@@ -39,7 +39,7 @@ FROM node:18 as client_builder
 USER node
 WORKDIR /client
 
-COPY client/package.json client/yarn.lock ./
+COPY --chown=node:node client/package.json client/yarn.lock ./
 RUN yarn
 
 ARG VITE_APP_API_HOST
@@ -47,8 +47,8 @@ ARG VITE_APP_API_ROOT
 ENV VITE_APP_API_HOST="$VITE_APP_API_HOST" \
   VITE_APP_API_ROOT="$VITE_APP_API_ROOT"
 
-COPY client ./
-COPY --from=model_generator /poetryuser/generated_types ./generated_types/
+COPY --chown=node:node client ./
+COPY --chown=node:node --from=model_generator /poetryuser/generated_types ./generated_types/
 RUN yarn build
 
 # nginx container

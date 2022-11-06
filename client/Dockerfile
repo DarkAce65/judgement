@@ -4,8 +4,8 @@ USER node
 WORKDIR /client
 EXPOSE 3000
 
-COPY package.json yarn.lock ./
+COPY --chown=node:node package.json yarn.lock ./
 RUN yarn
 
-COPY . .
+COPY --chown=node:node . .
 CMD ["yarn", "dev"]
