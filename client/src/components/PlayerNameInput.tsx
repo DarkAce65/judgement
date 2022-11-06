@@ -34,8 +34,8 @@ const PlayerNameInput = () => {
 
   return (
     <Form.Item
-      validateStatus={isValid ? 'success' : 'error'}
-      help={!isValid && 'Name must be at least one character'}
+      validateStatus={stagedPlayerName.length === 0 || isValid ? 'success' : 'error'}
+      help={stagedPlayerName.length !== 0 && !isValid && 'Name must be at least one character'}
     >
       <Input.Group compact={true} size="large" style={{ display: 'flex' }}>
         <Input
