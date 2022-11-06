@@ -135,7 +135,7 @@ class JudgementGame(Game[JudgementAction]):
 
         if player_type == GamePlayerType.PLAYER:
             self.player_states[player_id] = JudgementPlayerState(
-                score=0, current_hands=0, hand=[]
+                score=0, current_won_tricks=0, hand=[]
             )
 
             max_rounds = math.ceil(self.settings.num_decks * 52 / len(self.player_order))
@@ -234,7 +234,7 @@ class JudgementGame(Game[JudgementAction]):
         self.phase = JudgementPhase.BIDDING
         for player_state in self.player_states.values():
             player_state.current_bid = None
-            player_state.current_hands = 0
+            player_state.current_won_tricks = 0
 
         self.decks.shuffle()
         self.deal()
@@ -249,7 +249,7 @@ class JudgementGame(Game[JudgementAction]):
     async def end_trick(self) -> None:
         winning_player_index = compute_winning_card(self.pile, self.get_trump())
         winning_player_id = self.player_order[winning_player_index]
-        self.player_states[winning_player_id].current_hands += 1
+        self.player_states[winning_player_id].current_won_tricks += 1
 
         tricks_left = self.get_num_tricks_for_round() - self.current_trick - 1
         if tricks_left > 0:
@@ -262,11 +262,11 @@ class JudgementGame(Game[JudgementAction]):
 
     async def end_round(self) -> None:
         for player_state in self.player_states.values():
-            if player_state.current_bid == player_state.current_hands:
+            if player_state.current_bid == player_state.current_won_tricks:
                 player_state.score += player_state.current_bid + 10
 
             player_state.current_bid = None
-            player_state.current_hands = 0
+            player_state.current_won_tricks = 0
 
         if self.current_round < self.settings.num_rounds - 1:
             self.current_round += 1

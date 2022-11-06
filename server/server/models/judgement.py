@@ -74,7 +74,7 @@ class JudgementPlayCardAction(JudgementAction, action_type=JudgementActionType.P
 
 class JudgementPlayerState(CamelModel):
     score: int
-    current_hands: int
+    current_won_tricks: int
     current_bid: Optional[int] = None
 
     hand: list[Card]
