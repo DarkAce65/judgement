@@ -48,7 +48,7 @@ const DraggableCard = ({
 interface Props {
   cards: CardType[];
   onReorderCards?: (sourceIndex: number, destinationIndex: number) => void;
-  onClick?: (index: number, card: CardType) => void;
+  onClick?: (card: CardType, index: number) => void;
 }
 
 const Hand = ({ cards, onReorderCards, onClick }: Props) => {
@@ -127,7 +127,7 @@ const Hand = ({ cards, onReorderCards, onClick }: Props) => {
             }}
             {...(onClick && {
               onClick: () => {
-                onClick(index, cardsWithId[index]);
+                onClick(cardsWithId[index], index);
               },
             })}
           />
