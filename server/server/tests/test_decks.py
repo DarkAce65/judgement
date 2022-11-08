@@ -5,7 +5,7 @@ import statistics
 from collections import Counter
 from random import Random
 from typing import Counter as CounterType
-from unittest.case import TestCase
+from unittest import TestCase
 
 from server.game.card import Card, Suit
 from server.game.decks import Decks

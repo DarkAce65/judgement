@@ -1,4 +1,4 @@
-from unittest.case import TestCase
+from unittest import TestCase
 
 from server.utils.bimultidict import bimultidict
 

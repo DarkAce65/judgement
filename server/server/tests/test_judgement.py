@@ -1,4 +1,4 @@
-from unittest.case import TestCase
+from unittest import TestCase
 
 from server.game.card import Card, Suit
 from server.game.judgement import compute_winning_card

@@ -1,3 +1,6 @@
+import logging
+
 from socketio import AsyncServer
 
-sio = AsyncServer(async_mode="asgi", cors_allowed_origins=[])
+logger = logging.getLogger(__name__)
+sio = AsyncServer(logger=logger, async_mode="asgi", cors_allowed_origins=[])
