@@ -95,7 +95,7 @@ def get_players_for_room(room_id: str) -> list[Player]:
     return players
 
 
-def create_player(player_name: Optional[str]) -> PlayerWithAuth:
+def create_player(player_name: str) -> PlayerWithAuth:
     player_auth_id = str(uuid.uuid4())
     cur = db.get_cursor()
     cur.execute(
@@ -108,20 +108,20 @@ def create_player(player_name: Optional[str]) -> PlayerWithAuth:
     return player
 
 
-def set_player_name(player_id: int, player_name: Optional[str]) -> None:
+def set_player_name(player_id: int, player_name: str) -> None:
     cur = db.get_cursor()
-    cur.execute("UPDATE players SET name=%s WHERE id = %s", (player_name, player_id))
+    cur.execute("UPDATE players SET name = %s WHERE id = %s", (player_name, player_id))
 
 
 def ensure_player_with_name(
-    player_auth_id: Optional[str] = None, player_name: Optional[str] = None
+    player_name: str, player_auth_id: Optional[str] = None
 ) -> Tuple[PlayerWithAuth, bool]:
     should_propagate_name_change = False
     if player_auth_id is None or not player_exists_for_auth(player_auth_id):
         player = create_player(player_name)
     else:
         player = get_player_with_auth(player_auth_id)
-        if player_name is not None and player.name != player_name:
+        if player.name != player_name:
             set_player_name(player.player_id, player_name)
             player.name = player_name
             should_propagate_name_change = True

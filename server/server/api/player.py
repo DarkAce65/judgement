@@ -1,7 +1,6 @@
 from typing import Optional
 
 from fastapi import APIRouter, Cookie, Response
-from starlette.status import HTTP_204_NO_CONTENT
 
 from server.data import connection_manager, player_manager
 from server.models.player import PlayerWithAuth
@@ -11,10 +10,10 @@ router = APIRouter(prefix="/player", tags=["player"])
 
 
 async def ensure_player_and_set_cookie(
-    response: Response, player_auth_id: Optional[str], player_name: Optional[str]
+    response: Response, player_name: str, player_auth_id: Optional[str]
 ) -> PlayerWithAuth:
     player, should_propagate_name_change = player_manager.ensure_player_with_name(
-        player_auth_id, player_name
+        player_name, player_auth_id
     )
 
     if should_propagate_name_change:
@@ -28,10 +27,10 @@ async def ensure_player_and_set_cookie(
     return player
 
 
-@router.put("", status_code=HTTP_204_NO_CONTENT)
+@router.put("", status_code=204)
 async def ensure_player(
     request: EnsurePlayerRequest,
     response: Response,
     player_auth_id: Optional[str] = Cookie(None, alias="player_auth_id"),
 ) -> None:
-    await ensure_player_and_set_cookie(response, player_auth_id, request.player_name)
+    await ensure_player_and_set_cookie(response, request.player_name, player_auth_id)

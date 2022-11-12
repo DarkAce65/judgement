@@ -44,7 +44,7 @@ export const getPlayerNames = createSelector([getPlayerState], (state) => state.
 export const ensurePlayer = createAsyncThunk<string, string, { state: RootState }>(
   'player/ensurePlayer',
   async (playerName) => {
-    const body: EnsurePlayerRequest = { playerName: playerName || undefined };
+    const body: EnsurePlayerRequest = { playerName };
     await fetchAPI('/player', { method: 'PUT', ...makeJSONBodyWithContentType(body) });
 
     return playerName;
