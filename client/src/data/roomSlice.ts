@@ -54,7 +54,11 @@ export const joinRoom = createAsyncThunk<string, string, { state: RootState }>(
   async (roomId, { getState }) => {
     const playerName = getPlayerName(getState());
 
-    const body: EnsurePlayerRequest = { playerName: playerName || undefined };
+    if (playerName === null) {
+      throw new Error('Player name not set!');
+    }
+
+    const body: EnsurePlayerRequest = { playerName };
     await fetchAPI(`/rooms/${roomId}/join`, {
       method: 'POST',
       ...makeJSONBodyWithContentType(body),
@@ -76,10 +80,10 @@ const roomSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(createRoom.fulfilled, (state, { payload }: PayloadAction<string>) => {
+    builder.addCase(createRoom.fulfilled, (state, { payload }) => {
       state.roomId = payload;
     });
-    builder.addCase(joinRoom.fulfilled, (state, { payload }: PayloadAction<string>) => {
+    builder.addCase(joinRoom.fulfilled, (state, { payload }) => {
       state.roomId = payload;
     });
     builder.addMatcher(isAnyOf(createRoom.pending, joinRoom.pending), () => initialState);

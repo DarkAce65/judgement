@@ -64,20 +64,17 @@ const playerSlice = createSlice({
     builder.addCase(ensurePlayer.pending, (state) => {
       state.ensurePlayerStatus = 'pending';
     });
-    builder.addCase(
-      ensurePlayer.fulfilled,
-      (state, { payload: playerName }: PayloadAction<string | null>) => {
-        if (playerName) {
-          localStorage.setItem('playerName', playerName);
-        } else {
-          localStorage.removeItem('playerName');
-        }
-
-        state.playerId = Cookies.get(PLAYER_ID_COOKIE) ?? null;
-        state.playerName = playerName;
-        state.ensurePlayerStatus = 'succeeded';
+    builder.addCase(ensurePlayer.fulfilled, (state, { payload: playerName }) => {
+      if (playerName) {
+        localStorage.setItem('playerName', playerName);
+      } else {
+        localStorage.removeItem('playerName');
       }
-    );
+
+      state.playerId = Cookies.get(PLAYER_ID_COOKIE) ?? null;
+      state.playerName = playerName;
+      state.ensurePlayerStatus = 'succeeded';
+    });
     builder.addCase(ensurePlayer.rejected, (state) => {
       state.ensurePlayerStatus = 'failed';
     });
