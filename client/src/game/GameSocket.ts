@@ -184,7 +184,6 @@ class GameSocket {
     if (this.socket === null) {
       throw new Error('Socket not initialized');
     } else if (!this.attachedNamespaces.has(namespace)) {
-      console.error(`Unknown namespace ${namespace} - have you called GameSocket.attach()?`);
       return;
     }
 
@@ -263,7 +262,6 @@ class GameSocket {
     if (this.socket === null) {
       throw new Error('Socket not initialized');
     } else if (!this.attachedNamespaces.has(namespace)) {
-      console.error(`Unknown namespace ${namespace} - have you called GameSocket.attach()?`);
       return;
     }
 
