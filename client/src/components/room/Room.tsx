@@ -14,7 +14,12 @@ import {
 import { getGame, loadGameState } from '../../data/gameSlice';
 import { getPlayerId, loadPlayers } from '../../data/playerSlice';
 import { useAppDispatch, useAppSelector } from '../../data/reduxHooks';
-import { getGameName, getOrderedPlayerNames, loadRoomState } from '../../data/roomSlice';
+import {
+  getGameName,
+  getOrderedPlayerNames,
+  loadRoomState,
+  resetRoomState,
+} from '../../data/roomSlice';
 import GameSocket, { Listener } from '../../game/GameSocket';
 import withGameSocket, { WithGameSocketProps } from '../../game/withGameSocket';
 import PlayerNameInput from '../PlayerNameInput';
@@ -104,6 +109,7 @@ const Room = ({ roomId, socket, namespace }: Props & WithGameSocketProps) => {
       title={`hello ${roomId}`}
       onBack={() => {
         navigate('/');
+        dispatch(resetRoomState());
       }}
     >
       <Select<GameName>

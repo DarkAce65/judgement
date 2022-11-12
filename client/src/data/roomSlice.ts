@@ -78,6 +78,9 @@ const roomSlice = createSlice({
       state.orderedPlayerIds = payload.orderedPlayerIds;
       state.gameName = payload.gameName;
     },
+    resetRoomState() {
+      return initialState;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(createRoom.fulfilled, (state, { payload }) => {
@@ -90,6 +93,6 @@ const roomSlice = createSlice({
   },
 });
 
-export const { loadRoomState } = roomSlice.actions;
+export const { loadRoomState, resetRoomState } = roomSlice.actions;
 
 export default roomSlice.reducer;

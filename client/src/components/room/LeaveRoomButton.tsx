@@ -1,6 +1,8 @@
 import { Button } from 'antd';
 import { useNavigate } from 'react-router-dom';
 
+import { useAppDispatch } from '../../data/reduxHooks';
+import { resetRoomState } from '../../data/roomSlice';
 import withGameSocket, { WithGameSocketProps } from '../../game/withGameSocket';
 
 interface Props {
@@ -8,6 +10,7 @@ interface Props {
 }
 
 const LeaveRoomButton = ({ roomId, socket }: Props & WithGameSocketProps) => {
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   return (
@@ -17,6 +20,7 @@ const LeaveRoomButton = ({ roomId, socket }: Props & WithGameSocketProps) => {
       onClick={() => {
         socket.emit('leave_room', roomId);
         navigate('/');
+        dispatch(resetRoomState());
       }}
     >
       Leave room
