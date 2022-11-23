@@ -3,8 +3,7 @@ import { Col, Row, Typography } from 'antd';
 import { getGame } from '../../data/gameSlice';
 import { useAppSelector } from '../../data/reduxHooks';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const cardStringifyReplacer = (_: string, value: any): any =>
+const cardStringifyReplacer = (_: string, value: unknown): unknown =>
   value !== null && typeof value === 'object' && 'suit' in value && 'rank' in value
     ? `${value.suit}${value.rank}`
     : value;

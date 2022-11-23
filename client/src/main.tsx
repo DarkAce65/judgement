@@ -16,10 +16,10 @@ const initializeGameSocket = () => {
   GameSocket.initializeSocket(
     (socket, error) => {
       if (socketRetries < 3 && isConnectionError(error)) {
-        const { dispatch, getState } = store;
-        const playerName = getPlayerName(getState());
+        const playerName = getPlayerName(store.getState());
 
-        dispatch(ensurePlayer(playerName!))
+        store
+          .dispatch(ensurePlayer(playerName!))
           .then(unwrapResult)
           .then(() => {
             socket.connect();

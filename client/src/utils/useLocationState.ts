@@ -12,9 +12,9 @@ const useLocationState = (): LocationState | null => {
   if (
     locationState !== null &&
     typeof locationState === 'object' &&
-    Array.isArray(locationState) === false
+    !Array.isArray(locationState)
   ) {
-    return locationState;
+    return locationState as LocationState;
   }
 
   return null;

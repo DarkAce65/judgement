@@ -43,7 +43,7 @@ const useFetch = <T>(
 
     fetchAPI(path, apiOptions)
       .then(async (r) => {
-        setData(await r.json());
+        setData((await r.json()) as T);
         setResponse(r);
         setStatus('succeeded');
       })
