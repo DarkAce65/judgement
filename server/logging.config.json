@@ -30,7 +30,7 @@
   "loggers": {
     "": {
       "handlers": ["default"],
-      "level": "DEBUG",
+      "level": "INFO",
       "propagate": false
     },
     "pydantic2ts": { "level": "WARNING" },
