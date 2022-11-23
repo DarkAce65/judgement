@@ -32,6 +32,13 @@ export const buildSocket = (params?: SocketParams, namespace = ''): Socket => {
   return socket;
 };
 
+export interface FetchAPIOptions {
+  method?: RequestInit['method'];
+  data?: unknown;
+  additionalSuccessStatusCodes?: number[];
+  requestOptions?: Omit<RequestInit, 'body' | 'method'>;
+}
+
 export const buildRequestPath = (path: string): string => {
   if (path.length > 0) {
     return `${API_BASE}/${path.replace(/^\/+/, '')}`;
@@ -40,34 +47,37 @@ export const buildRequestPath = (path: string): string => {
   return API_BASE;
 };
 
-export const makeJSONBodyWithContentType = (body: unknown) => ({
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify(body),
-});
-
-export const fetchAPI = (
-  path: string,
-  init?: RequestInit & { additionalSuccessStatusCodes?: number[] }
-): Promise<Response> => {
-  const requestPath = buildRequestPath(path);
+const buildRequestInit = (options: FetchAPIOptions): RequestInit => {
   const requestInit: RequestInit = {
-    ...(import.meta.env.DEV && { credentials: 'include' }),
-    ...init,
+    ...options.requestOptions,
+    method: options.method,
   };
-
-  let request;
-  if (Object.keys(requestInit).length === 0) {
-    request = fetch(requestPath);
-  } else {
-    request = fetch(requestPath, requestInit);
+  if (options.data) {
+    requestInit['headers'] = {
+      ...requestInit['headers'],
+      'Content-Type': 'application/json',
+    };
+    requestInit['body'] = JSON.stringify(options.data);
+  }
+  if (import.meta.env.DEV) {
+    requestInit['credentials'] = 'include';
   }
 
-  const additionalSuccessStatusCodes =
-    init && init.additionalSuccessStatusCodes !== undefined
-      ? init.additionalSuccessStatusCodes
-      : [];
+  return requestInit;
+};
+
+export const fetchAPI = (path: string, options?: FetchAPIOptions): Promise<Response> => {
+  const requestPath = buildRequestPath(path);
+
+  let request;
+  if (options) {
+    request = fetch(requestPath, buildRequestInit(options));
+  } else {
+    request = fetch(requestPath);
+  }
+
   return request.then((response) => {
-    if (response.ok || additionalSuccessStatusCodes.indexOf(response.status) !== -1) {
+    if (response.ok || options?.additionalSuccessStatusCodes?.indexOf(response.status) !== -1) {
       return response;
     }
 

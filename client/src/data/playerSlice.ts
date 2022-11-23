@@ -4,7 +4,7 @@ import Cookies from 'js-cookie';
 import { EnsurePlayerRequest } from '../../generated_types/requests';
 import { PlayersMessage } from '../../generated_types/websocket';
 import { FetchStatus } from '../api/FetchStatus';
-import { fetchAPI, makeJSONBodyWithContentType } from '../api/client';
+import { fetchAPI } from '../api/client';
 import { PLAYER_ID_COOKIE } from '../constants';
 
 import { RootState } from './store';
@@ -44,8 +44,8 @@ export const getPlayerNames = createSelector([getPlayerState], (state) => state.
 export const ensurePlayer = createAsyncThunk<string, string, { state: RootState }>(
   'player/ensurePlayer',
   async (playerName) => {
-    const body: EnsurePlayerRequest = { playerName };
-    await fetchAPI('/player', { method: 'PUT', ...makeJSONBodyWithContentType(body) });
+    const data: EnsurePlayerRequest = { playerName };
+    await fetchAPI('/player', { method: 'PUT', data });
 
     return playerName;
   },

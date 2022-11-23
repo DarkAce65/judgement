@@ -9,7 +9,7 @@ import {
 import { EnsurePlayerRequest } from '../../generated_types/requests';
 import { RoomIdResponse } from '../../generated_types/responses';
 import { RoomMessage } from '../../generated_types/websocket';
-import { fetchAPI, makeJSONBodyWithContentType } from '../api/client';
+import { fetchAPI } from '../api/client';
 
 import { getPlayerName, getPlayerNames } from './playerSlice';
 import { RootState } from './store';
@@ -58,11 +58,8 @@ export const joinRoom = createAsyncThunk<string, string, { state: RootState }>(
       throw new Error('Player name not set!');
     }
 
-    const body: EnsurePlayerRequest = { playerName };
-    await fetchAPI(`/rooms/${roomId}/join`, {
-      method: 'POST',
-      ...makeJSONBodyWithContentType(body),
-    });
+    const data: EnsurePlayerRequest = { playerName };
+    await fetchAPI(`/rooms/${roomId}/join`, { method: 'POST', data });
 
     return roomId;
   }
