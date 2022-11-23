@@ -3084,10 +3084,10 @@ react-refresh@^0.14.0:
   resolved "https://registry.yarnpkg.com/react-refresh/-/react-refresh-0.14.0.tgz#4e02825378a5f227079554d4284889354e5f553e"
   integrity sha512-wViHqhAd8OHeLS/IRMJjTSDHF3U9eWi62F/MledQGPdJGDhodXJ9PBLNGr6WWL7qlH12Mt3TyTpbS+hGXMjCzQ==
 
-react-resize-aware@^3.1.2:
-  version "3.1.2"
-  resolved "https://registry.yarnpkg.com/react-resize-aware/-/react-resize-aware-3.1.2.tgz#a5e6fe4691a3ac8d3b0fadd37008339db2294c4f"
-  integrity sha512-sBtMIEy/9oI+Xf2o7IdWdkTokpZSPo9TWn60gqWKPG3BXg44Rg3FCIMiIjmgvRUF4eQptw6pqYTUhYwkeVSxXA==
+react-resize-aware@3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/react-resize-aware/-/react-resize-aware-3.1.1.tgz#a428fd53f34dec3a52b68c923a6ebe51a192c63c"
+  integrity sha512-M8IyVLBN8D6tEUss+bxQlWte3ZYtNEGhg7rBxtCVG8yEBjUlZwUo5EFLq6tnvTZXcgAbCLjsQn+NCoTJKumRYg==
 
 react-router-dom@^6.4.3:
   version "6.4.3"
