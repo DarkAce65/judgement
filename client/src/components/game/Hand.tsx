@@ -53,10 +53,7 @@ interface Props {
 
 const Hand = ({ cards, onReorderCards, onClick }: Props) => {
   const [resizeListener, { width }] = useResizeAware();
-  const cardWidth = useMemo(
-    () => (width === null ? 100 : Math.min(Math.max(100, width / 6), 175)),
-    [width]
-  );
+  const cardWidth = useMemo(() => (width ? Math.min(Math.max(100, width / 6), 175) : 100), [width]);
 
   const paddingRight = useMemo(
     () =>
