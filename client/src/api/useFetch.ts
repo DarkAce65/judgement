@@ -3,42 +3,47 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import isEqual from 'lodash-es/isEqual';
 
 import { FetchStatus } from './FetchStatus';
-import { fetchAPI } from './client';
+import { FetchAPIOptions, fetchAPI } from './client';
 
 interface FetchOptions {
   fetchOnMount?: boolean;
   fetchOnArgsChange?: boolean;
   skip?: boolean;
+  apiOptions?: FetchAPIOptions;
 }
 
-interface FetchResponse {
+interface FetchResponse<T = unknown> {
   status: FetchStatus;
   response: Response | null;
+  data: T | null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   error: any;
 
   triggerFetch: () => void;
 }
 
-const useFetch = (
-  fetchArgs: Parameters<typeof fetchAPI>,
-  { fetchOnMount = false, fetchOnArgsChange = false, skip = false }: FetchOptions = {}
-): FetchResponse => {
+const useFetch = <T>(
+  path: string,
+  { fetchOnMount = true, fetchOnArgsChange = true, skip = false, apiOptions }: FetchOptions = {}
+): FetchResponse<T> => {
   const [status, setStatus] = useState<FetchStatus>('uninitialized');
   const [response, setResponse] = useState<Response | null>(null);
+  const [data, setData] = useState<T | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [error, setError] = useState<any>(null);
 
   const firstRun = useRef(true);
-  const previousArgs = useRef(fetchArgs);
+  const previousArgs = useRef([path, apiOptions] as const);
 
   const triggerFetch = useCallback(() => {
     setStatus('pending');
     setResponse(null);
+    setData(null);
     setError(null);
 
-    fetchAPI(...fetchArgs)
-      .then((r) => {
+    fetchAPI(path, apiOptions)
+      .then(async (r) => {
+        setData(await r.json());
         setResponse(r);
         setStatus('succeeded');
       })
@@ -46,7 +51,7 @@ const useFetch = (
         setError(e);
         setStatus('failed');
       });
-  }, [fetchArgs]);
+  }, [apiOptions, path]);
 
   useEffect(() => {
     if (skip) {
@@ -54,17 +59,18 @@ const useFetch = (
     }
 
     const isFirstRun = firstRun.current;
-    const isSame = previousArgs.current.every((arg, index) => isEqual(arg, fetchArgs[index]));
+    const isSame =
+      isEqual(previousArgs.current[0], path) && isEqual(previousArgs.current[1], apiOptions);
 
     firstRun.current = false;
-    previousArgs.current = fetchArgs;
+    previousArgs.current = [path, apiOptions];
 
     if ((fetchOnMount && isFirstRun) || (fetchOnArgsChange && !isSame)) {
       triggerFetch();
     }
-  }, [skip, fetchArgs, fetchOnArgsChange, fetchOnMount, triggerFetch]);
+  }, [apiOptions, fetchOnArgsChange, fetchOnMount, path, skip, triggerFetch]);
 
-  return { status, response, error, triggerFetch };
+  return { status, response, data, error, triggerFetch };
 };
 
 export default useFetch;
