@@ -16,7 +16,7 @@ const CreateRoomButton = () => {
     dispatch(createRoom())
       .then(unwrapResult)
       .then((roomId) => {
-        const state: LocationState = { gameExists: true };
+        const state: LocationState = { roomExists: true };
         navigate(`/room/${roomId}`, { state });
       })
       .catch(() => {

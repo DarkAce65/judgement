@@ -6,12 +6,11 @@ import {
   isAnyOf,
 } from '@reduxjs/toolkit';
 
-import { EnsurePlayerRequest } from '../../generated_types/requests';
 import { RoomIdResponse } from '../../generated_types/responses';
 import { RoomMessage } from '../../generated_types/websocket';
 import { fetchAPI } from '../api/client';
 
-import { getPlayerName, getPlayerNames } from './playerSlice';
+import { getPlayerNames } from './playerSlice';
 import { RootState } from './store';
 
 interface RoomState {
@@ -49,22 +48,6 @@ export const createRoom = createAsyncThunk<string, void, { state: RootState }>(
   }
 );
 
-export const joinRoom = createAsyncThunk<string, string, { state: RootState }>(
-  'room/joinRoom',
-  async (roomId, { getState }) => {
-    const playerName = getPlayerName(getState());
-
-    if (playerName === null) {
-      throw new Error('Player name not set!');
-    }
-
-    const data: EnsurePlayerRequest = { playerName };
-    await fetchAPI(`/rooms/${roomId}/join`, { method: 'POST', data });
-
-    return roomId;
-  }
-);
-
 const roomSlice = createSlice({
   name: 'room',
   initialState,
@@ -83,10 +66,7 @@ const roomSlice = createSlice({
     builder.addCase(createRoom.fulfilled, (state, { payload }) => {
       state.roomId = payload;
     });
-    builder.addCase(joinRoom.fulfilled, (state, { payload }) => {
-      state.roomId = payload;
-    });
-    builder.addMatcher(isAnyOf(createRoom.pending, joinRoom.pending), () => initialState);
+    builder.addMatcher(isAnyOf(createRoom.pending), () => initialState);
   },
 });
 

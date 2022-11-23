@@ -13,35 +13,26 @@ const RoomContainer = () => {
   const pathParams = useParams<'roomId'>();
   const roomId = pathParams.roomId!;
 
-  const gameExists = useLocationStatePropertyOnce('gameExists');
+  const roomExists = useLocationStatePropertyOnce('roomExists');
+  const { status, data } = useFetch<boolean>(`/rooms/${roomId}/exists`, { skip: roomExists });
 
-  const { status, response } = useFetch(
-    [`/rooms/${roomId}/exists`, { method: 'HEAD', additionalSuccessStatusCodes: [404] }],
-    { fetchOnMount: true, skip: gameExists }
-  );
-
-  if (gameExists) {
+  if (roomExists || (status === 'succeeded' && data === true)) {
     return <Room roomId={roomId} />;
+  } else if (status === 'succeeded' && data === false) {
+    return (
+      <Result
+        status="error"
+        title={`Room ${roomId} not found`}
+        subTitle="Double check that you've entered the correct room code"
+        extra={
+          <Button type="primary" onClick={() => navigate('/')}>
+            Go Home
+          </Button>
+        }
+      />
+    );
   } else if (status === 'uninitialized' || status === 'pending') {
     return <LoadingPage />;
-  } else if (status === 'succeeded' && response) {
-    switch (response.status) {
-      case 204:
-        return <Room roomId={roomId} />;
-      case 404:
-        return (
-          <Result
-            status="error"
-            title={`Room ${roomId} not found`}
-            subTitle="Double check that you've entered the correct room code"
-            extra={
-              <Button type="primary" onClick={() => navigate('/')}>
-                Go Home
-              </Button>
-            }
-          />
-        );
-    }
   }
 
   return <ErrorPage />;

@@ -1,16 +1,13 @@
 import { useCallback, useState } from 'react';
 
 import { ArrowRightOutlined } from '@ant-design/icons';
-import { unwrapResult } from '@reduxjs/toolkit';
 import { Button, Input, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
 
+import { fetchAPI } from '../api/client';
 import { LocationState } from '../constants';
-import { useAppDispatch } from '../data/reduxHooks';
-import { joinRoom } from '../data/roomSlice';
 
 const JoinRoomInput = () => {
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const [roomId, setRoomId] = useState('');
@@ -20,16 +17,17 @@ const JoinRoomInput = () => {
       return;
     }
 
-    dispatch(joinRoom(roomId))
-      .then(unwrapResult)
-      .then(() => {
-        const state: LocationState = { gameExists: true };
-        navigate(`/room/${roomId}`, { state });
-      })
-      .catch(() => {
-        message.error(`Room ${roomId} not found`);
+    fetchAPI(`/rooms/${roomId}/exists`)
+      .then((response) => response.json())
+      .then((roomExists) => {
+        if (roomExists) {
+          const state: LocationState = { roomExists };
+          navigate(`/room/${roomId}`, { state });
+        } else {
+          message.error(`Room ${roomId} not found`);
+        }
       });
-  }, [dispatch, navigate, roomId]);
+  }, [navigate, roomId]);
 
   return (
     <Input.Group compact={true} size="large" style={{ display: 'flex' }}>
