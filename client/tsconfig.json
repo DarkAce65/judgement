@@ -21,6 +21,5 @@
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "generated_types"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": ["src", "generated_types"]
 }
