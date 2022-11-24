@@ -7,14 +7,16 @@ import {
   JudgementSpectatorGameState,
   JudgementUpdateSettingsAction,
 } from '../../../../generated_types/judgement';
-import withGameSocket, { WithGameSocketProps } from '../../../game/withGameSocket';
+import useConnectedGameSocket from '../../../game/useConnectedGameSocket';
 import useDraftValue from '../../../utils/useDraftValue';
 
 interface Props {
   game: JudgementGameState | JudgementSpectatorGameState;
 }
 
-const JudgementSettings = ({ game: { settings }, socket }: Props & WithGameSocketProps) => {
+const JudgementSettings = ({ game: { settings } }: Props) => {
+  const socket = useConnectedGameSocket();
+
   const [numRounds, setNumRounds, numRoundsChanged] = useDraftValue<number | null>(
     settings.numRounds
   );
@@ -24,6 +26,8 @@ const JudgementSettings = ({ game: { settings }, socket }: Props & WithGameSocke
     numRounds !== null && numDecks !== null && (numRoundsChanged || numDecksChanged);
 
   const updateSettings = useCallback(() => {
+    if (!socket) return;
+
     if (!canUpdateSettings) {
       message.error('Unable to update settings');
       return;
@@ -58,4 +62,4 @@ const JudgementSettings = ({ game: { settings }, socket }: Props & WithGameSocke
   );
 };
 
-export default withGameSocket(JudgementSettings);
+export default JudgementSettings;

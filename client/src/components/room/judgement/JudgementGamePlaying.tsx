@@ -10,7 +10,7 @@ import {
 } from '../../../../generated_types/judgement';
 import { optimisticallyReorderCards } from '../../../data/gameSlice';
 import { useAppDispatch } from '../../../data/reduxHooks';
-import withGameSocket, { WithGameSocketProps } from '../../../game/withGameSocket';
+import useConnectedGameSocket from '../../../game/useConnectedGameSocket';
 import { useConfiguredSensors } from '../../../utils/useConfiguredSensors';
 import Card, { CardType } from '../../game/Card';
 import Hand from '../../game/Hand';
@@ -19,14 +19,17 @@ interface Props {
   game: JudgementGameState;
 }
 
-const JudgementGamePlaying = ({ game, socket }: Props & WithGameSocketProps) => {
+const JudgementGamePlaying = ({ game }: Props) => {
   const dispatch = useAppDispatch();
   const sensors = useConfiguredSensors();
+  const socket = useConnectedGameSocket();
 
   const [selectedCard, setSelectedCard] = useState<CardType | null>(null);
 
   const reorderCards = useCallback(
     (fromIndex: number, toIndex: number) => {
+      if (!socket) return;
+
       const action: JudgementOrderCardsAction = { actionType: 'ORDER_CARDS', fromIndex, toIndex };
       socket.emit('game_input', action);
       dispatch(optimisticallyReorderCards({ fromIndex, toIndex }));
@@ -35,9 +38,7 @@ const JudgementGamePlaying = ({ game, socket }: Props & WithGameSocketProps) => 
   );
 
   const playCard = useCallback(() => {
-    if (!selectedCard) {
-      return;
-    }
+    if (!socket || !selectedCard) return;
 
     const card = `${selectedCard.suit}${selectedCard.rank}`;
     const action: JudgementPlayCardAction = { actionType: 'PLAY_CARD', card };
@@ -69,4 +70,4 @@ const JudgementGamePlaying = ({ game, socket }: Props & WithGameSocketProps) => 
   );
 };
 
-export default withGameSocket(JudgementGamePlaying);
+export default JudgementGamePlaying;

@@ -45,7 +45,7 @@ module.exports = {
     'import/no-anonymous-default-export': 'off',
     'no-multiple-empty-lines': ['warn', { max: 1 }],
     'no-duplicate-imports': 'warn',
-    'no-shadow': 'error',
+    'no-shadow': ['error', { ignoreOnInitialization: true }],
     'no-var': 'error',
     'object-shorthand': 'warn',
     'one-var': ['warn', 'never'],

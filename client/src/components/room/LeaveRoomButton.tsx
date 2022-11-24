@@ -3,21 +3,23 @@ import { useNavigate } from 'react-router-dom';
 
 import { useAppDispatch } from '../../data/reduxHooks';
 import { resetRoomState } from '../../data/roomSlice';
-import withGameSocket, { WithGameSocketProps } from '../../game/withGameSocket';
+import useConnectedGameSocket from '../../game/useConnectedGameSocket';
 
 interface Props {
   roomId: string;
 }
 
-const LeaveRoomButton = ({ roomId, socket }: Props & WithGameSocketProps) => {
+const LeaveRoomButton = ({ roomId }: Props) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const socket = useConnectedGameSocket();
 
   return (
     <Button
       type="primary"
       danger={true}
       onClick={() => {
+        if (!socket) return;
         socket.emit('leave_room', roomId);
         navigate('/');
         dispatch(resetRoomState());
@@ -28,4 +30,4 @@ const LeaveRoomButton = ({ roomId, socket }: Props & WithGameSocketProps) => {
   );
 };
 
-export default withGameSocket(LeaveRoomButton);
+export default LeaveRoomButton;

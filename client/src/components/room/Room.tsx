@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { Button, PageHeader, Select, Space, Typography, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
@@ -20,8 +20,8 @@ import {
   loadRoomState,
   resetRoomState,
 } from '../../data/roomSlice';
-import GameSocket, { Listener } from '../../game/GameSocket';
-import withGameSocket, { WithGameSocketProps } from '../../game/withGameSocket';
+import GameSocket from '../../game/GameSocket';
+import useConnectedGameSocket from '../../game/useConnectedGameSocket';
 import PlayerNameInput from '../PlayerNameInput';
 import requirePlayerName from '../requirePlayerName';
 
@@ -33,62 +33,47 @@ interface Props {
   roomId: string;
 }
 
-const Room = ({ roomId, socket, namespace }: Props & WithGameSocketProps) => {
+const Room = ({ roomId }: Props) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const socket = useConnectedGameSocket(({ socket, namespace }) => {
+    socket.emit('join_room', roomId);
+    GameSocket.onReconnect(namespace, () => {
+      socket.emit('join_room', roomId);
+    });
+    GameSocket.onNamespaced(namespace, 'room', (roomMessage: RoomMessage) => {
+      dispatch(loadRoomState(roomMessage));
+    });
+    GameSocket.onNamespaced(namespace, 'players', (playersMessage: PlayersMessage) => {
+      dispatch(loadPlayers(playersMessage));
+    });
+    GameSocket.onNamespaced(namespace, 'game_state', (gameStateMessage: GameStateMessage) => {
+      dispatch(loadGameState(gameStateMessage));
+    });
+    GameSocket.onNamespaced(namespace, 'invalid_input', (error: GameErrorMessage) => {
+      message.error(error.errorMessage);
+    });
+  });
 
   const playerId = useAppSelector(getPlayerId)!;
   const gameName = useAppSelector(getGameName);
   const playerNames = useAppSelector(getOrderedPlayerNames);
   const game = useAppSelector(getGame);
 
-  useEffect(() => {
-    socket.emit('join_room', roomId);
-    GameSocket.onReconnect(namespace, () => {
-      socket.emit('join_room', roomId);
-    });
-  }, [socket, namespace, roomId]);
-
-  useEffect(() => {
-    const listeners: { [event: string]: Listener } = {
-      ['room']: (roomMessage: RoomMessage) => {
-        dispatch(loadRoomState(roomMessage));
-      },
-      ['players']: (playersMessage: PlayersMessage) => {
-        dispatch(loadPlayers(playersMessage));
-      },
-      ['game_state']: (gameStateMessage: GameStateMessage) => {
-        dispatch(loadGameState(gameStateMessage));
-      },
-      ['invalid_input']: (error: GameErrorMessage) => {
-        message.error(error.errorMessage);
-      },
-    };
-    for (const [event, listener] of Object.entries(listeners)) {
-      GameSocket.onNamespaced(namespace, event, listener);
-    }
-
-    return () => {
-      for (const [event, listener] of Object.entries(listeners)) {
-        GameSocket.offNamespaced(namespace, event, listener);
-      }
-    };
-  }, [dispatch, namespace]);
-
   const handleGameChange = useCallback(
     (name: GameName) => {
       const setGameMessage: SetGameMessage = { gameName: name };
-      socket.emit('set_game', setGameMessage);
+      socket?.emit('set_game', setGameMessage);
     },
     [socket]
   );
 
   const handleGameInit = useCallback(() => {
-    socket.emit('confirm_game');
+    socket?.emit('confirm_game');
   }, [socket]);
 
   const handleGameStart = useCallback(() => {
-    socket.emit('start_game');
+    socket?.emit('start_game');
   }, [socket]);
 
   const renderedGame = useMemo(() => {
@@ -144,4 +129,4 @@ const Room = ({ roomId, socket, namespace }: Props & WithGameSocketProps) => {
   );
 };
 
-export default requirePlayerName(withGameSocket(Room));
+export default requirePlayerName(Room);
