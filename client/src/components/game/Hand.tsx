@@ -1,9 +1,10 @@
-import { CSSProperties, useMemo, useState } from 'react';
+import { CSSProperties, useMemo, useRef, useState } from 'react';
 
 import { DragOverlay, useDndMonitor } from '@dnd-kit/core';
 import { SortableContext, horizontalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import useResizeAware from 'react-resize-aware';
+
+import useElementSize from '../../utils/useElementSize';
 
 import Card, { CardType } from './Card';
 
@@ -52,7 +53,8 @@ interface Props {
 }
 
 const Hand = ({ cards, onReorderCards, onClick }: Props) => {
-  const [resizeListener, { width }] = useResizeAware();
+  const wrapperRef = useRef(null);
+  const { width } = useElementSize(wrapperRef);
   const cardWidth = useMemo(() => (width ? Math.min(Math.max(100, width / 6), 175) : 100), [width]);
 
   const paddingRight = useMemo(
@@ -114,37 +116,34 @@ const Hand = ({ cards, onReorderCards, onClick }: Props) => {
   });
 
   return (
-    <div>
-      {resizeListener}
-      <div style={{ display: 'flex', justifyContent: 'center', paddingRight }}>
-        <SortableContext items={cardOrder} strategy={horizontalListSortingStrategy}>
-          {cardsWithId.map((card, index) => (
-            <DraggableCard
-              key={card.id}
-              sortableId={card.id}
-              cardWidth={cardWidth}
-              card={card}
-              containerStyle={{
-                width: `${100 / cardsWithId.length}%`,
-                minWidth: 0.13 * cardWidth,
-                maxWidth: cardWidth + 10,
-              }}
-              {...(onClick && {
-                onClick: () => {
-                  onClick(cardsWithId[index], index);
-                },
-              })}
-            />
-          ))}
-          <DragOverlay>
-            {draggedCard && (
-              <div style={{ textAlign: 'center' }}>
-                <Card card={draggedCard} style={{ width: cardWidth }} />
-              </div>
-            )}
-          </DragOverlay>
-        </SortableContext>
-      </div>
+    <div ref={wrapperRef} style={{ display: 'flex', justifyContent: 'center', paddingRight }}>
+      <SortableContext items={cardOrder} strategy={horizontalListSortingStrategy}>
+        {cardsWithId.map((card, index) => (
+          <DraggableCard
+            key={card.id}
+            sortableId={card.id}
+            cardWidth={cardWidth}
+            card={card}
+            containerStyle={{
+              width: `${100 / cardsWithId.length}%`,
+              minWidth: 0.13 * cardWidth,
+              maxWidth: cardWidth + 10,
+            }}
+            {...(onClick && {
+              onClick: () => {
+                onClick(cardsWithId[index], index);
+              },
+            })}
+          />
+        ))}
+        <DragOverlay>
+          {draggedCard && (
+            <div style={{ textAlign: 'center' }}>
+              <Card card={draggedCard} style={{ width: cardWidth }} />
+            </div>
+          )}
+        </DragOverlay>
+      </SortableContext>
     </div>
   );
 };
