@@ -36,7 +36,7 @@ async def emit_room(room: Room) -> None:
                 if game_states is None
                 else cast(ConcreteGameState, game_states[player_id]),
             ).dict(by_alias=True),
-            to=str(player_id),
+            to=f"{room.room_id}/{player_id}",
         )
 
 
@@ -52,7 +52,7 @@ async def emit_room_to_player(room: Room, player_id: int) -> None:
             game_name=room.game_name,
             game=cast(Optional[ConcreteGameState], game_state),
         ).dict(by_alias=True),
-        to=str(player_id),
+        to=f"{room.room_id}/{player_id}",
     )
 
 
@@ -64,7 +64,7 @@ async def emit_game_state(game: Game) -> None:
             GameStateMessage(state=cast(ConcreteGameState, game_states[player_id])).dict(
                 by_alias=True
             ),
-            to=str(player_id),
+            to=f"{game.room_id}/{player_id}",
         )
 
 
