@@ -1,6 +1,6 @@
 import { ComponentType, useRef } from 'react';
 
-import { PageHeader } from 'antd';
+import { PageHeader } from '@ant-design/pro-layout';
 import Cookies from 'js-cookie';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';

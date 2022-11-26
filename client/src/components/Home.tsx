@@ -1,4 +1,5 @@
-import { Divider, PageHeader } from 'antd';
+import { PageHeader } from '@ant-design/pro-layout';
+import { Divider } from 'antd';
 import styled from 'styled-components';
 
 import CreateRoomButton from './CreateRoomButton';

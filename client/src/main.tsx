@@ -9,7 +9,7 @@ import { ensurePlayer, getPlayerName } from './data/playerSlice';
 import store from './data/store';
 import GameSocket, { isConnectionError } from './game/GameSocket';
 
-import 'antd/dist/antd.less';
+import 'antd/dist/reset.css';
 
 const initializeGameSocket = () => {
   let socketRetries = 0;
