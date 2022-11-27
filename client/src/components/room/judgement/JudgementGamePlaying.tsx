@@ -15,6 +15,8 @@ import { useConfiguredSensors } from '../../../utils/useConfiguredSensors';
 import Card, { CardType } from '../../game/Card';
 import Hand from '../../game/Hand';
 
+import JudgementTable from './JudgementTable';
+
 interface Props {
   game: JudgementGameState;
 }
@@ -49,6 +51,7 @@ const JudgementGamePlaying = ({ game }: Props) => {
   return (
     <DndContext sensors={sensors}>
       <Typography.Paragraph>
+        <JudgementTable />
         <Space direction="vertical" style={{ display: 'flex' }}>
           <Space direction="horizontal" size="large">
             Pile:

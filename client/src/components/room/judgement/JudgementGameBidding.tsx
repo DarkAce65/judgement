@@ -14,6 +14,8 @@ import useConnectedGameSocket from '../../../game/useConnectedGameSocket';
 import { useConfiguredSensors } from '../../../utils/useConfiguredSensors';
 import Hand from '../../game/Hand';
 
+import JudgementTable from './JudgementTable';
+
 interface Props {
   game: JudgementGameState;
 }
@@ -45,6 +47,7 @@ const JudgementGameBidding = ({ game }: Props) => {
 
   return (
     <Typography.Paragraph>
+      <JudgementTable />
       <Space direction="vertical" style={{ display: 'flex' }}>
         <DndContext sensors={sensors}>
           <Hand cards={game.playerState.hand} onReorderCards={reorderCards} />
