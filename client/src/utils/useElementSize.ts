@@ -85,7 +85,12 @@ const useElementSize = <T extends Element>(
     let isSubscribed = true;
     const callback = (entry: ResizeObserverEntry) => {
       if (!isSubscribed) return;
-      setSize(entry.contentRect);
+      if (entry.borderBoxSize?.length > 0) {
+        const { blockSize, inlineSize } = entry.borderBoxSize[0];
+        setSize({ height: blockSize, width: inlineSize });
+      } else {
+        setSize(entry.contentRect);
+      }
     };
     observer.subscribe(elementToObserve, callback);
 
