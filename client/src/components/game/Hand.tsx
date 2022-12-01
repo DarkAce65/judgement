@@ -3,6 +3,7 @@ import { CSSProperties, useMemo, useRef, useState } from 'react';
 import { DragOverlay, useDndMonitor } from '@dnd-kit/core';
 import { SortableContext, horizontalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import styled from 'styled-components';
 
 import useElementSize from '../../utils/useElementSize';
 
@@ -46,6 +47,20 @@ const DraggableCard = ({
   );
 };
 
+const HandWrapper = styled.div<{ paddingRight?: string }>`
+  display: flex;
+  padding-right: ${(props) => props.paddingRight};
+  overflow: auto;
+
+  & > :first-child {
+    margin-left: auto;
+  }
+
+  & > :last-child {
+    margin-right: auto;
+  }
+`;
+
 interface Props {
   cards: CardType[];
   onReorderCards?: (sourceIndex: number, destinationIndex: number) => void;
@@ -57,15 +72,15 @@ const Hand = ({ cards, onReorderCards, onClick }: Props) => {
   const { width } = useElementSize(wrapperRef);
   const cardWidth = useMemo(() => (width ? Math.min(Math.max(100, width / 6), 175) : 100), [width]);
 
-  const paddingRight = useMemo(
-    () =>
-      cards.length < 2
-        ? 0
-        : `calc(${100 - 100 * (cards.length / (cards.length - 1))}% + ${
-            cardWidth * (cards.length / (cards.length - 1))
-          }px)`,
-    [cardWidth, cards.length]
-  );
+  const minWidth = useMemo(() => (width > 900 ? cardWidth / 4 : cardWidth / 2), [cardWidth, width]);
+  const paddingRight = useMemo(() => {
+    if (minWidth * cards.length > width || cards.length < 2) {
+      return undefined;
+    }
+    return `calc(${100 - 100 * (cards.length / (cards.length - 1))}% + ${
+      cardWidth * (cards.length / (cards.length - 1))
+    }px)`;
+  }, [cardWidth, cards.length, minWidth, width]);
 
   const cardsWithId: (CardType & { id: string })[] = useMemo(() => {
     const counter: Record<string, number> = {};
@@ -116,8 +131,8 @@ const Hand = ({ cards, onReorderCards, onClick }: Props) => {
   });
 
   return (
-    <div ref={wrapperRef} style={{ display: 'flex', justifyContent: 'center', paddingRight }}>
-      <SortableContext items={cardOrder} strategy={horizontalListSortingStrategy}>
+    <SortableContext items={cardOrder} strategy={horizontalListSortingStrategy}>
+      <HandWrapper ref={wrapperRef} paddingRight={paddingRight}>
         {cardsWithId.map((card, index) => (
           <DraggableCard
             key={card.id}
@@ -126,7 +141,7 @@ const Hand = ({ cards, onReorderCards, onClick }: Props) => {
             card={card}
             containerStyle={{
               width: `${100 / cardsWithId.length}%`,
-              minWidth: 0.13 * cardWidth,
+              minWidth,
               maxWidth: cardWidth + 10,
             }}
             {...(onClick && {
@@ -136,15 +151,15 @@ const Hand = ({ cards, onReorderCards, onClick }: Props) => {
             })}
           />
         ))}
-        <DragOverlay>
-          {draggedCard && (
-            <div style={{ textAlign: 'center' }}>
-              <Card card={draggedCard} style={{ width: cardWidth }} />
-            </div>
-          )}
-        </DragOverlay>
-      </SortableContext>
-    </div>
+      </HandWrapper>
+      <DragOverlay>
+        {draggedCard && (
+          <div style={{ textAlign: 'center' }}>
+            <Card card={draggedCard} style={{ width: cardWidth }} />
+          </div>
+        )}
+      </DragOverlay>
+    </SortableContext>
   );
 };
 
