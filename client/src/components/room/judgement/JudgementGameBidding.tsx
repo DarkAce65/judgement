@@ -11,7 +11,7 @@ import {
 import { optimisticallyReorderCards } from '../../../data/gameSlice';
 import { useAppDispatch } from '../../../data/reduxHooks';
 import useConnectedGameSocket from '../../../game/useConnectedGameSocket';
-import { useConfiguredSensors } from '../../../utils/useConfiguredSensors';
+import useConfiguredSensors from '../../../utils/useConfiguredSensors';
 import Hand from '../../game/Hand';
 
 import JudgementTable from './JudgementTable';
