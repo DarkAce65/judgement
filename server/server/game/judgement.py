@@ -212,6 +212,16 @@ class JudgementGame(Game[JudgementAction]):
         if card not in self.player_states[player_id].hand:
             raise GameError(f"Missing card from hand: {str(card)}")
 
+        if (
+            len(self.pile) > 0
+            and card.suit != self.pile[0].suit
+            and any(
+                card.suit == self.pile[0].suit
+                for card in self.player_states[player_id].hand
+            )
+        ):
+            raise GameError(f"Cannot play non-matching suit: {str(card)}")
+
         self.player_states[player_id].hand.remove(card)
         self.pile.append(card)
 
@@ -219,6 +229,8 @@ class JudgementGame(Game[JudgementAction]):
             self.current_turn = (self.current_turn + 1) % len(self.player_order)
         else:
             await self.end_trick()
+
+        await socket_messager.emit_game_state(self)
 
     def assert_phase(self, phase: JudgementPhase) -> None:
         if self.phase != phase:
