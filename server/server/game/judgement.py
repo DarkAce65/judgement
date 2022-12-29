@@ -36,22 +36,25 @@ def compute_winning_card(
 
     winning_index = 0
     trick_suit = pile[0].suit
-    for index, card in enumerate(pile[1:]):
-        if card == pile[winning_index] and last_duplicate_wins:
-            winning_index = index + 1
-        elif (
-            card.suit == trick_suit
-            and pile[winning_index].suit != trump_suit
-            and card.compare_rank(pile[winning_index]) > 0
-        ):
-            winning_index = index + 1
+    for i, card in enumerate(pile[1:]):
+        index = i + 1
+        if card == pile[winning_index]:
+            if last_duplicate_wins:
+                winning_index = index
         elif card.suit == trump_suit:
             if (
                 pile[winning_index].suit != trump_suit
                 or card.compare_rank(pile[winning_index]) > 0
             ):
-                winning_index = index + 1
+                winning_index = index
+        elif card.suit == trick_suit:
+            if (
+                pile[winning_index].suit != trump_suit
+                and card.compare_rank(pile[winning_index]) > 0
+            ):
+                winning_index = index
 
+    logger.info("%s %s", winning_index, pile)
     return winning_index
 
 
@@ -65,6 +68,7 @@ class JudgementGame(Game[JudgementAction]):
 
     current_round: int
     current_trick: int
+    start_player_index: int
     current_turn: int
 
     player_states: dict[int, JudgementPlayerState]
@@ -81,6 +85,7 @@ class JudgementGame(Game[JudgementAction]):
 
         self.current_round = 0
         self.current_trick = 0
+        self.start_player_index = 0
         self.current_turn = 0
 
         self.player_states = {}
@@ -99,6 +104,7 @@ class JudgementGame(Game[JudgementAction]):
                     pile=self.pile,
                     current_round=self.current_round,
                     current_trick=self.current_trick,
+                    start_player_index=self.start_player_index,
                     current_turn=self.current_turn,
                     player_state=self.player_states[player_id],
                     full_state_do_not_use=dump_class(self),
@@ -113,6 +119,7 @@ class JudgementGame(Game[JudgementAction]):
                     pile=self.pile,
                     current_round=self.current_round,
                     current_trick=self.current_trick,
+                    start_player_index=self.start_player_index,
                     current_turn=self.current_turn,
                     full_state_do_not_use=dump_class(self),
                 )
@@ -254,7 +261,8 @@ class JudgementGame(Game[JudgementAction]):
 
     async def start_round(self) -> None:
         self.current_trick = 0
-        self.current_turn = self.current_round % len(self.player_order)
+        self.start_player_index = self.current_round % len(self.player_order)
+        self.current_turn = self.start_player_index
         self.decks.replace(self.discard_pile)
         self.pile = []
         self.discard_pile = []
@@ -269,12 +277,15 @@ class JudgementGame(Game[JudgementAction]):
         await socket_messager.emit_game_state(self)
 
     def start_trick(self, start_player_index: int = 0) -> None:
-        self.current_turn = start_player_index
+        self.start_player_index = start_player_index
+        self.current_turn = self.start_player_index
         self.discard_pile.extend(self.pile)
         self.pile = []
 
     async def end_trick(self) -> None:
-        winning_player_index = compute_winning_card(self.pile, self.get_trump())
+        winning_player_index = (
+            self.start_player_index + compute_winning_card(self.pile, self.get_trump())
+        ) % len(self.player_order)
         winning_player_id = self.player_order[winning_player_index]
         self.player_states[winning_player_id].current_won_tricks += 1
 

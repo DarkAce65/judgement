@@ -106,6 +106,7 @@ class JudgementGameState(GameState):
 
     current_round: int
     current_trick: int
+    start_player_index: int
     current_turn: int
     player_state: JudgementPlayerState
 
@@ -122,4 +123,5 @@ class JudgementSpectatorGameState(GameState):
 
     current_round: int
     current_trick: int
+    start_player_index: int
     current_turn: int
