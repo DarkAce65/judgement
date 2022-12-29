@@ -5,26 +5,38 @@ import { SortableContext, horizontalListSortingStrategy, useSortable } from '@dn
 import { CSS } from '@dnd-kit/utilities';
 import styled from 'styled-components';
 
+import isObjectWithKeys from '../../utils/isObjectWithKeys';
 import useElementSize from '../../utils/useElementSize';
 
 import Card, { CardType } from './Card';
 
+interface CardDraggableData {
+  index: number;
+  card: CardType;
+}
+
+export const isCardDraggableData = (data: unknown): data is CardDraggableData =>
+  isObjectWithKeys(data, ['index', 'card']) && isObjectWithKeys(data.card, ['suit', 'rank']);
+
 const DraggableCard = ({
   sortableId,
   cardWidth,
+  index,
   card,
   containerStyle,
   onClick,
 }: {
   sortableId: string;
   cardWidth: number;
+  index: number;
   card: CardType;
   containerStyle?: CSSProperties;
   onClick?: () => void;
 }) => {
+  const data: CardDraggableData = { index, card };
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: sortableId,
-    data: { card },
+    data,
   });
 
   return (
@@ -138,6 +150,7 @@ const Hand = ({ cards, onReorderCards, onClick }: Props) => {
             key={card.id}
             sortableId={card.id}
             cardWidth={cardWidth}
+            index={index}
             card={card}
             containerStyle={{
               width: `${100 / cardsWithId.length}%`,
