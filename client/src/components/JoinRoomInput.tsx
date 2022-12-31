@@ -7,7 +7,9 @@ import { useNavigate } from 'react-router-dom';
 import { fetchAPI } from '../api/client';
 import { LocationState } from '../constants';
 
-const JoinRoomInput = () => {
+import { WithRequirePlayerNameProps, withRequirePlayerName } from './ensurePlayerWithCookie';
+
+const JoinRoomInput = ({ requirePlayerName }: WithRequirePlayerNameProps) => {
   const navigate = useNavigate();
 
   const [roomId, setRoomId] = useState('');
@@ -17,17 +19,21 @@ const JoinRoomInput = () => {
       return;
     }
 
-    fetchAPI(`/rooms/${roomId}/exists`)
-      .then((response) => response.json())
-      .then((roomExists) => {
-        if (roomExists) {
-          const state: LocationState = { roomExists };
-          navigate(`/room/${roomId}`, { state });
-        } else {
-          message.error(`Room ${roomId} not found`);
-        }
-      });
-  }, [navigate, roomId]);
+    requirePlayerName()
+      .then(() => {
+        fetchAPI(`/rooms/${roomId}/exists`)
+          .then((response) => response.json())
+          .then((roomExists) => {
+            if (roomExists) {
+              const state: LocationState = { roomExists };
+              navigate(`/room/${roomId}`, { state });
+            } else {
+              message.error(`Room ${roomId} not found`);
+            }
+          });
+      })
+      .catch(() => {});
+  }, [navigate, requirePlayerName, roomId]);
 
   return (
     <Input.Group compact={true} size="large" style={{ display: 'flex' }}>
@@ -51,4 +57,4 @@ const JoinRoomInput = () => {
   );
 };
 
-export default JoinRoomInput;
+export default withRequirePlayerName(JoinRoomInput);

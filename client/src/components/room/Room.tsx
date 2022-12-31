@@ -24,7 +24,7 @@ import {
 import GameSocket from '../../game/GameSocket';
 import useConnectedGameSocket from '../../game/useConnectedGameSocket';
 import PlayerNameInput from '../PlayerNameInput';
-import requirePlayerName from '../requirePlayerName';
+import ensurePlayerWithCookie from '../ensurePlayerWithCookie';
 
 import DebugGameState from './DebugGameState';
 import LeaveRoomButton from './LeaveRoomButton';
@@ -130,4 +130,4 @@ const Room = ({ roomId }: Props) => {
   );
 };
 
-export default requirePlayerName(Room);
+export default ensurePlayerWithCookie(Room);

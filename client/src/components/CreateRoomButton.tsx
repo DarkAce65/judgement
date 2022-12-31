@@ -8,21 +8,27 @@ import { LocationState } from '../constants';
 import { useAppDispatch } from '../data/reduxHooks';
 import { createRoom } from '../data/roomSlice';
 
-const CreateRoomButton = () => {
+import { WithRequirePlayerNameProps, withRequirePlayerName } from './ensurePlayerWithCookie';
+
+const CreateRoomButton = ({ requirePlayerName }: WithRequirePlayerNameProps) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const handleCreate = useCallback(() => {
-    dispatch(createRoom())
-      .then(unwrapResult)
-      .then((roomId) => {
-        const state: LocationState = { roomExists: true };
-        navigate(`/room/${roomId}`, { state });
+    requirePlayerName()
+      .then(() => {
+        dispatch(createRoom())
+          .then(unwrapResult)
+          .then((roomId) => {
+            const state: LocationState = { roomExists: true };
+            navigate(`/room/${roomId}`, { state });
+          })
+          .catch(() => {
+            message.error('Failed to create a new room');
+          });
       })
-      .catch(() => {
-        message.error('Failed to create a new room');
-      });
-  }, [dispatch, navigate]);
+      .catch(() => {});
+  }, [dispatch, navigate, requirePlayerName]);
 
   return (
     <Button type="primary" size="large" onClick={handleCreate}>
@@ -31,4 +37,4 @@ const CreateRoomButton = () => {
   );
 };
 
-export default CreateRoomButton;
+export default withRequirePlayerName(CreateRoomButton);
