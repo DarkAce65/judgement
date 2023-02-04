@@ -73,20 +73,11 @@ const Room = ({ roomId }: Props) => {
     socket?.emit('confirm_game');
   }, [socket]);
 
-  const handleGameStart = useCallback(() => {
-    socket?.emit('start_game');
-  }, [socket]);
-
   if (game) {
     switch (game.gameName) {
       case 'JUDGEMENT':
         return (
           <RoomSettingsWrapper roomId={roomId}>
-            {game.status === 'NOT_STARTED' && (
-              <Typography.Paragraph>
-                <Button onClick={handleGameStart}>Start game</Button>
-              </Typography.Paragraph>
-            )}
             <JudgementContainer game={game} />
           </RoomSettingsWrapper>
         );

@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 
-import { Button, Form, InputNumber, message } from 'antd';
+import { Button, Form, InputNumber, Space, message } from 'antd';
 
 import {
   JudgementGameState,
@@ -49,14 +49,24 @@ const JudgementSettings = ({ game: { settings } }: Props) => {
         <InputNumber value={numDecks} min={1} onChange={(value) => setNumDecks(value)} />
       </Form.Item>
       <Form.Item>
-        <Button
-          disabled={!canUpdateSettings}
-          onClick={() => {
-            updateSettings();
-          }}
-        >
-          Update settings
-        </Button>
+        <Space>
+          <Button
+            disabled={!canUpdateSettings}
+            onClick={() => {
+              updateSettings();
+            }}
+          >
+            Update settings
+          </Button>
+          <Button
+            type="primary"
+            onClick={() => {
+              socket?.emit('start_game');
+            }}
+          >
+            Start game
+          </Button>
+        </Space>
       </Form.Item>
     </Form>
   );
