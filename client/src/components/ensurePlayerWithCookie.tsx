@@ -8,6 +8,7 @@ import styled from 'styled-components';
 import { PLAYER_ID_COOKIE } from '../constants';
 import { ensurePlayer, getEnsurePlayerFetchStatus, getPlayerName } from '../data/playerSlice';
 import { useAppDispatch } from '../data/reduxHooks';
+import useIsMounted from '../utils/useIsMounted';
 
 import ErrorPage from './ErrorPage';
 import LoadingPage from './LoadingPage';
@@ -65,6 +66,7 @@ export const withRequirePlayerName = <P extends object>(
   WrappedComponent: ComponentType<P & WithRequirePlayerNameProps>
 ) => {
   const RequirePlayerName = (props: P) => {
+    const isMounted = useIsMounted();
     const playerName = useSelector(getPlayerName);
 
     const [promiseHandlers, setPromiseHandlers] = useState<{
@@ -78,11 +80,13 @@ export const withRequirePlayerName = <P extends object>(
       }
 
       const promise = new Promise<void>((resolve, reject) => {
-        setPromiseHandlers({ resolve, reject });
+        if (isMounted.current) {
+          setPromiseHandlers({ resolve, reject });
+        }
       });
 
       return promise;
-    }, [playerName]);
+    }, [isMounted, playerName]);
 
     return (
       <>
