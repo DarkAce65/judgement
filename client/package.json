@@ -16,6 +16,7 @@
     "*.{ts,tsx,css,html}": "prettier --list-different"
   },
   "dependencies": {
+    "@ant-design/icons": "^5.0.1",
     "@ant-design/pro-components": "^2.3.52",
     "@dnd-kit/core": "^6.0.7",
     "@dnd-kit/sortable": "^7.0.2",

@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 
 import { PageHeader } from '@ant-design/pro-layout';
 import { Button, Select, Space, Typography, message } from 'antd';
@@ -13,7 +13,7 @@ import {
   SetGameMessage,
 } from '../../../generated_types/websocket';
 import { getGame, loadGameState } from '../../data/gameSlice';
-import { getPlayerId, loadPlayers } from '../../data/playerSlice';
+import { loadPlayers } from '../../data/playerSlice';
 import { useAppDispatch, useAppSelector } from '../../data/reduxHooks';
 import {
   getGameName,
@@ -28,6 +28,7 @@ import ensurePlayerWithCookie from '../ensurePlayerWithCookie';
 
 import DebugGameState from './DebugGameState';
 import LeaveRoomButton from './LeaveRoomButton';
+import RoomSettingsWrapper from './RoomSettingsWrapper';
 import JudgementContainer from './judgement/JudgementContainer';
 
 interface Props {
@@ -56,7 +57,6 @@ const Room = ({ roomId }: Props) => {
     });
   });
 
-  const playerId = useAppSelector(getPlayerId)!;
   const gameName = useAppSelector(getGameName);
   const playerNames = useAppSelector(getOrderedPlayerNames);
   const game = useAppSelector(getGame);
@@ -77,18 +77,23 @@ const Room = ({ roomId }: Props) => {
     socket?.emit('start_game');
   }, [socket]);
 
-  const renderedGame = useMemo(() => {
-    if (!game) {
-      return null;
-    }
-
+  if (game) {
     switch (game.gameName) {
       case 'JUDGEMENT':
-        return <JudgementContainer game={game} />;
+        return (
+          <RoomSettingsWrapper roomId={roomId}>
+            {game.status === 'NOT_STARTED' && (
+              <Typography.Paragraph>
+                <Button onClick={handleGameStart}>Start game</Button>
+              </Typography.Paragraph>
+            )}
+            <JudgementContainer game={game} />
+          </RoomSettingsWrapper>
+        );
       default:
         return null;
     }
-  }, [game]);
+  }
 
   return (
     <PageHeader
@@ -104,21 +109,12 @@ const Room = ({ roomId }: Props) => {
         onChange={handleGameChange}
         style={{ width: '100%', maxWidth: 250 }}
       />
-      <Typography.Paragraph>{playerId}</Typography.Paragraph>
       {playerNames.map((playerName, index) => (
         <Typography.Paragraph key={index}>{playerName}</Typography.Paragraph>
       ))}
-      {!game && (
-        <Typography.Paragraph>
-          <Button onClick={handleGameInit}>Init game</Button>
-        </Typography.Paragraph>
-      )}
-      {game && game.status === 'NOT_STARTED' && (
-        <Typography.Paragraph>
-          <Button onClick={handleGameStart}>Start game</Button>
-        </Typography.Paragraph>
-      )}
-      {renderedGame}
+      <Typography.Paragraph>
+        <Button onClick={handleGameInit}>Init game</Button>
+      </Typography.Paragraph>
       <Typography.Paragraph>
         <Space direction="vertical" style={{ width: '100%' }}>
           <PlayerNameInput />
