@@ -46,26 +46,27 @@ const JudgementGameBidding = ({ game }: Props) => {
   }, [socket, bidAmount]);
 
   return (
-    <Typography.Paragraph>
-      <JudgementTable />
-      <Space direction="vertical" style={{ display: 'flex' }}>
-        <DndContext sensors={sensors}>
+    <DndContext sensors={sensors}>
+      <Typography.Paragraph>
+        <JudgementTable game={game} />
+        <Space direction="vertical" style={{ display: 'flex' }}>
           <Hand cards={game.playerState.hand} onReorderCards={reorderCards} />
-        </DndContext>
-        <Space direction="horizontal">
-          <InputNumber
-            value={bidAmount || undefined}
-            min={0}
-            onChange={(bid) => {
-              setBidAmount(bid);
-            }}
-          />
-          <Button disabled={bidAmount === null} onClick={bidHands}>
-            Bid hands
-          </Button>
+          <Space direction="horizontal">
+            <InputNumber
+              value={bidAmount || undefined}
+              min={0}
+              onChange={(bid) => {
+                setBidAmount(bid);
+              }}
+              onPressEnter={bidHands}
+            />
+            <Button disabled={bidAmount === null} onClick={bidHands}>
+              Bid hands
+            </Button>
+          </Space>
         </Space>
-      </Space>
-    </Typography.Paragraph>
+      </Typography.Paragraph>
+    </DndContext>
   );
 };
 

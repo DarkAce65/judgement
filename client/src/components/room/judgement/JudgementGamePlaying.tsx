@@ -51,7 +51,7 @@ const JudgementGamePlaying = ({ game }: Props) => {
   return (
     <DndContext sensors={sensors}>
       <Typography.Paragraph>
-        <JudgementTable />
+        <JudgementTable game={game} canPlayCards={true} />
         <Space direction="vertical" style={{ display: 'flex' }}>
           <Space direction="horizontal" size="large">
             Pile:
