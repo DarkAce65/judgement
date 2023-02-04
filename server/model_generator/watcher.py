@@ -61,7 +61,7 @@ if __name__ == "__main__":
     for changes in watch(
         watch_dir,
         watcher_cls=RegExpWatcher,
-        watcher_kwargs=dict(re_files=WATCHER_FILE_REGEX),
+        watcher_kwargs={"re_files": WATCHER_FILE_REGEX},
     ):
         run_generator(
             out_dir, [get_dotted_module_name(watch_dir, change[1]) for change in changes]

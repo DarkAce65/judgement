@@ -51,7 +51,7 @@ def get_players(player_ids: Collection[int]) -> dict[int, Player]:
 
     results = cast(list[tuple[int, str]], cur.fetchall())
     players: dict[int, Player] = {}
-    for (player_id, player_name) in results:
+    for player_id, player_name in results:
         players[player_id] = Player(player_id, player_name)
 
     return players
@@ -89,7 +89,7 @@ def get_players_for_room(room_id: str) -> list[Player]:
 
     results = cast(list[tuple[int, str]], cur.fetchall())
     players: list[Player] = []
-    for (player_id, player_name) in results:
+    for player_id, player_name in results:
         players.append(Player(player_id, player_name))
 
     return players

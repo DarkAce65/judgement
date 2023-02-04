@@ -9,7 +9,7 @@ def get_db_connection() -> "psycopg2.connection":
     if "POSTGRES_PASSWORD_FILE" in os.environ:
         postgres_password_file = os.environ.get("POSTGRES_PASSWORD_FILE")
         if postgres_password_file is None:
-            raise Exception("Missing path to postgres password secret")
+            raise RuntimeError("Missing path to postgres password secret")
 
         with open(postgres_password_file, encoding="utf-8") as pass_file:
             postgres_password = pass_file.readline().strip()
