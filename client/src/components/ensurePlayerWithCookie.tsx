@@ -1,4 +1,4 @@
-import { ComponentType, useCallback, useRef, useState } from 'react';
+import { ComponentType, useRef } from 'react';
 
 import { PageHeader } from '@ant-design/pro-layout';
 import Cookies from 'js-cookie';
@@ -8,11 +8,10 @@ import styled from 'styled-components';
 import { PLAYER_ID_COOKIE } from '../constants';
 import { ensurePlayer, getEnsurePlayerFetchStatus, getPlayerName } from '../data/playerSlice';
 import { useAppDispatch } from '../data/reduxHooks';
-import useIsMounted from '../utils/useIsMounted';
 
 import ErrorPage from './ErrorPage';
 import LoadingPage from './LoadingPage';
-import PlayerNameInput, { PlayerNameModal } from './PlayerNameInput';
+import PlayerNameInput from './PlayerNameInput';
 
 const CenteredBlock = styled.div`
   width: 50%;
@@ -56,57 +55,6 @@ const ensurePlayerWithCookie = <P extends object>(WrappedComponent: ComponentTyp
   };
 
   return EnsurePlayerCookie;
-};
-
-export interface WithRequirePlayerNameProps {
-  requirePlayerName: () => Promise<void>;
-}
-
-export const withRequirePlayerName = <P extends object>(
-  WrappedComponent: ComponentType<P & WithRequirePlayerNameProps>
-) => {
-  const RequirePlayerName = (props: P) => {
-    const isMounted = useIsMounted();
-    const playerName = useSelector(getPlayerName);
-
-    const [promiseHandlers, setPromiseHandlers] = useState<{
-      resolve: () => void;
-      reject: () => void;
-    } | null>(null);
-
-    const requirePlayerName = useCallback(() => {
-      if (playerName) {
-        return Promise.resolve();
-      }
-
-      const promise = new Promise<void>((resolve, reject) => {
-        if (isMounted.current) {
-          setPromiseHandlers({ resolve, reject });
-        }
-      });
-
-      return promise;
-    }, [isMounted, playerName]);
-
-    return (
-      <>
-        <PlayerNameModal
-          open={promiseHandlers !== null}
-          onOk={() => {
-            promiseHandlers?.resolve();
-            setPromiseHandlers(null);
-          }}
-          onCancel={() => {
-            promiseHandlers?.reject();
-            setPromiseHandlers(null);
-          }}
-        />
-        <WrappedComponent {...props} requirePlayerName={requirePlayerName} />
-      </>
-    );
-  };
-
-  return RequirePlayerName;
 };
 
 export default ensurePlayerWithCookie;

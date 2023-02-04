@@ -6,34 +6,46 @@ import { useNavigate } from 'react-router-dom';
 
 import { fetchAPI } from '../api/client';
 import { LocationState } from '../constants';
+import { getPlayerName } from '../data/playerSlice';
+import { useAppSelector } from '../data/reduxHooks';
 
-import { WithRequirePlayerNameProps, withRequirePlayerName } from './ensurePlayerWithCookie';
+import withPromptPlayerName, { WithPromptPlayerNameProps } from './withPromptPlayerName';
 
-const JoinRoomInput = ({ requirePlayerName }: WithRequirePlayerNameProps) => {
+const JoinRoomInput = ({ promptPlayerName }: WithPromptPlayerNameProps) => {
   const navigate = useNavigate();
 
+  const playerName = useAppSelector(getPlayerName);
+
   const [roomId, setRoomId] = useState('');
+
+  const joinRoomAndNavigate = useCallback(() => {
+    fetchAPI(`/rooms/${roomId}/exists`)
+      .then((response) => response.json())
+      .then((roomExists) => {
+        if (roomExists) {
+          const state: LocationState = { roomExists };
+          navigate(`/room/${roomId}`, { state });
+        } else {
+          message.error(`Room ${roomId} not found`);
+        }
+      });
+  }, [navigate, roomId]);
 
   const handleJoinRoom = useCallback(() => {
     if (roomId.length !== 4) {
       return;
     }
 
-    requirePlayerName()
-      .then(() => {
-        fetchAPI(`/rooms/${roomId}/exists`)
-          .then((response) => response.json())
-          .then((roomExists) => {
-            if (roomExists) {
-              const state: LocationState = { roomExists };
-              navigate(`/room/${roomId}`, { state });
-            } else {
-              message.error(`Room ${roomId} not found`);
-            }
-          });
-      })
-      .catch(() => {});
-  }, [navigate, requirePlayerName, roomId]);
+    if (!playerName) {
+      promptPlayerName()
+        .then(() => {
+          joinRoomAndNavigate();
+        })
+        .catch(() => {});
+    } else {
+      joinRoomAndNavigate();
+    }
+  }, [joinRoomAndNavigate, playerName, promptPlayerName, roomId.length]);
 
   return (
     <Input.Group compact={true} size="large" style={{ display: 'flex' }}>
@@ -57,4 +69,4 @@ const JoinRoomInput = ({ requirePlayerName }: WithRequirePlayerNameProps) => {
   );
 };
 
-export default withRequirePlayerName(JoinRoomInput);
+export default withPromptPlayerName(JoinRoomInput);

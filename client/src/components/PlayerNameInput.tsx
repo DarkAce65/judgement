@@ -66,13 +66,13 @@ const PlayerNameInput = () => {
   );
 };
 
-interface PlayerNameModalProps {
+interface Props {
   open?: boolean;
   onOk?: () => void;
   onCancel?: () => void;
 }
 
-export const PlayerNameModal = ({ open, onOk, onCancel }: PlayerNameModalProps) => {
+export const PlayerNameModal = ({ open, onOk, onCancel }: Props) => {
   const dispatch = useAppDispatch();
 
   const playerName = useAppSelector(getPlayerName);
