@@ -3,7 +3,7 @@ FROM python:3.10-alpine as python_poetry
 
 ENV PYTHONUNBUFFERED=1 \
   PYTHONDONTWRITEBYTECODE=1 \
-  POETRY_VERSION=1.2.2 \
+  POETRY_VERSION=1.3.2 \
   POETRY_HOME="/opt/poetry"
 
 RUN apk add --no-cache \
