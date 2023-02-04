@@ -104,6 +104,8 @@ export const PlayerNameModal = ({ open, onOk, onCancel }: Props) => {
     <Modal
       open={open}
       closable={false}
+      maskClosable={false}
+      keyboard={false}
       footer={
         <>
           <Button
