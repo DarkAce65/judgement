@@ -7,7 +7,7 @@ import ErrorPage from '../ErrorPage';
 import LoadingPage from '../LoadingPage';
 
 import Room from './Room';
-import RoomSettingsWrapper from './RoomSettingsWrapper';
+import RoomControls from './RoomControls';
 
 const RoomContainer = () => {
   const navigate = useNavigate();
@@ -19,9 +19,9 @@ const RoomContainer = () => {
 
   if (roomExists || (status === 'succeeded' && data === true)) {
     return (
-      <RoomSettingsWrapper roomId={roomId}>
+      <RoomControls roomId={roomId}>
         <Room roomId={roomId} />
-      </RoomSettingsWrapper>
+      </RoomControls>
     );
   } else if (status === 'succeeded' && data === false) {
     return (

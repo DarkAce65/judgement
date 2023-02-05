@@ -11,7 +11,6 @@ import withPromptPlayerName, { WithPromptPlayerNameProps } from '../withPromptPl
 import LeaveRoomButton from './LeaveRoomButton';
 
 const CornerDiv = styled.div`
-  display: inline-block;
   position: fixed;
   top: 20px;
   right: 20px;
@@ -21,7 +20,7 @@ interface Props {
   roomId: string;
 }
 
-const RoomSettingsWrapper = ({
+const RoomControls = ({
   children,
   roomId,
   promptPlayerName,
@@ -33,32 +32,32 @@ const RoomSettingsWrapper = ({
   return (
     <>
       {children}
-      <Popover
-        zIndex={999}
-        open={open}
-        trigger="click"
-        placement="bottomLeft"
-        showArrow={false}
-        content={
-          <div style={{ textAlign: 'center', maxWidth: 200 }}>
-            <Typography.Title level={5}>{playerName}</Typography.Title>
-            <Typography.Paragraph>
-              <Button
-                block={true}
-                onClick={() => {
-                  promptPlayerName();
-                }}
-              >
-                Change name
-              </Button>
-            </Typography.Paragraph>
-            <Typography.Paragraph style={{ marginBottom: 0 }}>
-              <LeaveRoomButton roomId={roomId} buttonProps={{ block: true }} />
-            </Typography.Paragraph>
-          </div>
-        }
-      >
-        <CornerDiv>
+      <CornerDiv>
+        <Popover
+          zIndex={999}
+          open={open}
+          trigger="click"
+          placement="bottomLeft"
+          showArrow={false}
+          content={
+            <div style={{ textAlign: 'center', maxWidth: 200 }}>
+              <Typography.Title level={5}>{playerName}</Typography.Title>
+              <Typography.Paragraph>
+                <Button
+                  block={true}
+                  onClick={() => {
+                    promptPlayerName();
+                  }}
+                >
+                  Change name
+                </Button>
+              </Typography.Paragraph>
+              <Typography.Paragraph style={{ marginBottom: 0 }}>
+                <LeaveRoomButton roomId={roomId} buttonProps={{ block: true }} />
+              </Typography.Paragraph>
+            </div>
+          }
+        >
           <SettingOutlined
             tabIndex={1}
             style={{ cursor: 'pointer', fontSize: '2rem' }}
@@ -66,10 +65,10 @@ const RoomSettingsWrapper = ({
               setOpen((o) => !o);
             }}
           />
-        </CornerDiv>
-      </Popover>
+        </Popover>
+      </CornerDiv>
     </>
   );
 };
 
-export default withPromptPlayerName(RoomSettingsWrapper);
+export default withPromptPlayerName(RoomControls);
