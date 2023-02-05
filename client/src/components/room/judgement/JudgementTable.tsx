@@ -57,16 +57,10 @@ const JudgementTable = ({ game, canPlayCards }: Props) => {
     },
   });
 
-  const players = useAppSelector(getPlayerNames);
-  const playerNames = useMemo(
-    () => game.playerOrder.map((playerId) => players[playerId]),
-    [game.playerOrder, players]
-  );
-
   const renderedSeats = useMemo(
     () =>
-      playerNames.map((_, index) => {
-        const theta = (index / playerNames.length) * Math.PI * 2 + Math.PI / 2;
+      game.orderedPlayerIds.map((playerId, index) => {
+        const theta = (index / game.orderedPlayerIds.length) * Math.PI * 2 + Math.PI / 2;
         const radius = BASE_SIZE / 3;
         const x = radius * Math.cos(theta) + HALF_BASE_SIZE;
         const y = radius * Math.sin(theta) + HALF_BASE_SIZE;
@@ -76,16 +70,20 @@ const JudgementTable = ({ game, canPlayCards }: Props) => {
             cx={x}
             cy={y}
             r={BASE_SIZE / 20}
-            style={{ fill: 'lightgray', stroke: 'gray' }}
+            style={{
+              fill: playerId === game.orderedPlayerIds[game.currentTurnIndex] ? 'red' : 'lightgray',
+              stroke: 'gray',
+            }}
           />
         );
       }),
-    [playerNames]
+    [game.currentTurnIndex, game.orderedPlayerIds]
   );
+  const players = useAppSelector(getPlayerNames);
   const renderedNameTags = useMemo(
     () =>
-      playerNames.map((playerName, index) => {
-        const position = index / playerNames.length;
+      game.orderedPlayerIds.map((playerId, index) => {
+        const position = index / game.orderedPlayerIds.length;
         const theta = position * Math.PI * 2 + Math.PI / 2;
         const radius = BASE_SIZE * 0.42;
         const x = radius * Math.cos(theta) + HALF_BASE_SIZE;
@@ -98,11 +96,11 @@ const JudgementTable = ({ game, canPlayCards }: Props) => {
             : 'start';
         return (
           <text key={index} x={x} y={y} textAnchor={textAnchor} dominantBaseline="middle">
-            {playerName ?? 'Player'}
+            {players[playerId] ?? 'Player'}
           </text>
         );
       }),
-    [playerNames]
+    [game.orderedPlayerIds, players]
   );
 
   return (
