@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 
 import { PageHeader } from '@ant-design/pro-layout';
-import { Button, Select, Space, Typography, message } from 'antd';
+import { Button, Select, Typography, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
 
 import {
@@ -23,12 +23,9 @@ import {
 } from '../../data/roomSlice';
 import GameSocket from '../../game/GameSocket';
 import useConnectedGameSocket from '../../game/useConnectedGameSocket';
-import PlayerNameInput from '../PlayerNameInput';
 import ensurePlayerWithCookie from '../ensurePlayerWithCookie';
 
 import DebugGameState from './DebugGameState';
-import LeaveRoomButton from './LeaveRoomButton';
-import RoomSettingsWrapper from './RoomSettingsWrapper';
 import JudgementContainer from './judgement/JudgementContainer';
 
 interface Props {
@@ -76,11 +73,7 @@ const Room = ({ roomId }: Props) => {
   if (game) {
     switch (game.gameName) {
       case 'JUDGEMENT':
-        return (
-          <RoomSettingsWrapper roomId={roomId}>
-            <JudgementContainer game={game} />
-          </RoomSettingsWrapper>
-        );
+        return <JudgementContainer game={game} />;
       default:
         return null;
     }
@@ -105,12 +98,6 @@ const Room = ({ roomId }: Props) => {
       ))}
       <Typography.Paragraph>
         <Button onClick={handleGameInit}>Init game</Button>
-      </Typography.Paragraph>
-      <Typography.Paragraph>
-        <Space direction="vertical" style={{ width: '100%' }}>
-          <PlayerNameInput />
-          <LeaveRoomButton roomId={roomId} />
-        </Space>
       </Typography.Paragraph>
       <DebugGameState />
     </PageHeader>

@@ -2,12 +2,20 @@ import { PropsWithChildren, useState } from 'react';
 
 import { SettingOutlined } from '@ant-design/icons';
 import { Button, Popover, Typography } from 'antd';
+import styled from 'styled-components';
 
 import { getPlayerName } from '../../data/playerSlice';
 import { useAppSelector } from '../../data/reduxHooks';
 import withPromptPlayerName, { WithPromptPlayerNameProps } from '../withPromptPlayerName';
 
 import LeaveRoomButton from './LeaveRoomButton';
+
+const CornerDiv = styled.div`
+  display: inline-block;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+`;
 
 interface Props {
   roomId: string;
@@ -50,7 +58,7 @@ const RoomSettingsWrapper = ({
           </div>
         }
       >
-        <div style={{ position: 'fixed', display: 'inline-block', top: 20, right: 20 }}>
+        <CornerDiv>
           <SettingOutlined
             tabIndex={1}
             style={{ cursor: 'pointer', fontSize: '2rem' }}
@@ -58,7 +66,7 @@ const RoomSettingsWrapper = ({
               setOpen((o) => !o);
             }}
           />
-        </div>
+        </CornerDiv>
       </Popover>
     </>
   );

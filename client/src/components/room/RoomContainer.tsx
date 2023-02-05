@@ -7,6 +7,7 @@ import ErrorPage from '../ErrorPage';
 import LoadingPage from '../LoadingPage';
 
 import Room from './Room';
+import RoomSettingsWrapper from './RoomSettingsWrapper';
 
 const RoomContainer = () => {
   const navigate = useNavigate();
@@ -17,7 +18,11 @@ const RoomContainer = () => {
   const { status, data } = useFetch<boolean>(`/rooms/${roomId}/exists`, { skip: roomExists });
 
   if (roomExists || (status === 'succeeded' && data === true)) {
-    return <Room roomId={roomId} />;
+    return (
+      <RoomSettingsWrapper roomId={roomId}>
+        <Room roomId={roomId} />
+      </RoomSettingsWrapper>
+    );
   } else if (status === 'succeeded' && data === false) {
     return (
       <Result
