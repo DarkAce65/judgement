@@ -48,7 +48,9 @@ const JudgementGameBidding = ({ game }: Props) => {
   return (
     <DndContext sensors={sensors}>
       <Typography.Paragraph>
-        <JudgementTable game={game} />
+        <div style={{ height: '60vh' }}>
+          <JudgementTable game={game} />
+        </div>
         <Space direction="vertical" style={{ display: 'flex' }}>
           <Hand cards={game.playerState.hand} onReorderCards={reorderCards} />
           <Space direction="horizontal">

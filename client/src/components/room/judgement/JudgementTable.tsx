@@ -104,38 +104,36 @@ const JudgementTable = ({ game, canPlayCards }: Props) => {
   );
 
   return (
-    <div ref={setNodeRef} style={{ textAlign: 'center' }}>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox={`-${HALF_BASE_SIZE / 2} 0 ${BASE_SIZE * 1.5} ${BASE_SIZE}`}
-        fontSize={BASE_SIZE / 20}
-        style={{ width: '100%', maxHeight: '60vh', strokeWidth: BASE_SIZE / 100 }}
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox={`-${HALF_BASE_SIZE / 2} 0 ${BASE_SIZE * 1.5} ${BASE_SIZE}`}
+      fontSize={BASE_SIZE / 20}
+      style={{ width: '100%', maxHeight: '100%', strokeWidth: BASE_SIZE / 100 }}
+    >
+      <circle
+        cx={HALF_BASE_SIZE}
+        cy={HALF_BASE_SIZE}
+        r={TABLE_SIZE}
+        style={{
+          fill: isOver ? 'red' : 'lightgray',
+          stroke: 'gray',
+          transition: isOver ? '0s' : '0.3s',
+        }}
+      />
+      {game.pile.map((card, index) => (
+        <SmallCard key={index} />
+      ))}
+      <foreignObject
+        x={HALF_BASE_SIZE - TABLE_SIZE}
+        y={HALF_BASE_SIZE - TABLE_SIZE}
+        width={TABLE_SIZE * 2}
+        height={TABLE_SIZE * 2}
       >
-        <circle
-          cx={HALF_BASE_SIZE}
-          cy={HALF_BASE_SIZE}
-          r={TABLE_SIZE}
-          style={{
-            fill: isOver ? 'red' : 'lightgray',
-            stroke: 'gray',
-            transition: isOver ? '0s' : '0.3s',
-          }}
-        />
-        {game.pile.map((card, index) => (
-          <SmallCard key={index} />
-        ))}
-        <foreignObject
-          x={HALF_BASE_SIZE - TABLE_SIZE}
-          y={HALF_BASE_SIZE - TABLE_SIZE}
-          width={TABLE_SIZE * 2}
-          height={TABLE_SIZE * 2}
-        >
-          <div ref={setNodeRef} style={{ width: '100%', height: '100%' }} />
-        </foreignObject>
-        <g>{renderedSeats}</g>
-        <g>{renderedNameTags}</g>
-      </svg>
-    </div>
+        <div ref={setNodeRef} style={{ width: '100%', height: '100%' }} />
+      </foreignObject>
+      <g>{renderedSeats}</g>
+      <g>{renderedNameTags}</g>
+    </svg>
   );
 };
 
