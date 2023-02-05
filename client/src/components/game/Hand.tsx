@@ -41,7 +41,6 @@ const DraggableCard = ({
 
   return (
     <div
-      ref={setNodeRef}
       style={{
         ...containerStyle,
         visibility: isDragging ? 'hidden' : undefined,
@@ -54,7 +53,7 @@ const DraggableCard = ({
       {...listeners}
       onClick={onClick}
     >
-      <Card card={card} style={{ width: cardWidth }} />
+      <Card ref={setNodeRef} card={card} style={{ width: cardWidth }} />
     </div>
   );
 };
