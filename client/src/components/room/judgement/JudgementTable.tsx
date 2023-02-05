@@ -2,9 +2,13 @@ import { useMemo } from 'react';
 
 import { useDndMonitor, useDroppable } from '@dnd-kit/core';
 
-import { JudgementGameState, JudgementPlayCardAction } from '../../../../generated_types/judgement';
+import {
+  JudgementGameState,
+  JudgementPlayCardAction,
+  JudgementSpectatorGameState,
+} from '../../../../generated_types/judgement';
+import { getPlayerNames } from '../../../data/playerSlice';
 import { useAppSelector } from '../../../data/reduxHooks';
-import { getOrderedPlayerNames } from '../../../data/roomSlice';
 import useConnectedGameSocket from '../../../game/useConnectedGameSocket';
 import { isCardDraggableData } from '../../game/Hand';
 
@@ -31,7 +35,7 @@ const SmallCard = () => (
 );
 
 interface Props {
-  game: JudgementGameState;
+  game: JudgementGameState | JudgementSpectatorGameState;
   canPlayCards?: boolean;
 }
 
@@ -53,11 +57,15 @@ const JudgementTable = ({ game, canPlayCards }: Props) => {
     },
   });
 
-  const playerNames = useAppSelector(getOrderedPlayerNames);
+  const players = useAppSelector(getPlayerNames);
+  const playerNames = useMemo(
+    () => game.playerOrder.map((playerId) => players[playerId]),
+    [game.playerOrder, players]
+  );
 
   const renderedSeats = useMemo(
     () =>
-      playerNames.map((playerName, index) => {
+      playerNames.map((_, index) => {
         const theta = (index / playerNames.length) * Math.PI * 2 + Math.PI / 2;
         const radius = BASE_SIZE / 3;
         const x = radius * Math.cos(theta) + HALF_BASE_SIZE;
