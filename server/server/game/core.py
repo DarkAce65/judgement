@@ -27,7 +27,6 @@ class Game(Generic[Action], ABC):
 
     status: GameStatus
     players: dict[int, GamePlayer]
-    player_order: list[int]
 
     def __init__(self, action_cls: Type[Action], room_id: str) -> None:
         self._action_cls = action_cls
@@ -36,7 +35,6 @@ class Game(Generic[Action], ABC):
 
         self.status = GameStatus.NOT_STARTED
         self.players = {}
-        self.player_order = []
 
     @abstractmethod
     def build_game_states(self, player_ids: set[int]) -> Mapping[int, GameState]:
@@ -45,20 +43,17 @@ class Game(Generic[Action], ABC):
     def add_player(
         self, player_id: int, player_type: GamePlayerType = GamePlayerType.PLAYER
     ) -> None:
-        game_player = GamePlayer(player_id, player_type)
+        game_player = GamePlayer(player_id=player_id, player_type=player_type)
         self.players[player_id] = game_player
 
-        if player_type == GamePlayerType.PLAYER:
-            self.player_order.append(player_id)
-
-    def remove_player(self, player_id: int) -> None:
+    def remove_player(self, player_id: int) -> GamePlayer:
         if player_id not in self.players:
             raise ValueError(f"Player {player_id} is not in the game")
 
         player = self.players[player_id]
-        if player.player_type == GamePlayerType.PLAYER:
-            self.player_order.remove(player_id)
         del self.players[player_id]
+
+        return player
 
     async def start_game(self) -> None:
         if self.status == GameStatus.IN_PROGRESS:
@@ -82,9 +77,6 @@ class Game(Generic[Action], ABC):
     @abstractmethod
     async def process_input(self, player_id: int, game_input: Action) -> None:
         ...
-
-    def is_host(self, player_id: int) -> bool:
-        return len(self.players) > 0 and self.player_order[0] == player_id
 
     def is_in_game(self, player_id: int) -> bool:
         return player_id in self.players

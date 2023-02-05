@@ -23,13 +23,9 @@ class GamePlayerType(str, Enum):
     SPECTATOR = "SPECTATOR"
 
 
-class GamePlayer:
+class GamePlayer(CamelModel):
     player_id: int
     player_type: GamePlayerType
-
-    def __init__(self, player_id: int, player_type: GamePlayerType) -> None:
-        self.player_id = player_id
-        self.player_type = player_type
 
 
 class GameState(CamelModel, ABC):
@@ -37,5 +33,7 @@ class GameState(CamelModel, ABC):
 
     game_name: GameName
     status: GameStatus
+
+    players: dict[int, GamePlayer]
 
     full_state_do_not_use: dict[str, Any]

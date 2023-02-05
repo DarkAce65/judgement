@@ -99,6 +99,8 @@ class JudgementGameState(GameState):
 
     game_name: Literal[GameName.JUDGEMENT]
 
+    ordered_player_ids: list[int]
+
     settings: JudgementSettings
     phase: JudgementPhase
 
@@ -107,7 +109,7 @@ class JudgementGameState(GameState):
     current_round: int
     current_trick: int
     start_player_index: int
-    current_turn: int
+    current_turn_index: int
     player_state: JudgementPlayerState
 
 
@@ -116,6 +118,8 @@ class JudgementSpectatorGameState(GameState):
 
     game_name: Literal[GameName.JUDGEMENT]
 
+    ordered_player_ids: list[int]
+
     settings: JudgementSettings
     phase: JudgementPhase
 
@@ -124,4 +128,4 @@ class JudgementSpectatorGameState(GameState):
     current_round: int
     current_trick: int
     start_player_index: int
-    current_turn: int
+    current_turn_index: int

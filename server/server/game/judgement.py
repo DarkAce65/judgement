@@ -3,7 +3,13 @@ import math
 from typing import Mapping
 
 from server.data import socket_messager
-from server.models.game import GameName, GamePlayerType, GameState, GameStatus
+from server.models.game import (
+    GameName,
+    GamePlayer,
+    GamePlayerType,
+    GameState,
+    GameStatus,
+)
 from server.models.judgement import (
     JudgementAction,
     JudgementBidHandsAction,
@@ -62,6 +68,8 @@ class JudgementGame(Game[JudgementAction]):
     phase: JudgementPhase
     settings: JudgementSettings
 
+    ordered_player_ids: list[int]
+
     decks: Decks
     pile: list[Card]
     discard_pile: list[Card]
@@ -69,7 +77,7 @@ class JudgementGame(Game[JudgementAction]):
     current_round: int
     current_trick: int
     start_player_index: int
-    current_turn: int
+    current_turn_index: int
 
     player_states: dict[int, JudgementPlayerState]
 
@@ -79,6 +87,8 @@ class JudgementGame(Game[JudgementAction]):
         self.phase = JudgementPhase.NOT_STARTED
         self.settings = JudgementSettings(num_decks=1, num_rounds=13)
 
+        self.ordered_player_ids = []
+
         self.decks = Decks()
         self.pile = []
         self.discard_pile = []
@@ -86,7 +96,7 @@ class JudgementGame(Game[JudgementAction]):
         self.current_round = 0
         self.current_trick = 0
         self.start_player_index = 0
-        self.current_turn = 0
+        self.current_turn_index = 0
 
         self.player_states = {}
 
@@ -99,13 +109,15 @@ class JudgementGame(Game[JudgementAction]):
                     player_type=GamePlayerType.PLAYER,
                     game_name=GameName.JUDGEMENT,
                     status=self.status,
+                    players=self.players,
+                    ordered_player_ids=self.ordered_player_ids,
                     settings=self.settings,
                     phase=self.phase,
                     pile=self.pile,
                     current_round=self.current_round,
                     current_trick=self.current_trick,
                     start_player_index=self.start_player_index,
-                    current_turn=self.current_turn,
+                    current_turn_index=self.current_turn_index,
                     player_state=self.player_states[player_id],
                     full_state_do_not_use=dump_class(self),
                 )
@@ -114,13 +126,15 @@ class JudgementGame(Game[JudgementAction]):
                     player_type=GamePlayerType.SPECTATOR,
                     game_name=GameName.JUDGEMENT,
                     status=self.status,
+                    players=self.players,
+                    ordered_player_ids=self.ordered_player_ids,
                     settings=self.settings,
                     phase=self.phase,
                     pile=self.pile,
                     current_round=self.current_round,
                     current_trick=self.current_trick,
                     start_player_index=self.start_player_index,
-                    current_turn=self.current_turn,
+                    current_turn_index=self.current_turn_index,
                     full_state_do_not_use=dump_class(self),
                 )
 
@@ -142,19 +156,32 @@ class JudgementGame(Game[JudgementAction]):
         super().add_player(player_id, player_type)
 
         if player_type == GamePlayerType.PLAYER:
+            self.ordered_player_ids.append(player_id)
             self.player_states[player_id] = JudgementPlayerState(
                 score=0, current_won_tricks=0, hand=[]
             )
 
-            max_rounds = math.ceil(self.settings.num_decks * 52 / len(self.player_order))
+            max_rounds = math.ceil(
+                self.settings.num_decks * 52 / len(self.ordered_player_ids)
+            )
             self.settings.num_rounds = min(self.settings.num_rounds, max_rounds)
 
-    def remove_player(self, player_id: int) -> None:
+    def remove_player(self, player_id: int) -> GamePlayer:
         if self.status != GameStatus.NOT_STARTED:
             raise NotImplementedError("Cannot remove a player from this game")
 
-        del self.player_states[player_id]
-        super().remove_player(player_id)
+        player = super().remove_player(player_id)
+
+        if player.player_type == GamePlayerType.PLAYER:
+            self.ordered_player_ids.remove(player_id)
+            del self.player_states[player_id]
+
+        return player
+
+    def is_host(self, player_id: int) -> bool:
+        return (
+            len(self.ordered_player_ids) > 0 and self.ordered_player_ids[0] == player_id
+        )
 
     async def process_input(self, player_id: int, game_input: JudgementAction) -> None:
         logger.debug("player_id: %s, action: %s", player_id, repr(game_input))
@@ -203,8 +230,8 @@ class JudgementGame(Game[JudgementAction]):
         self.assert_turn(player_id)
         self.player_states[player_id].current_bid = action.num_hands
 
-        if self.current_turn < len(self.player_order) - 1:
-            self.current_turn += 1
+        if self.current_turn_index < len(self.ordered_player_ids) - 1:
+            self.current_turn_index += 1
         else:
             self.phase = JudgementPhase.PLAYING
             self.start_trick()
@@ -232,8 +259,10 @@ class JudgementGame(Game[JudgementAction]):
         self.player_states[player_id].hand.remove(card)
         self.pile.append(card)
 
-        if len(self.pile) < len(self.player_order):
-            self.current_turn = (self.current_turn + 1) % len(self.player_order)
+        if len(self.pile) < len(self.ordered_player_ids):
+            self.current_turn_index = (self.current_turn_index + 1) % len(
+                self.ordered_player_ids
+            )
         else:
             await self.end_trick()
 
@@ -244,7 +273,7 @@ class JudgementGame(Game[JudgementAction]):
             raise GameError("You can't do that right now!")
 
     def assert_turn(self, player_id: int) -> None:
-        if self.player_order[self.current_turn] != player_id:
+        if self.ordered_player_ids[self.current_turn_index] != player_id:
             raise GameError("It is not your turn!")
 
     def get_num_tricks_for_round(self) -> int:
@@ -261,8 +290,8 @@ class JudgementGame(Game[JudgementAction]):
 
     async def start_round(self) -> None:
         self.current_trick = 0
-        self.start_player_index = self.current_round % len(self.player_order)
-        self.current_turn = self.start_player_index
+        self.start_player_index = self.current_round % len(self.ordered_player_ids)
+        self.current_turn_index = self.start_player_index
         self.decks.replace(self.discard_pile)
         self.pile = []
         self.discard_pile = []
@@ -278,15 +307,15 @@ class JudgementGame(Game[JudgementAction]):
 
     def start_trick(self, start_player_index: int = 0) -> None:
         self.start_player_index = start_player_index
-        self.current_turn = self.start_player_index
+        self.current_turn_index = self.start_player_index
         self.discard_pile.extend(self.pile)
         self.pile = []
 
     async def end_trick(self) -> None:
         winning_player_index = (
             self.start_player_index + compute_winning_card(self.pile, self.get_trump())
-        ) % len(self.player_order)
-        winning_player_id = self.player_order[winning_player_index]
+        ) % len(self.ordered_player_ids)
+        winning_player_id = self.ordered_player_ids[winning_player_index]
         self.player_states[winning_player_id].current_won_tricks += 1
 
         tricks_left = self.get_num_tricks_for_round() - self.current_trick - 1
