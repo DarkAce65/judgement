@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 
 import { unwrapResult } from '@reduxjs/toolkit';
-import { Button, message } from 'antd';
+import { Button, ButtonProps, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
 
 import { LocationState } from '../constants';
@@ -11,7 +11,11 @@ import { createRoom } from '../data/roomSlice';
 
 import withPromptPlayerName, { WithPromptPlayerNameProps } from './withPromptPlayerName';
 
-const CreateRoomButton = ({ promptPlayerName }: WithPromptPlayerNameProps) => {
+interface Props {
+  buttonProps: ButtonProps;
+}
+
+const CreateRoomButton = ({ promptPlayerName, buttonProps }: Props & WithPromptPlayerNameProps) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -42,7 +46,7 @@ const CreateRoomButton = ({ promptPlayerName }: WithPromptPlayerNameProps) => {
   }, [createRoomAndNavigate, playerName, promptPlayerName]);
 
   return (
-    <Button type="primary" size="large" onClick={handleCreate}>
+    <Button type="primary" size="large" {...buttonProps} onClick={handleCreate}>
       Create room
     </Button>
   );
