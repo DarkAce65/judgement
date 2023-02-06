@@ -10,7 +10,7 @@ import { useAppDispatch } from '../data/reduxHooks';
 import ErrorPage from './ErrorPage';
 import LoadingPage from './LoadingPage';
 import PageLayout from './PageLayout';
-import { PlayerNameModal } from './PlayerNameInput';
+import PlayerNameModal from './PlayerNameModal';
 
 const ensurePlayerWithCookie = <P extends object>(WrappedComponent: ComponentType<P>) => {
   const EnsurePlayerCookie = (props: P) => {

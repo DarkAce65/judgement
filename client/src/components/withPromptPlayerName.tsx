@@ -2,7 +2,7 @@ import { ComponentType, useCallback, useState } from 'react';
 
 import useIsMounted from '../utils/useIsMounted';
 
-import { PlayerNameModal } from './PlayerNameInput';
+import PlayerNameModal from './PlayerNameModal';
 
 export interface WithPromptPlayerNameProps {
   promptPlayerName: () => Promise<void>;
