@@ -73,7 +73,12 @@ const Room = ({ roomId }: Props) => {
   if (game) {
     switch (game.gameName) {
       case 'JUDGEMENT':
-        return <JudgementContainer game={game} />;
+        return (
+          <>
+            <JudgementContainer game={game} />
+            <DebugGameState />
+          </>
+        );
       default:
         return null;
     }
@@ -99,7 +104,6 @@ const Room = ({ roomId }: Props) => {
       <Typography.Paragraph>
         <Button onClick={handleGameInit}>Init game</Button>
       </Typography.Paragraph>
-      <DebugGameState />
     </PageHeader>
   );
 };

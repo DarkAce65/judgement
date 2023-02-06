@@ -22,13 +22,15 @@ const DebugGameState = () => {
   const { fullStateDoNotUse, ...game } = maybeGame;
 
   return (
-    <Typography.Paragraph style={{ fontSize: '0.7em' }}>
+    <Typography.Paragraph>
       <Row gutter={16}>
         <Col xs={24} md={12}>
-          <pre>{JSON.stringify(game, cardStringifyReplacer, 2)}</pre>
+          <pre style={{ fontSize: '0.7rem' }}>{JSON.stringify(game, cardStringifyReplacer, 2)}</pre>
         </Col>
         <Col xs={24} md={12}>
-          <pre>{JSON.stringify(fullStateDoNotUse, cardStringifyReplacer, 2)}</pre>
+          <pre style={{ fontSize: '0.7rem' }}>
+            {JSON.stringify(fullStateDoNotUse, cardStringifyReplacer, 2)}
+          </pre>
         </Col>
       </Row>
     </Typography.Paragraph>

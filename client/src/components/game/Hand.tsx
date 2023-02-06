@@ -18,6 +18,15 @@ interface CardDraggableData {
 export const isCardDraggableData = (data: unknown): data is CardDraggableData =>
   isObjectWithKeys(data, ['index', 'card']) && isObjectWithKeys(data.card, ['suit', 'rank']);
 
+interface DraggableCardProps {
+  sortableId: string;
+  cardWidth: number;
+  index: number;
+  card: CardType;
+  containerStyle?: CSSProperties;
+  onClick?: () => void;
+}
+
 const DraggableCard = ({
   sortableId,
   cardWidth,
@@ -25,14 +34,7 @@ const DraggableCard = ({
   card,
   containerStyle,
   onClick,
-}: {
-  sortableId: string;
-  cardWidth: number;
-  index: number;
-  card: CardType;
-  containerStyle?: CSSProperties;
-  onClick?: () => void;
-}) => {
+}: DraggableCardProps) => {
   const data: CardDraggableData = { index, card };
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: sortableId,
@@ -80,17 +82,16 @@ interface Props {
 
 const Hand = ({ cards, onReorderCards, onClick }: Props) => {
   const wrapperRef = useRef(null);
+
   const { width } = useElementSize(wrapperRef);
   const cardWidth = useMemo(() => (width ? Math.min(Math.max(100, width / 6), 175) : 100), [width]);
-
   const minWidth = useMemo(() => (width > 900 ? cardWidth / 4 : cardWidth / 2), [cardWidth, width]);
   const paddingRight = useMemo(() => {
     if (minWidth * cards.length > width || cards.length < 2) {
       return undefined;
     }
-    return `calc(${100 - 100 * (cards.length / (cards.length - 1))}% + ${
-      cardWidth * (cards.length / (cards.length - 1))
-    }px)`;
+    const l = cards.length / (cards.length - 1);
+    return `calc(${100 - 100 * l}% + ${cardWidth * l}px)`;
   }, [cardWidth, cards.length, minWidth, width]);
 
   const cardsWithId: (CardType & { id: string })[] = useMemo(() => {
