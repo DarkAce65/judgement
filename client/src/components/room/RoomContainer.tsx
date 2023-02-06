@@ -5,6 +5,7 @@ import useFetch from '../../api/useFetch';
 import useLocationStatePropertyOnce from '../../utils/useLocationStatePropertyOnce';
 import ErrorPage from '../ErrorPage';
 import LoadingPage from '../LoadingPage';
+import PageLayout from '../PageLayout';
 
 import Room from './Room';
 import RoomControls from './RoomControls';
@@ -19,22 +20,26 @@ const RoomContainer = () => {
 
   if (roomExists || (status === 'succeeded' && data === true)) {
     return (
-      <RoomControls roomId={roomId}>
-        <Room roomId={roomId} />
-      </RoomControls>
+      <PageLayout>
+        <RoomControls roomId={roomId}>
+          <Room roomId={roomId} />
+        </RoomControls>
+      </PageLayout>
     );
   } else if (status === 'succeeded' && data === false) {
     return (
-      <Result
-        status="error"
-        title={`Room ${roomId} not found`}
-        subTitle="Double check that you've entered the correct room code"
-        extra={
-          <Button type="primary" onClick={() => navigate('/')}>
-            Go Home
-          </Button>
-        }
-      />
+      <PageLayout>
+        <Result
+          status="error"
+          title={`Room ${roomId} not found`}
+          subTitle="Double check that you've entered the correct room code"
+          extra={
+            <Button type="primary" onClick={() => navigate('/')}>
+              Go Home
+            </Button>
+          }
+        />
+      </PageLayout>
     );
   } else if (status === 'uninitialized' || status === 'pending') {
     return <LoadingPage />;

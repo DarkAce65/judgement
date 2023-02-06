@@ -1,9 +1,7 @@
 import { ComponentType, useRef } from 'react';
 
-import { PageHeader } from '@ant-design/pro-layout';
 import Cookies from 'js-cookie';
 import { useSelector } from 'react-redux';
-import styled from 'styled-components';
 
 import { PLAYER_ID_COOKIE } from '../constants';
 import { ensurePlayer, getEnsurePlayerFetchStatus, getPlayerName } from '../data/playerSlice';
@@ -11,14 +9,8 @@ import { useAppDispatch } from '../data/reduxHooks';
 
 import ErrorPage from './ErrorPage';
 import LoadingPage from './LoadingPage';
-import PlayerNameInput from './PlayerNameInput';
-
-const CenteredBlock = styled.div`
-  width: 50%;
-  min-width: 400px;
-  margin: 0 auto;
-  text-align: center;
-`;
+import PageLayout from './PageLayout';
+import { PlayerNameModal } from './PlayerNameInput';
 
 const ensurePlayerWithCookie = <P extends object>(WrappedComponent: ComponentType<P>) => {
   const EnsurePlayerCookie = (props: P) => {
@@ -30,11 +22,9 @@ const ensurePlayerWithCookie = <P extends object>(WrappedComponent: ComponentTyp
 
     if (!playerName) {
       return (
-        <PageHeader>
-          <CenteredBlock>
-            <PlayerNameInput />
-          </CenteredBlock>
-        </PageHeader>
+        <PageLayout>
+          <PlayerNameModal open={true} />
+        </PageLayout>
       );
     }
 

@@ -3,14 +3,13 @@ import styled from 'styled-components';
 
 import CreateRoomButton from './CreateRoomButton';
 import JoinRoomInput from './JoinRoomInput';
+import PageLayout from './PageLayout';
 
 const CenteredBlock = styled.div`
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  max-width: 400px;
+  height: 100%;
   margin: 0 auto;
-  text-align: center;
 
   &::before,
   &::after {
@@ -24,13 +23,15 @@ const CenteredBlock = styled.div`
 `;
 
 const Home = () => (
-  <CenteredBlock>
-    <div>
-      <CreateRoomButton buttonProps={{ block: true }} />
-      <Divider style={{ textTransform: 'lowercase', fontVariant: 'small-caps' }}>Or</Divider>
-      <JoinRoomInput />
-    </div>
-  </CenteredBlock>
+  <PageLayout>
+    <CenteredBlock style={{ height: '100vh', maxWidth: 400, textAlign: 'center' }}>
+      <div>
+        <CreateRoomButton buttonProps={{ block: true }} />
+        <Divider style={{ textTransform: 'lowercase', fontVariant: 'small-caps' }}>Or</Divider>
+        <JoinRoomInput />
+      </div>
+    </CenteredBlock>
+  </PageLayout>
 );
 
 export default Home;

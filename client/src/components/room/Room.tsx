@@ -1,8 +1,6 @@
 import { useCallback } from 'react';
 
-import { PageHeader } from '@ant-design/pro-layout';
 import { Button, Select, Typography, message } from 'antd';
-import { useNavigate } from 'react-router-dom';
 
 import {
   GameErrorMessage,
@@ -15,12 +13,7 @@ import {
 import { getGame, loadGameState } from '../../data/gameSlice';
 import { loadPlayers } from '../../data/playerSlice';
 import { useAppDispatch, useAppSelector } from '../../data/reduxHooks';
-import {
-  getGameName,
-  getOrderedPlayerNames,
-  loadRoomState,
-  resetRoomState,
-} from '../../data/roomSlice';
+import { getGameName, getOrderedPlayerNames, loadRoomState } from '../../data/roomSlice';
 import GameSocket from '../../game/GameSocket';
 import useConnectedGameSocket from '../../game/useConnectedGameSocket';
 import ensurePlayerWithCookie from '../ensurePlayerWithCookie';
@@ -34,7 +27,6 @@ interface Props {
 
 const Room = ({ roomId }: Props) => {
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
   const socket = useConnectedGameSocket(({ socket, namespace }) => {
     socket.emit('join_room', roomId);
     GameSocket.onReconnect(namespace, () => {
@@ -85,13 +77,8 @@ const Room = ({ roomId }: Props) => {
   }
 
   return (
-    <PageHeader
-      title={`hello ${roomId}`}
-      onBack={() => {
-        navigate('/');
-        dispatch(resetRoomState());
-      }}
-    >
+    <>
+      <Typography.Title>{roomId}</Typography.Title>
       <Select<GameName>
         value={gameName}
         options={[{ label: 'Judgement', value: 'JUDGEMENT' }]}
@@ -104,7 +91,7 @@ const Room = ({ roomId }: Props) => {
       <Typography.Paragraph>
         <Button onClick={handleGameInit}>Init game</Button>
       </Typography.Paragraph>
-    </PageHeader>
+    </>
   );
 };
 

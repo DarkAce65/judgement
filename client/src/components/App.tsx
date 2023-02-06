@@ -10,7 +10,7 @@ import RoomContainer from './room/RoomContainer';
 const App = () => (
   <Provider store={store}>
     <Router>
-      <Layout style={{ minHeight: '100vh' }}>
+      <Layout>
         <Layout.Content>
           <Routes>
             <Route path="/" element={<Home />} />
