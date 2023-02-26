@@ -69,7 +69,7 @@ generate_watch = "python -m model_generator.watcher --out_dir ../client/generate
 
 [tool.poetry.dependencies]
 python = "^3.10"
-fastapi = "^0.89.0"
+fastapi = "^0.92.0"
 psycopg2 = "^2.9.3"
 python-socketio = { git = "https://github.com/miguelgrinberg/python-socketio.git", rev = "de4d5b5" }
 uvicorn = { version = "^0.20.0", extras = ["standard"] }
@@ -90,7 +90,7 @@ watchgod = "^0.8.2"
 [tool.poetry.group.dev.dependencies]
 black = "^23.1.0"
 isort = "^5.10.1"
-mypy = "^0.991"
+mypy = "^1.0.1"
 pylint = "^2.12.2"
 taskipy = "^1.6.0"
 types-psycopg2 = "^2.9.5"
