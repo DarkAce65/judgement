@@ -161,7 +161,7 @@ class JudgementGame(Game[JudgementAction]):
                 score=0, current_won_tricks=0, hand=[]
             )
 
-            max_rounds = math.ceil(
+            max_rounds = math.floor(
                 self.settings.num_decks * 52 / len(self.ordered_player_ids)
             )
             self.settings.num_rounds = min(self.settings.num_rounds, max_rounds)
