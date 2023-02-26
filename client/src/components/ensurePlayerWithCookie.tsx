@@ -30,7 +30,9 @@ const ensurePlayerWithCookie = <P extends object>(WrappedComponent: ComponentTyp
 
     if (!isRenewingCookie.current && !Cookies.get(PLAYER_ID_COOKIE)) {
       isRenewingCookie.current = true;
-      dispatch(ensurePlayer(playerName));
+      setTimeout(() => {
+        dispatch(ensurePlayer(playerName));
+      }, 0);
     }
 
     if (isRenewingCookie.current) {
