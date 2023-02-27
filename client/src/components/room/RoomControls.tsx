@@ -1,8 +1,8 @@
 import { PropsWithChildren, useState } from 'react';
 
 import { SettingOutlined } from '@ant-design/icons';
-import { Button, Popover, Typography } from 'antd';
-import styled from 'styled-components';
+import { Button, Grid, Popover, Typography } from 'antd';
+import styled, { css } from 'styled-components';
 
 import { getPlayerName } from '../../data/playerSlice';
 import { useAppSelector } from '../../data/reduxHooks';
@@ -10,10 +10,21 @@ import withPromptPlayerName, { WithPromptPlayerNameProps } from '../withPromptPl
 
 import LeaveRoomButton from './LeaveRoomButton';
 
-const CornerDiv = styled.div`
-  position: fixed;
-  top: 20px;
-  right: 20px;
+const CornerDiv = styled.div<{
+  floating: boolean;
+}>`
+  z-index: 999;
+  ${(props) =>
+    props.floating
+      ? css`
+          position: fixed;
+          top: 20px;
+          right: 20px;
+        `
+      : css`
+          text-align: right;
+          margin-bottom: 20px;
+        `};
 `;
 
 interface Props {
@@ -25,16 +36,15 @@ const RoomControls = ({
   roomId,
   promptPlayerName,
 }: PropsWithChildren<Props & WithPromptPlayerNameProps>) => {
+  const breakpoints = Grid.useBreakpoint();
   const playerName = useAppSelector(getPlayerName);
 
   const [open, setOpen] = useState(false);
 
   return (
     <>
-      {children}
-      <CornerDiv>
+      <CornerDiv floating={breakpoints.md ?? false}>
         <Popover
-          zIndex={999}
           open={open}
           trigger="click"
           placement="bottomLeft"
@@ -67,6 +77,7 @@ const RoomControls = ({
           />
         </Popover>
       </CornerDiv>
+      {children}
     </>
   );
 };

@@ -50,11 +50,12 @@ const JudgementGameBidding = ({ game }: Props) => {
     <DndContext sensors={sensors}>
       <div style={{ maxWidth: 1000, margin: 'auto' }}>
         <Row>
-          <Col xs={20} style={{ maxHeight: '60vh' }}>
+          <Col xs={16} md={18} style={{ maxHeight: '60vh' }}>
             <JudgementTable game={game} />
           </Col>
           <Col
-            xs={{ span: 4 }}
+            xs={8}
+            md={6}
             style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
           >
             <Space direction="vertical" size="large">
