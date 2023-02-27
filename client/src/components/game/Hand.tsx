@@ -49,13 +49,14 @@ const DraggableCard = ({
         textAlign: 'center',
         transform: CSS.Transform.toString(transform),
         transition,
-        touchAction: 'none',
+        touchAction: 'manipulation',
+        WebkitTouchCallout: 'none',
       }}
       {...attributes}
       {...listeners}
       onClick={onClick}
     >
-      <Card ref={setNodeRef} card={card} style={{ width: cardWidth }} />
+      <Card ref={setNodeRef} card={card} style={{ width: cardWidth, WebkitTouchCallout: 'none' }} />
     </div>
   );
 };
