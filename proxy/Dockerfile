@@ -1,9 +1,9 @@
 # Model generator container
-FROM python:3.10-alpine as model_generator
+FROM python:3.12-alpine AS model_generator
 
 ENV PYTHONUNBUFFERED=1 \
   PYTHONDONTWRITEBYTECODE=1 \
-  POETRY_VERSION=1.3.2 \
+  POETRY_VERSION=1.8.3 \
   POETRY_HOME="/opt/poetry"
 
 RUN apk add --no-cache \
@@ -34,7 +34,7 @@ COPY server .
 RUN poetry run python -m model_generator.model_generator --out_dir /poetryuser/generated_types
 
 # Client builder stage
-FROM node:18 as client_builder
+FROM node:22 AS client_builder
 
 USER node
 WORKDIR /client
