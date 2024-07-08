@@ -41,7 +41,6 @@ init_typed = true
 warn_required_dynamic_aliases = true
 warn_untyped_fields = true
 
-
 [tool.pylint.messages_control]
 disable = [
   "missing-class-docstring",
@@ -54,23 +53,22 @@ disable = [
 extension-pkg-whitelist = ["pydantic"]
 
 [tool.taskipy.tasks]
-pre_format = "isort ."
-format = "black ."
+format = "isort . && black ."
 pre_lint = "task format"
-lint = "task lint_mypy && task lint_pylint"
 lint_mypy = "mypy model_generator server main.py"
 lint_pylint = "pylint model_generator server main.py"
+lint = "task lint_mypy && task lint_pylint"
 test = "python -m unittest"
 yarn = "yarn --cwd ./model_generator/ install --silent"
 pre_generate = "task yarn"
 pre_generate_watch = "task yarn"
 generate = "python -m model_generator.model_generator --out_dir ../client/generated_types"
-generate_watch = "python -m model_generator.watcher --out_dir ../client/generated_types"
+generate_watch = "python -m model_generator.model_generator --watch --out_dir ../client/generated_types"
 
 [tool.poetry.dependencies]
 python = "^3.12"
 fastapi = "^0.111.0"
-psycopg2 = "^2.9.9"
+psycopg = "^3.2.1"
 python-socketio = "^5.11.3"
 uvicorn = { version = "^0.30.1", extras = ["standard"] }
 
@@ -84,8 +82,7 @@ debugpy = "^1.8.2"
 optional = true
 
 [tool.poetry.group.generator.dependencies]
-pydantic-to-typescript = "^1.0.10"
-watchgod = "^0.8.2"
+watchfiles = "^0.22.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.4.2"

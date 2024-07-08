@@ -57,4 +57,4 @@ WORKDIR /server
 RUN poetry install --only main,generator --no-interaction
 
 COPY . .
-CMD ["sh", "-c", "poetry run python -m model_generator.watcher --out_dir \"$GENERATED_TYPES_OUT_DIR\""]
+CMD ["sh", "-c", "poetry run python -m model_generator.model_generator --watch --out_dir \"$GENERATED_TYPES_OUT_DIR\""]
