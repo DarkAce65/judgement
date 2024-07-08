@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "prepare": "cd .. && husky install client/.husky",
+    "prepare": "husky",
     "eslint:fix": "eslint --fix \"*.config.{js,ts}\" \"src/**/*.{ts,tsx}\"",
     "prettier:write": "prettier --write .eslintrc.js \"*.config.{js,ts}\" tsconfig.json index.html \"src/**/*.{ts,tsx,css,less}\"",
     "dev": "vite",
