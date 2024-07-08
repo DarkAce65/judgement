@@ -29,7 +29,7 @@ def mount() -> None:
 
     app.include_router(player.router)
     app.include_router(room.router)
-    app.mount("/ws", ASGIApp(sio))
+    app.mount("/ws", ASGIApp(sio, socketio_path="/ws/socket.io"))
 
 
 mount()

@@ -64,13 +64,13 @@ def get_client_ids_for_players(player_ids: set[int]) -> set[str]:
     return {client_id for (client_id,) in results}
 
 
-def connect_player_client(player_id: int, client_id: str) -> None:
+async def connect_player_client(player_id: int, client_id: str) -> None:
     cur = db.get_cursor()
     cur.execute(
         "INSERT INTO client_player_room(client_id, player_id) VALUES(%s, %s)",
         (client_id, player_id),
     )
-    sio.enter_room(client_id, str(player_id))
+    await sio.enter_room(client_id, str(player_id))
 
 
 async def propagate_name_change(player: Player) -> None:
@@ -86,7 +86,7 @@ async def propagate_name_change(player: Player) -> None:
     await socket_messager.emit_players([player], room_ids)
 
 
-def add_player_client_to_room(client_id: str, room_id: str) -> None:
+async def add_player_client_to_room(client_id: str, room_id: str) -> None:
     player_id = get_player_id_for_client(client_id)
 
     cur = db.get_cursor()
@@ -98,17 +98,17 @@ def add_player_client_to_room(client_id: str, room_id: str) -> None:
     result = cast(Optional[tuple[str]], cur.fetchone())
     if result is not None:
         (old_room_id,) = result
-        sio.leave_room(client_id, old_room_id)
-        sio.leave_room(client_id, f"{old_room_id}/{player_id}")
+        await sio.leave_room(client_id, old_room_id)
+        await sio.leave_room(client_id, f"{old_room_id}/{player_id}")
 
     set_client_room(client_id, room_id)
 
     room_manager.add_player_to_room(player_id, room_id)
-    sio.enter_room(client_id, room_id)
-    sio.enter_room(client_id, f"{room_id}/{player_id}")
+    await sio.enter_room(client_id, room_id)
+    await sio.enter_room(client_id, f"{room_id}/{player_id}")
 
 
-def remove_player_client_from_room(client_id: str, room_id: str) -> None:
+async def remove_player_client_from_room(client_id: str, room_id: str) -> None:
     player_id = get_player_id_for_client(client_id)
 
     cur = db.get_cursor()
@@ -118,8 +118,8 @@ def remove_player_client_from_room(client_id: str, room_id: str) -> None:
     )
     results = cast(list[tuple[str]], cur.fetchall())
     for (c_id,) in results:
-        sio.leave_room(c_id, room_id)
-        sio.leave_room(c_id, f"{room_id}/{player_id}")
+        await sio.leave_room(c_id, room_id)
+        await sio.leave_room(c_id, f"{room_id}/{player_id}")
 
     cur.execute(
         "UPDATE client_player_room SET room_id=NULL "
