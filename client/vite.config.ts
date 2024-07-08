@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => ({
       overlay: { initialIsOpen: false },
       terminal: mode !== 'test',
       typescript: true,
-      eslint: { lintCommand: "eslint './src/**/*.{ts,tsx}'" },
+      eslint: { lintCommand: "eslint './src/**/*.{ts,tsx}'", useFlatConfig: true },
     }),
   ],
 }));

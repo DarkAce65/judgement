@@ -62,7 +62,7 @@ export default [
       parser: typescriptParser,
       parserOptions: {
         ecmaFeatures: { jsx: true },
-        project: ['./tsconfig.json', './tsconfig.node.json'],
+        project: ['./tsconfig.json'],
       },
     },
     plugins: {
