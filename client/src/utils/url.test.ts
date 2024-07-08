@@ -188,7 +188,7 @@ describe('non-empty segments', () => {
       'join(%p, %p, %p)',
       (segment1: string, segment2: string, segment3: string, expected: string) => {
         expect(join(segment1, segment2, segment3)).toBe(expected);
-      }
+      },
     );
   });
 });

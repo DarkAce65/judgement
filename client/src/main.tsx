@@ -47,7 +47,7 @@ const initializeGameSocket = () => {
     () => {
       socketRetries = 0;
       message.destroy('socketError');
-    }
+    },
   );
 };
 
@@ -55,7 +55,7 @@ const render = () => {
   ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
       <App />
-    </React.StrictMode>
+    </React.StrictMode>,
   );
 };
 

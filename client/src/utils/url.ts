@@ -73,7 +73,7 @@ export const join = (...segments: string[]): string => {
 
   if (url !== 'file://' && /^[^/]+:\/{2}$/.test(url)) {
     throw new Error(
-      `Malformed url from segments: [${segments.map((segment) => `'${segment}'`).join(', ')}]`
+      `Malformed url from segments: [${segments.map((segment) => `'${segment}'`).join(', ')}]`,
     );
   }
 

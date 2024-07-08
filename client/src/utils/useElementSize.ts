@@ -29,7 +29,7 @@ class ResizeObserverManager {
           });
         }
         didQueueEntries = true;
-      }
+      },
     );
     this.callbacks = new Map();
   }
@@ -65,7 +65,7 @@ const getResizeObserverManager = () =>
     : resizeObserverManager;
 
 const useElementSize = <T extends Element>(
-  element: RefObject<T> | T | null
+  element: RefObject<T> | T | null,
 ): { height: number; width: number } => {
   const observer = getResizeObserverManager();
 

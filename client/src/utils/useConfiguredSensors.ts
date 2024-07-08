@@ -4,7 +4,7 @@ const useConfiguredSensors = () =>
   useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 300, tolerance: 5 } }),
-    useSensor(KeyboardSensor)
+    useSensor(KeyboardSensor),
   );
 
 export default useConfiguredSensors;

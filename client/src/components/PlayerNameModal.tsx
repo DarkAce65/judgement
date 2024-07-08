@@ -7,7 +7,7 @@ import { ensurePlayer, getEnsurePlayerFetchStatus, getPlayerName } from '../data
 import { useAppDispatch, useAppSelector } from '../data/reduxHooks';
 
 const validatePlayerName = (
-  playerName: string
+  playerName: string,
 ): { isValid: boolean; validationMessage?: string } => {
   if (0 < playerName.length && playerName.length < 2) {
     return { isValid: false, validationMessage: 'Name must be at least two characters' };
@@ -31,7 +31,7 @@ const PlayerNameModal = ({ open, onOk, onCancel }: Props) => {
 
   const { isValid, validationMessage } = useMemo(
     () => validatePlayerName(stagedPlayerName),
-    [stagedPlayerName]
+    [stagedPlayerName],
   );
   const canUpdate = playerName !== stagedPlayerName && isValid;
 

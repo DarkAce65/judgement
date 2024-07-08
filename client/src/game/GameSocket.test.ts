@@ -84,7 +84,7 @@ describe('GameSocket', () => {
       GameSocket.onNamespaced(namespace, 'event', listener);
 
       expect(consoleErrorSpy).toBeCalledWith(
-        `Unknown namespace ${namespace} - have you called GameSocket.attach()?`
+        `Unknown namespace ${namespace} - have you called GameSocket.attach()?`,
       );
       consoleErrorSpy.mockRestore();
     });
@@ -123,7 +123,7 @@ describe('GameSocket', () => {
       GameSocket.onNamespaced(namespace, 'event', listener);
 
       expect(consoleErrorSpy).toBeCalledWith(
-        `Unknown namespace ${namespace} - have you called GameSocket.attach()?`
+        `Unknown namespace ${namespace} - have you called GameSocket.attach()?`,
       );
       consoleErrorSpy.mockRestore();
     });
@@ -141,11 +141,11 @@ describe('GameSocket', () => {
       expect(GameSocket['listeners']).toHaveProperty(`${namespace}.test_event`);
       expect(GameSocket['onceListenersMapping'].has(listener)).toBe(true);
       expect(GameSocket['listeners'][namespace]['test_event']).toContain(
-        GameSocket['onceListenersMapping'].get(listener)
+        GameSocket['onceListenersMapping'].get(listener),
       );
       expect(mockSocket.once).toHaveBeenCalledWith(
         'test_event',
-        GameSocket['onceListenersMapping'].get(listener)
+        GameSocket['onceListenersMapping'].get(listener),
       );
     });
 
@@ -168,7 +168,7 @@ describe('GameSocket', () => {
       GameSocket.onceNamespaced(namespace, 'event', listener);
 
       expect(consoleErrorSpy).toBeCalledWith(
-        `Unknown namespace ${namespace} - have you called GameSocket.attach()?`
+        `Unknown namespace ${namespace} - have you called GameSocket.attach()?`,
       );
       consoleErrorSpy.mockRestore();
     });
@@ -221,17 +221,17 @@ describe('GameSocket', () => {
     expect(GameSocket['listeners'][namespace1]['test_event']).toContain(listener2);
     expect(GameSocket['onceListenersMapping'].has(onceListener1)).toBeTruthy();
     expect(GameSocket['listeners'][namespace1]['test_event']).toContain(
-      GameSocket['onceListenersMapping'].get(onceListener1)
+      GameSocket['onceListenersMapping'].get(onceListener1),
     );
     expect(GameSocket['onceListenersMapping'].has(onceListener2)).toBeTruthy();
     expect(GameSocket['listeners'][namespace1]['test_event']).toContain(
-      GameSocket['onceListenersMapping'].get(onceListener2)
+      GameSocket['onceListenersMapping'].get(onceListener2),
     );
     expect(GameSocket['listeners']).toHaveProperty(`${namespace1}.test_event2`);
     expect(GameSocket['listeners'][namespace1]['test_event2']).toContain(listener3);
     expect(GameSocket['onceListenersMapping'].has(onceListener3)).toBeTruthy();
     expect(GameSocket['listeners'][namespace1]['test_event2']).toContain(
-      GameSocket['onceListenersMapping'].get(onceListener3)
+      GameSocket['onceListenersMapping'].get(onceListener3),
     );
 
     expect(GameSocket['anyListeners']).toHaveProperty(namespace2);
@@ -240,24 +240,24 @@ describe('GameSocket', () => {
     expect(GameSocket['listeners'][namespace2]['test_event']).toContain(listener4);
     expect(GameSocket['onceListenersMapping'].has(onceListener4)).toBeTruthy();
     expect(GameSocket['listeners'][namespace2]['test_event']).toContain(
-      GameSocket['onceListenersMapping'].get(onceListener4)
+      GameSocket['onceListenersMapping'].get(onceListener4),
     );
 
     expect(mockSocket.once).toHaveBeenCalledWith(
       'test_event',
-      GameSocket['onceListenersMapping'].get(onceListener1)
+      GameSocket['onceListenersMapping'].get(onceListener1),
     );
     expect(mockSocket.once).toHaveBeenCalledWith(
       'test_event',
-      GameSocket['onceListenersMapping'].get(onceListener2)
+      GameSocket['onceListenersMapping'].get(onceListener2),
     );
     expect(mockSocket.once).toHaveBeenCalledWith(
       'test_event2',
-      GameSocket['onceListenersMapping'].get(onceListener3)
+      GameSocket['onceListenersMapping'].get(onceListener3),
     );
     expect(mockSocket.once).toHaveBeenCalledWith(
       'test_event',
-      GameSocket['onceListenersMapping'].get(onceListener4)
+      GameSocket['onceListenersMapping'].get(onceListener4),
     );
   });
 
@@ -464,7 +464,7 @@ describe('GameSocket', () => {
         expect(GameSocket['listeners'][namespace1]['test_event']).toContain(onceListener1Actual);
         expect(GameSocket['onceListenersMapping'].has(onceListener1)).toBe(true);
         expect(GameSocket['listeners'][namespace1]['test_event']).not.toContain(
-          onceListener2Actual
+          onceListener2Actual,
         );
         expect(GameSocket['onceListenersMapping'].has(onceListener2)).toBe(false);
         expect(GameSocket['listeners']).toHaveProperty(`${namespace1}.test_event2`);
@@ -662,7 +662,7 @@ describe('GameSocket', () => {
       expect(GameSocket['listeners'][namespace2]['test_event']).toContain(listener4);
       expect(GameSocket['onceListenersMapping'].has(onceListener4)).toBe(true);
       expect(GameSocket['listeners'][namespace2]['test_event']).toContain(
-        GameSocket['onceListenersMapping'].get(onceListener4)
+        GameSocket['onceListenersMapping'].get(onceListener4),
       );
 
       expect(mockSocket.disconnect).toBeCalledTimes(0);
@@ -701,7 +701,7 @@ describe('GameSocket', () => {
       expect(GameSocket['listeners'][namespace2]['test_event']).toContain(listener4);
       expect(GameSocket['onceListenersMapping'].has(onceListener4)).toBe(true);
       expect(GameSocket['listeners'][namespace2]['test_event']).toContain(
-        GameSocket['onceListenersMapping'].get(onceListener4)
+        GameSocket['onceListenersMapping'].get(onceListener4),
       );
 
       expect(mockSocket.disconnect).toBeCalledTimes(0);

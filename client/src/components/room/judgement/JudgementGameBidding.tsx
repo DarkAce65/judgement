@@ -37,7 +37,7 @@ const JudgementGameBidding = ({ game }: Props) => {
       socket.emit('game_input', action);
       dispatch(optimisticallyReorderCards({ fromIndex, toIndex }));
     },
-    [dispatch, socket]
+    [dispatch, socket],
   );
   const bidHands = useCallback(() => {
     if (!socket) return;

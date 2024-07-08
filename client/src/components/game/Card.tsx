@@ -21,7 +21,7 @@ const Card = forwardRef<HTMLImageElement, Props & ImgHTMLAttributes<HTMLImageEle
       draggable={false}
       style={{ width: '100%', ...passthroughProps.style }}
     />
-  )
+  ),
 );
 Card.displayName = 'Card';
 
@@ -35,7 +35,7 @@ export const CardBack = forwardRef<HTMLImageElement, ImgHTMLAttributes<HTMLImage
       draggable={false}
       style={{ width: '100%', ...passthroughProps.style }}
     />
-  )
+  ),
 );
 CardBack.displayName = 'CardBack';
 

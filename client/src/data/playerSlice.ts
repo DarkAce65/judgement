@@ -29,12 +29,12 @@ const getPlayerState = (state: RootState): PlayerState => state.player;
 
 export const getEnsurePlayerFetchStatus = createSelector(
   [getPlayerState],
-  (state) => state.ensurePlayerStatus
+  (state) => state.ensurePlayerStatus,
 );
 
 export const getPlayerId = createSelector(
   [getPlayerState],
-  (state): string | null => state.playerId ?? Cookies.get(PLAYER_ID_COOKIE) ?? null
+  (state): string | null => state.playerId ?? Cookies.get(PLAYER_ID_COOKIE) ?? null,
 );
 
 export const getPlayerName = createSelector([getPlayerState], (state) => state.playerName);
@@ -49,7 +49,7 @@ export const ensurePlayer = createAsyncThunk<string, string, { state: RootState 
 
     return playerName;
   },
-  { condition: (_, { getState }) => getEnsurePlayerFetchStatus(getState()) !== 'pending' }
+  { condition: (_, { getState }) => getEnsurePlayerFetchStatus(getState()) !== 'pending' },
 );
 
 const playerSlice = createSlice({

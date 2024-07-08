@@ -12,7 +12,7 @@ const useLocationStatePropertyOnce = <P extends keyof LocationState>(stateProper
   const navigate = useNavigate();
 
   const [statePropertyValue, setStatePropertyValue] = useState<LocationState[P]>(
-    locationState?.[stateProperty]
+    locationState?.[stateProperty],
   );
 
   useEffect(() => {

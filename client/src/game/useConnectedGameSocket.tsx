@@ -7,7 +7,7 @@ import useMountEffect from '../utils/useMountEffect';
 import GameSocket from './GameSocket';
 
 const useConnectedGameSocket = (
-  registerListenersHook?: (socketAndNamespace: { socket: Socket; namespace: string }) => void
+  registerListenersHook?: (socketAndNamespace: { socket: Socket; namespace: string }) => void,
 ): Socket | null => {
   const [socket, setSocket] = useState<Socket | null>(null);
 

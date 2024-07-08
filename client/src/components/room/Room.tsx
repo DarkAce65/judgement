@@ -55,7 +55,7 @@ const Room = ({ roomId }: Props) => {
       const setGameMessage: SetGameMessage = { gameName: name };
       socket?.emit('set_game', setGameMessage);
     },
-    [socket]
+    [socket],
   );
 
   const handleGameInit = useCallback(() => {

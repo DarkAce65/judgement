@@ -24,7 +24,7 @@ interface FetchResponse<T = unknown> {
 
 const useFetch = <T>(
   path: string,
-  { fetchOnMount = true, fetchOnArgsChange = true, skip = false, apiOptions }: FetchOptions = {}
+  { fetchOnMount = true, fetchOnArgsChange = true, skip = false, apiOptions }: FetchOptions = {},
 ): FetchResponse<T> => {
   const [status, setStatus] = useState<FetchStatus>('uninitialized');
   const [response, setResponse] = useState<Response | null>(null);

@@ -18,7 +18,7 @@ const JudgementSettings = ({ game: { settings } }: Props) => {
   const socket = useConnectedGameSocket();
 
   const [numRounds, setNumRounds, numRoundsChanged] = useDraftValue<number | null>(
-    settings.numRounds
+    settings.numRounds,
   );
   const [numDecks, setNumDecks, numDecksChanged] = useDraftValue<number | null>(settings.numDecks);
 

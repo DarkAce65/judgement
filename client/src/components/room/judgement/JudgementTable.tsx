@@ -77,7 +77,7 @@ const JudgementTable = ({ game, canPlayCards }: Props) => {
           />
         );
       }),
-    [game.currentTurnIndex, game.orderedPlayerIds]
+    [game.currentTurnIndex, game.orderedPlayerIds],
   );
   const players = useAppSelector(getPlayerNames);
   const renderedNameTags = useMemo(
@@ -92,15 +92,15 @@ const JudgementTable = ({ game, canPlayCards }: Props) => {
           position < 0.001 || Math.abs(position - 0.5) < 0.001
             ? 'middle'
             : position < 0.5
-            ? 'end'
-            : 'start';
+              ? 'end'
+              : 'start';
         return (
           <text key={index} x={x} y={y} textAnchor={textAnchor} dominantBaseline="middle">
             {players[playerId] ?? 'Player'}
           </text>
         );
       }),
-    [game.orderedPlayerIds, players]
+    [game.orderedPlayerIds, players],
   );
 
   return (

@@ -34,7 +34,7 @@ export const getRoomStatus = createSelector([getRoomState], (state) => state.roo
 export const getOrderedPlayerNames = createSelector(
   [getRoomState, getPlayerNames],
   (state, playerNames): (string | null)[] =>
-    state.orderedPlayerIds.map((playerId) => playerNames[playerId] ?? null)
+    state.orderedPlayerIds.map((playerId) => playerNames[playerId] ?? null),
 );
 export const getGameName = createSelector([getRoomState], (state) => state.gameName);
 
@@ -45,7 +45,7 @@ export const createRoom = createAsyncThunk<string, void, { state: RootState }>(
     const { roomId }: RoomIdResponse = await response.json();
 
     return roomId;
-  }
+  },
 );
 
 const roomSlice = createSlice({

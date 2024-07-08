@@ -36,7 +36,7 @@ const JudgementGamePlaying = ({ game }: Props) => {
       socket.emit('game_input', action);
       dispatch(optimisticallyReorderCards({ fromIndex, toIndex }));
     },
-    [dispatch, socket]
+    [dispatch, socket],
   );
 
   const playCard = useCallback(() => {

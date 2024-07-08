@@ -84,7 +84,7 @@ class GameSocket {
 
   static initializeSocket(
     onConnectionError?: (socket: Socket, error: Error) => void,
-    resetConnectionAttempts?: () => void
+    resetConnectionAttempts?: () => void,
   ): Socket {
     const socket = buildSocket({
       auth: (auth) => auth({ player_auth_id: Cookies.get(PLAYER_ID_COOKIE) }),
@@ -145,7 +145,7 @@ class GameSocket {
   private static removeListenerAndCleanup(
     namespace: string,
     event: string,
-    listener: Listener
+    listener: Listener,
   ): Listener | null {
     let removedListener = null;
     for (let i = 0; i < this.listeners[namespace][event].length; i++) {

@@ -21,7 +21,7 @@ const gameSlice = createSlice({
     },
     optimisticallyReorderCards(
       state,
-      { payload: { fromIndex, toIndex } }: PayloadAction<{ fromIndex: number; toIndex: number }>
+      { payload: { fromIndex, toIndex } }: PayloadAction<{ fromIndex: number; toIndex: number }>,
     ) {
       if (fromIndex === toIndex || state === null || state.playerType === 'SPECTATOR') {
         return;
