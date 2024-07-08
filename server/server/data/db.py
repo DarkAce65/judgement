@@ -16,13 +16,13 @@ def get_db_connection() -> Connection:
             postgres_password = pass_file.readline().strip()
             conn = psycopg.connect(
                 host="database",
-                database=os.environ.get("POSTGRES_DB"),
+                dbname=os.environ.get("POSTGRES_DB"),
                 user="postgres",
                 password=postgres_password,
             )
     else:
         conn = psycopg.connect(
-            host="database", database=os.environ.get("POSTGRES_DB"), user="postgres"
+            host="database", dbname=os.environ.get("POSTGRES_DB"), user="postgres"
         )
 
     conn.autocommit = True
