@@ -37,8 +37,7 @@ class Game(Generic[Action], ABC):
         self.players = {}
 
     @abstractmethod
-    def build_game_states(self, player_ids: set[int]) -> Mapping[int, GameState]:
-        ...
+    def build_game_states(self, player_ids: set[int]) -> Mapping[int, GameState]: ...
 
     def add_player(
         self, player_id: int, player_type: GamePlayerType = GamePlayerType.PLAYER
@@ -75,8 +74,7 @@ class Game(Generic[Action], ABC):
         await self.process_input(player_id, parsed_action)
 
     @abstractmethod
-    async def process_input(self, player_id: int, game_input: Action) -> None:
-        ...
+    async def process_input(self, player_id: int, game_input: Action) -> None: ...
 
     def is_in_game(self, player_id: int) -> bool:
         return player_id in self.players

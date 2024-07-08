@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC
 from enum import Enum, unique
-from typing import Any, Callable, Generator, Literal, Optional
+from typing import Any, Callable, ClassVar, Generator, Literal, Optional
 
 from server.game.card import Card, Suit
 from server.game.core import GameError
@@ -29,7 +29,7 @@ class JudgementActionType(str, Enum):
 
 
 class JudgementAction(CamelModel, ABC):
-    _types: dict[JudgementActionType, type] = {}
+    _types: ClassVar[dict[JudgementActionType, type]] = {}
 
     action_type: JudgementActionType
 

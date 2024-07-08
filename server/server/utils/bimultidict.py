@@ -73,12 +73,10 @@ class bimultidict(MutableMapping[KT, set[VT]]):
         )
 
     @overload
-    def get(self, key: KT) -> Optional[set[VT]]:
-        ...
+    def get(self, key: KT) -> Optional[set[VT]]: ...
 
     @overload
-    def get(self, key: KT, default: Any = ...) -> Union[set[VT], Any]:
-        ...
+    def get(self, key: KT, default: Any = ...) -> Union[set[VT], Any]: ...
 
     def get(self, key: KT, default: Any = None) -> Union[set[VT], Any]:
         if key in self._forward_mapping:

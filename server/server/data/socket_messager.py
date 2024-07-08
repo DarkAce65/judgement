@@ -32,9 +32,11 @@ async def emit_room(room: Room) -> None:
                 status=room.room_status,
                 ordered_player_ids=room.ordered_player_ids,
                 game_name=room.game_name,
-                game=None
-                if game_states is None
-                else cast(ConcreteGameState, game_states[player_id]),
+                game=(
+                    None
+                    if game_states is None
+                    else cast(ConcreteGameState, game_states[player_id])
+                ),
             ).dict(by_alias=True),
             to=f"{room.room_id}/{player_id}",
         )
