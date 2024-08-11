@@ -34,7 +34,7 @@ FROM base_server_deps AS debug
 EXPOSE "$API_PORT"
 RUN poetry install --only main,debug --no-interaction
 COPY . .
-CMD ["sh", "-c", "poetry run python -m debugpy --listen 0.0.0.0:5678 -m uvicorn main:app --host 0.0.0.0 --port $API_PORT --use-colors --log-config logging.config.json --reload --reload-dir server"]
+CMD ["sh", "-c", "poetry run python -Xfrozen_modules=off -m debugpy --listen 0.0.0.0:5678 -m uvicorn main:app --host 0.0.0.0 --port $API_PORT --use-colors --log-config logging.config.json --reload --reload-dir server"]
 
 # Production container
 FROM base_server_deps AS production
