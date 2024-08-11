@@ -112,16 +112,7 @@ def generate_typescript_defs(
             raise e
 
 
-if __name__ == "__main__":
-    with open("logging.config.json", encoding="utf-8") as config:
-        logging.config.dictConfig(json.load(config))
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--out_dir", type=str, required=True)
-    parser.add_argument("--watch", action="store_true")
-    args = parser.parse_args()
-
-    out_dir = PurePath(args.out_dir)
+def start_model_generator(out_dir: PurePath, should_watch: bool = False) -> None:
     model_files: dict[str, tuple[str, PurePath]] = {}
     for module_name, module_path in MODEL_MODULES.items():
         module_file_path = importlib.import_module(module_path).__file__
@@ -132,10 +123,22 @@ if __name__ == "__main__":
             )
 
     for module_file_path, (module_path, out_filename) in model_files.items():
-        generate_typescript_defs(out_filename, module_path, not args.watch)
+        generate_typescript_defs(out_filename, module_path, not should_watch)
 
-    if args.watch:
+    if should_watch:
         for changes in watch(*model_files.keys()):
             for _, changed_file in changes:
                 module_path, out_filename = model_files[changed_file]
-                generate_typescript_defs(out_filename, module_path, not args.watch)
+                generate_typescript_defs(out_filename, module_path, not should_watch)
+
+
+if __name__ == "__main__":
+    with open("logging.config.json", encoding="utf-8") as config:
+        logging.config.dictConfig(json.load(config))
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--out_dir", type=str, required=True)
+    parser.add_argument("--watch", action="store_true")
+    args = parser.parse_args()
+
+    start_model_generator(PurePath(args.out_dir), args.watch)
