@@ -20,9 +20,8 @@ TEMPORARY_MODEL_NAME = "_" + "".join(random.choices(string.ascii_uppercase, k=10
 
 
 MODEL_MODULES: dict[str, str] = {
+    "api": "server.models.api",
     "judgement": "server.models.judgement",
-    "requests": "server.models.requests",
-    "responses": "server.models.responses",
     "websocket": "server.models.websocket",
 }
 

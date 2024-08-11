@@ -3,8 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Path
 
 from server.data import game_manager
-from server.models.requests import CreateGameRequest
-from server.models.responses import GameIdResponse, GameResponse
+from server.models.api import CreateGameRequest, GameIdResponse, GameResponse
 
 router = APIRouter(prefix="/games", tags=["games"])
 

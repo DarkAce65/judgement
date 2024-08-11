@@ -4,7 +4,8 @@ from fastapi import APIRouter, Cookie, Depends, Response
 
 from server.api.dependencies import get_player
 from server.data import player_manager
-from server.models.player import Player, PlayerNameModel
+from server.models.api import PlayerNameModel
+from server.models.player import Player
 
 router = APIRouter(prefix="/player", tags=["player"])
 

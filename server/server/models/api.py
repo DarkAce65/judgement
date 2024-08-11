@@ -7,7 +7,15 @@ from pydantic import Field
 from server.game.core import Game
 
 from .camel_model import CamelModel
-from .game import GameStatus
+from .game import GameName, GameStatus
+
+
+class PlayerNameModel(CamelModel):
+    player_name: Annotated[str, Field(description="The name of the player", min_length=1)]
+
+
+class CreateGameRequest(CamelModel):
+    game_name: Annotated[GameName, Field(description="The name of the game")]
 
 
 class GameIdResponse(CamelModel):

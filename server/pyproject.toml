@@ -11,7 +11,7 @@ line-length = 90
 skip-magic-trailing-comma = true
 
 [tool.ruff.lint]
-extend-select = ["TID", "B"]
+extend-select = ["I", "TID", "B"]
 
 [tool.ruff.lint.isort]
 split-on-trailing-comma = false

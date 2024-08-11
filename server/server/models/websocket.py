@@ -1,3 +1,7 @@
+from typing import Annotated
+
+from pydantic import Field
+
 from .camel_model import CamelModel
 from .judgement import JudgementGameState, JudgementSpectatorGameState
 
@@ -13,4 +17,4 @@ class PlayersMessage(CamelModel):
 
 
 class GameStateMessage(CamelModel):
-    state: ConcreteGameState
+    state: Annotated[ConcreteGameState, Field(title="Concrete game state")]
