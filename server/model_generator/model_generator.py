@@ -122,7 +122,7 @@ def start_model_generator(out_dir: PurePath, should_watch: bool = False) -> None
                 (out_dir / module_name).with_suffix(".ts"),
             )
 
-    for module_file_path, (module_path, out_filename) in model_files.items():
+    for module_path, out_filename in model_files.values():
         generate_typescript_defs(out_filename, module_path, not should_watch)
 
     if should_watch:

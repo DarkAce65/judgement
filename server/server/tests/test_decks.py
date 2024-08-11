@@ -1,5 +1,3 @@
-# pylint: disable=protected-access
-
 import itertools
 import statistics
 from collections import Counter

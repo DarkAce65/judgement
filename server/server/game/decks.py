@@ -27,7 +27,10 @@ class Decks:
 
         self._drawn_card_counts = Counter([])
 
-    def shuffle(self, rand: Random = Random()) -> None:
+    def shuffle(self, rand: Random | None = None) -> None:
+        if rand is None:
+            rand = Random()
+
         shuffle_index = len(self.cards) - 1
 
         while shuffle_index > 0:

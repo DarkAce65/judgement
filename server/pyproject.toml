@@ -10,6 +10,12 @@ line-length = 90
 [tool.ruff.format]
 skip-magic-trailing-comma = true
 
+[tool.ruff.lint]
+extend-select = ["TID", "B"]
+
+[tool.ruff.lint.isort]
+split-on-trailing-comma = false
+
 [tool.mypy]
 plugins = ["pydantic.mypy"]
 
@@ -34,9 +40,9 @@ warn_untyped_fields = true
 [tool.taskipy.tasks]
 format = "ruff format ."
 pre_lint = "task format"
+lint_ruff = "ruff check --fix model_generator server main.py"
 lint_mypy = "mypy model_generator server main.py"
-lint_pylint = "ruff check model_generator server main.py"
-lint = "task lint_mypy && task lint_pylint"
+lint = "task lint_ruff && task lint_mypy"
 test = "python -m unittest"
 yarn = "yarn --cwd ./model_generator/ install --silent"
 pre_generate = "task yarn"

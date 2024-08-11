@@ -15,6 +15,4 @@ async def get_player(
     try:
         return player_manager.get_player_by_auth(player_auth_id)
     except ValueError:
-        raise HTTPException(  # pylint: disable=raise-missing-from
-            status_code=403, detail="Invalid player cookie"
-        )
+        raise HTTPException(status_code=403, detail="Invalid player cookie") from None
