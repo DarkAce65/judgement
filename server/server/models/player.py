@@ -1,3 +1,10 @@
+from typing import Annotated
+
+from pydantic import Field
+
+from .camel_model import CamelModel
+
+
 class Player:
     player_id: int
     name: str
@@ -7,9 +14,5 @@ class Player:
         self.name = name
 
 
-class PlayerWithAuth(Player):
-    player_auth_id: str
-
-    def __init__(self, player_id: int, name: str, player_auth_id: str) -> None:
-        super().__init__(player_id, name)
-        self.player_auth_id = player_auth_id
+class PlayerNameModel(CamelModel):
+    player_name: Annotated[str, Field(description="The name of the player", min_length=1)]

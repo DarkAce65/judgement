@@ -1,23 +1,22 @@
 from __future__ import annotations
 
+from typing import Annotated
+
 from pydantic import Field
 
+from server.game.core import Game
+
 from .camel_model import CamelModel
-from .room import Room, RoomStatus
+from .game import GameStatus
 
 
-class RoomIdResponse(CamelModel):
-    room_id: str = Field(title="The id of the room")
+class GameIdResponse(CamelModel):
+    game_id: Annotated[str, Field(description="The id of the game")]
 
 
-class RoomResponse(RoomIdResponse):
-    room_status: RoomStatus = Field(title="The state of the room")
-    ordered_player_ids: list[int] = Field(title="The ids of the players in the room")
+class GameResponse(GameIdResponse):
+    game_status: Annotated[GameStatus, Field(description="The state of the game")]
 
     @staticmethod
-    def from_room(room: Room) -> RoomResponse:
-        return RoomResponse(
-            room_id=room.room_id,
-            room_status=room.room_status,
-            ordered_player_ids=room.ordered_player_ids,
-        )
+    def from_game(game: Game) -> GameResponse:
+        return GameResponse(game_id=game.game_id, game_status=game.status)

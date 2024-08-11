@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from enum import Enum, unique
+from typing import Annotated
 
 from pydantic import BaseModel, Field
 
@@ -15,7 +16,7 @@ class Suit(str, Enum):
 
 class Card(BaseModel):
     suit: Suit
-    rank: int = Field(..., ge=1, le=13)
+    rank: Annotated[int, Field(ge=1, le=13)]
 
     class Config:
         frozen = True

@@ -81,8 +81,8 @@ class JudgementGame(Game[JudgementAction]):
 
     player_states: dict[int, JudgementPlayerState]
 
-    def __init__(self, room_id: str) -> None:
-        super().__init__(JudgementAction, room_id)
+    def __init__(self, game_id: str) -> None:
+        super().__init__(JudgementAction, game_id)
 
         self.phase = JudgementPhase.NOT_STARTED
         self.settings = JudgementSettings(num_decks=1, num_rounds=13)

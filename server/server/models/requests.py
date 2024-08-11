@@ -1,7 +1,7 @@
-from pydantic import Field
+from server.models.game import GameName
 
 from .camel_model import CamelModel
 
 
-class EnsurePlayerRequest(CamelModel):
-    player_name: str = Field(title="The name of the player", min_length=1)
+class CreateGameRequest(CamelModel):
+    game_name: GameName

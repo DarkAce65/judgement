@@ -1,4 +1,3 @@
-import logging
 from abc import ABC, abstractmethod
 from typing import Any, Generic, Mapping, Type, TypeVar
 
@@ -6,11 +5,6 @@ from pydantic import ValidationError
 
 from server.models.camel_model import CamelModel
 from server.models.game import GamePlayer, GamePlayerType, GameState, GameStatus
-
-logger = logging.getLogger(__name__)
-
-
-Action = TypeVar("Action", bound=CamelModel)
 
 
 class GameError(Exception):
@@ -21,24 +15,30 @@ class GameError(Exception):
         self.message = message
 
 
+Action = TypeVar("Action", bound=CamelModel)
+
+
 class Game(Generic[Action], ABC):
     _action_cls: Type[Action]
 
-    room_id: str
+    game_id: str
 
     status: GameStatus
     players: dict[int, GamePlayer]
 
-    def __init__(self, action_cls: Type[Action], room_id: str) -> None:
+    def __init__(self, action_cls: Type[Action], game_id: str) -> None:
         self._action_cls = action_cls
 
-        self.room_id = room_id
+        self.game_id = game_id
 
         self.status = GameStatus.NOT_STARTED
         self.players = {}
 
     @abstractmethod
     def build_game_states(self, player_ids: set[int]) -> Mapping[int, GameState]: ...
+
+    def is_in_game(self, player_id: int) -> bool:
+        return player_id in self.players
 
     def add_player(
         self, player_id: int, player_type: GamePlayerType = GamePlayerType.PLAYER
@@ -76,6 +76,3 @@ class Game(Generic[Action], ABC):
 
     @abstractmethod
     async def process_input(self, player_id: int, game_input: Action) -> None: ...
-
-    def is_in_game(self, player_id: int) -> bool:
-        return player_id in self.players

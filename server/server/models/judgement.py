@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC
 from enum import Enum, unique
-from typing import Annotated, Any, ClassVar, Literal, Optional, Self, Union
+from typing import Annotated, Any, ClassVar, Literal, Self, Union
 
 from pydantic import Field, TypeAdapter, model_validator
 from pydantic_core.core_schema import ValidatorFunctionWrapHandler
@@ -58,8 +58,8 @@ class JudgementUpdateSettingsAction(JudgementAction):
     action_type: Literal[JudgementActionType.UPDATE_SETTINGS] = (
         JudgementActionType.UPDATE_SETTINGS
     )
-    num_decks: Optional[int]
-    num_rounds: Optional[int]
+    num_decks: int | None
+    num_rounds: int | None
 
 
 class JudgementOrderCardsAction(JudgementAction):
@@ -89,7 +89,7 @@ class JudgementPlayCardAction(JudgementAction):
 class JudgementPlayerState(CamelModel):
     score: int
     current_won_tricks: int
-    current_bid: Optional[int] = None
+    current_bid: int | None = None
 
     hand: list[Card]
 

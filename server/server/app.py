@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from socketio import ASGIApp
 from starlette.middleware.errors import ServerErrorMiddleware
 
-from server.api import player, room
+from server.api import game, player
 from server.sio_app import sio
 
 app = FastAPI()
@@ -25,5 +25,5 @@ if "CORS_ALLOWED_ORIGIN" in os.environ:
 
 
 app.include_router(player.router)
-app.include_router(room.router)
+app.include_router(game.router)
 app.mount("/ws", ASGIApp(sio, socketio_path="/ws/socket.io"))
