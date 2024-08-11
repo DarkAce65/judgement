@@ -2,7 +2,10 @@ from __future__ import annotations
 
 from abc import ABC
 from enum import Enum, unique
-from typing import Any, Callable, ClassVar, Generator, Literal, Optional
+from typing import Annotated, Any, ClassVar, Literal, Optional, Self, Union
+
+from pydantic import Field, TypeAdapter, model_validator
+from pydantic_core.core_schema import ValidatorFunctionWrapHandler
 
 from server.game.card import Card, Suit
 from server.game.core import GameError
@@ -29,49 +32,51 @@ class JudgementActionType(str, Enum):
 
 
 class JudgementAction(CamelModel, ABC):
-    _types: ClassVar[dict[JudgementActionType, type]] = {}
+    _subclasses: ClassVar[dict[str, type]] = {}
+    _type_adapter: ClassVar[TypeAdapter]
 
     action_type: JudgementActionType
 
-    def __init_subclass__(cls, action_type: JudgementActionType):
-        cls._types[action_type] = cls
-
     @classmethod
-    def __get_validators__(cls) -> Generator[Callable[..., Any], None, None]:
-        yield cls.validate
+    def __pydantic_init_subclass__(cls, **kwargs: Any) -> None:
+        JudgementAction._subclasses[cls.model_fields["action_type"].default] = cls
+        JudgementAction._type_adapter = TypeAdapter(
+            Annotated[
+                Union[tuple(cls._subclasses.values())], Field(discriminator="action_type")
+            ]
+        )
 
+    @model_validator(mode="wrap")
     @classmethod
-    def validate(cls, value: dict[str, Any]) -> JudgementAction:
-        try:
-            action_type = value["actionType"]
-            return cls._types[action_type](**value)
-        except KeyError as error:
-            raise ValueError from error
+    def parse_subclass(cls, data: Any, handler: ValidatorFunctionWrapHandler) -> Self:
+        if cls is JudgementAction:
+            return JudgementAction._type_adapter.validate_python(data)
+        return handler(data)
 
 
-class JudgementUpdateSettingsAction(
-    JudgementAction, action_type=JudgementActionType.UPDATE_SETTINGS
-):
-    action_type: Literal[JudgementActionType.UPDATE_SETTINGS]
+class JudgementUpdateSettingsAction(JudgementAction):
+    action_type: Literal[JudgementActionType.UPDATE_SETTINGS] = (
+        JudgementActionType.UPDATE_SETTINGS
+    )
     num_decks: Optional[int]
     num_rounds: Optional[int]
 
 
-class JudgementOrderCardsAction(
-    JudgementAction, action_type=JudgementActionType.ORDER_CARDS
-):
-    action_type: Literal[JudgementActionType.ORDER_CARDS]
+class JudgementOrderCardsAction(JudgementAction):
+    action_type: Literal[JudgementActionType.ORDER_CARDS] = (
+        JudgementActionType.ORDER_CARDS
+    )
     from_index: int
     to_index: int
 
 
-class JudgementBidHandsAction(JudgementAction, action_type=JudgementActionType.BID_HANDS):
-    action_type: Literal[JudgementActionType.BID_HANDS]
+class JudgementBidHandsAction(JudgementAction):
+    action_type: Literal[JudgementActionType.BID_HANDS] = JudgementActionType.BID_HANDS
     num_hands: int
 
 
-class JudgementPlayCardAction(JudgementAction, action_type=JudgementActionType.PLAY_CARD):
-    action_type: Literal[JudgementActionType.PLAY_CARD]
+class JudgementPlayCardAction(JudgementAction):
+    action_type: Literal[JudgementActionType.PLAY_CARD] = JudgementActionType.PLAY_CARD
     card: str
 
     def get_card(self) -> Card:

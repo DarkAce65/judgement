@@ -2,14 +2,15 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Any, Generic, Mapping, Type, TypeVar
 
-from pydantic import BaseModel, ValidationError, parse_obj_as
+from pydantic import ValidationError
 
+from server.models.camel_model import CamelModel
 from server.models.game import GamePlayer, GamePlayerType, GameState, GameStatus
 
 logger = logging.getLogger(__name__)
 
 
-Action = TypeVar("Action", bound=BaseModel)
+Action = TypeVar("Action", bound=CamelModel)
 
 
 class GameError(Exception):
@@ -64,7 +65,7 @@ class Game(Generic[Action], ABC):
         self, player_id: int, raw_game_input: dict[str, Any]
     ) -> None:
         try:
-            parsed_action = parse_obj_as(self._action_cls, raw_game_input)
+            parsed_action = self._action_cls.model_validate(raw_game_input)
         except ValidationError as error:
             raise GameError(
                 f"Input could not be parsed into {self._action_cls.__name__} "
