@@ -4,13 +4,7 @@ from typing import Any
 BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE = range(8)
 RESET_SEQ = "\033[0m"
 COLOR_SEQ = "\033[1;%dm"
-COLORS = {
-    "DEBUG": BLUE,
-    "INFO": WHITE,
-    "WARNING": YELLOW,
-    "CRITICAL": RED,
-    "ERROR": RED,
-}
+COLORS = {"DEBUG": BLUE, "INFO": WHITE, "WARNING": YELLOW, "CRITICAL": RED, "ERROR": RED}
 
 
 class ColoredFormatter(logging.Formatter):

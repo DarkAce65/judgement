@@ -6,12 +6,7 @@ from socketio.exceptions import (  # pylint: disable=redefined-builtin
     ConnectionRefusedError,
 )
 
-from server.data import (
-    connection_manager,
-    game_manager,
-    player_manager,
-    socket_messager,
-)
+from server.data import connection_manager, game_manager, player_manager, socket_messager
 from server.game.core import GameError
 from server.models.player import Player
 from server.sio_app import sio

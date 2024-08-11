@@ -3,13 +3,7 @@ import math
 from typing import Mapping
 
 from server.data import socket_messager
-from server.models.game import (
-    GameName,
-    GamePlayer,
-    GamePlayerType,
-    GameState,
-    GameStatus,
-)
+from server.models.game import GameName, GamePlayer, GamePlayerType, GameState, GameStatus
 from server.models.judgement import (
     JudgementAction,
     JudgementBidHandsAction,

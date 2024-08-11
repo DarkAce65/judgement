@@ -7,7 +7,7 @@ from server.models.player import Player
 
 
 async def get_player(
-    player_auth_id: Annotated[str | None, Cookie(alias="player_auth_id")] = None
+    player_auth_id: Annotated[str | None, Cookie(alias="player_auth_id")] = None,
 ) -> Player:
     if player_auth_id is None:
         raise HTTPException(status_code=403, detail="Missing player cookie")

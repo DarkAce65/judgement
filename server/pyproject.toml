@@ -4,21 +4,11 @@ version = "0.1.0"
 description = ""
 authors = []
 
-[tool.black]
+[tool.ruff]
 line-length = 90
-include = '\.pyi?$'
-exclude = '''
-/(
-    \.eggs
-  | \.git
-  | \.mypy_cache
-  | \.venv
-)/
-'''
 
-[tool.isort]
-profile = "black"
-src_paths = ["model_generator", "server", "main.py"]
+[tool.ruff.format]
+skip-magic-trailing-comma = true
 
 [tool.mypy]
 plugins = ["pydantic.mypy"]
@@ -41,22 +31,11 @@ init_typed = true
 warn_required_dynamic_aliases = true
 warn_untyped_fields = true
 
-[tool.pylint.messages_control]
-disable = [
-  "missing-class-docstring",
-  "missing-function-docstring",
-  "missing-module-docstring",
-  "too-few-public-methods",
-  "too-many-instance-attributes",
-  "unsubscriptable-object"
-]
-extension-pkg-whitelist = ["pydantic"]
-
 [tool.taskipy.tasks]
-format = "isort . && black ."
+format = "ruff format ."
 pre_lint = "task format"
 lint_mypy = "mypy model_generator server main.py"
-lint_pylint = "pylint model_generator server main.py"
+lint_pylint = "ruff check model_generator server main.py"
 lint = "task lint_mypy && task lint_pylint"
 test = "python -m unittest"
 yarn = "yarn --cwd ./model_generator/ install --silent"
@@ -85,10 +64,8 @@ optional = true
 watchfiles = "^0.22.0"
 
 [tool.poetry.group.dev.dependencies]
-black = "^24.4.2"
-isort = "^5.13.2"
 mypy = "^1.10.1"
-pylint = "^3.2.5"
+ruff = "^0.5.7"
 taskipy = "^1.13.0"
 types-psycopg2 = "^2.9.21"
 
