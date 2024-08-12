@@ -24,7 +24,7 @@ def get_game(game_id: str) -> Game:
     return games[game_id]
 
 
-def create_game(game_name: GameName) -> str:
+def create_game(game_name: GameName) -> Game:
     game_id = generate_id()
     while game_exists(game_id):
         game_id = generate_id()
@@ -34,7 +34,7 @@ def create_game(game_name: GameName) -> str:
     else:
         raise ValueError(f"Unrecognized game name ({game_name})")
 
-    return game_id
+    return games[game_id]
 
 
 def delete_game(game_id: str) -> None:
