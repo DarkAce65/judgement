@@ -5,22 +5,24 @@ import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-d
 import store from '../data/store';
 
 import Home from './Home';
-import RoomContainer from './room/RoomContainer';
+import GameContainer from './game/GameContainer';
 
-const App = () => (
-  <Provider store={store}>
-    <Router>
-      <Layout>
-        <Layout.Content>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/room/:roomId" element={<RoomContainer />} />
-            <Route path="*" element={<Navigate to="/" />} />
-          </Routes>
-        </Layout.Content>
-      </Layout>
-    </Router>
-  </Provider>
-);
+function App() {
+  return (
+    <Provider store={store}>
+      <Router>
+        <Layout>
+          <Layout.Content>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/game/:gameId" element={<GameContainer />} />
+              <Route path="*" element={<Navigate to="/" />} />
+            </Routes>
+          </Layout.Content>
+        </Layout>
+      </Router>
+    </Provider>
+  );
+}
 
 export default App;

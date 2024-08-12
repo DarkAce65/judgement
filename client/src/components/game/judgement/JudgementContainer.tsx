@@ -11,7 +11,7 @@ interface Props {
   game: JudgementGameState | JudgementSpectatorGameState;
 }
 
-const JudgementContainer = ({ game }: Props) => {
+function JudgementContainer({ game }: Props) {
   if (game.status === 'NOT_STARTED') {
     return <JudgementSettings game={game} />;
   }
@@ -28,6 +28,6 @@ const JudgementContainer = ({ game }: Props) => {
   }
 
   return null;
-};
+}
 
 export default JudgementContainer;

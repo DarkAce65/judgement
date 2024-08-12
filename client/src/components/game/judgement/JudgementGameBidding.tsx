@@ -13,7 +13,7 @@ import { optimisticallyReorderCards } from '../../../data/gameSlice';
 import { useAppDispatch } from '../../../data/reduxHooks';
 import useConnectedGameSocket from '../../../game/useConnectedGameSocket';
 import useConfiguredSensors from '../../../utils/useConfiguredSensors';
-import Hand from '../../game/Hand';
+import Hand from '../Hand';
 
 import JudgementTable from './JudgementTable';
 
@@ -21,7 +21,7 @@ interface Props {
   game: JudgementGameState;
 }
 
-const JudgementGameBidding = ({ game }: Props) => {
+function JudgementGameBidding({ game }: Props) {
   const dispatch = useAppDispatch();
   const sensors = useConfiguredSensors();
   const socket = useConnectedGameSocket();
@@ -91,6 +91,6 @@ const JudgementGameBidding = ({ game }: Props) => {
       <Hand cards={game.playerState.hand} onReorderCards={reorderCards} />
     </DndContext>
   );
-};
+}
 
 export default JudgementGameBidding;

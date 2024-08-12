@@ -1,9 +1,11 @@
-import { Divider } from 'antd';
+import { Divider, Dropdown, Select, Space } from 'antd';
 import styled from 'styled-components';
 
-import CreateRoomButton from './CreateRoomButton';
-import JoinRoomInput from './JoinRoomInput';
+import CreateGameButton from './CreateGameButton';
+import JoinGameInput from './JoinGameInput';
 import PageLayout from './PageLayout';
+import { GameName } from '../../generated_types/api';
+import { useState } from 'react';
 
 const CenteredBlock = styled.div`
   display: flex;
@@ -22,16 +24,18 @@ const CenteredBlock = styled.div`
   }
 `;
 
-const Home = () => (
-  <PageLayout>
-    <CenteredBlock style={{ height: '100vh', maxWidth: 400, textAlign: 'center' }}>
-      <div>
-        <CreateRoomButton buttonProps={{ block: true }} />
-        <Divider style={{ textTransform: 'lowercase', fontVariant: 'small-caps' }}>Or</Divider>
-        <JoinRoomInput />
-      </div>
-    </CenteredBlock>
-  </PageLayout>
-);
+function Home() {
+  return (
+    <PageLayout>
+      <CenteredBlock style={{ height: '100vh', maxWidth: 400 }}>
+        <div>
+          <CreateGameButton />
+          <Divider style={{ textTransform: 'lowercase', fontVariant: 'small-caps' }}>Or</Divider>
+          <JoinGameInput />
+        </div>
+      </CenteredBlock>
+    </PageLayout>
+  );
+}
 
 export default Home;

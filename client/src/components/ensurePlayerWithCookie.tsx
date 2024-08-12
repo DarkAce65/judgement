@@ -3,7 +3,7 @@ import { ComponentType, useRef } from 'react';
 import Cookies from 'js-cookie';
 import { useSelector } from 'react-redux';
 
-import { PLAYER_ID_COOKIE } from '../constants';
+import { PLAYER_AUTH_ID_COOKIE } from '../constants';
 import { ensurePlayer, getEnsurePlayerFetchStatus, getPlayerName } from '../data/playerSlice';
 import { useAppDispatch } from '../data/reduxHooks';
 
@@ -11,12 +11,13 @@ import ErrorPage from './ErrorPage';
 import LoadingPage from './LoadingPage';
 import PageLayout from './PageLayout';
 import PlayerNameModal from './PlayerNameModal';
+import usePlayerName from '../data/usePlayerName';
 
-const ensurePlayerWithCookie = <P extends object>(WrappedComponent: ComponentType<P>) => {
-  const EnsurePlayerCookie = (props: P) => {
+function ensurePlayerWithCookie<P extends object>(WrappedComponent: ComponentType<P>) {
+  function EnsurePlayerCookie(props: P) {
     const dispatch = useAppDispatch();
 
-    const playerName = useSelector(getPlayerName);
+    const [playerName, setPlayerName] = usePlayerName();
     const isRenewingCookie = useRef(false);
     const ensurePlayerFetchStatus = useSelector(getEnsurePlayerFetchStatus);
 
@@ -28,7 +29,7 @@ const ensurePlayerWithCookie = <P extends object>(WrappedComponent: ComponentTyp
       );
     }
 
-    if (!isRenewingCookie.current && !Cookies.get(PLAYER_ID_COOKIE)) {
+    if (!isRenewingCookie.current && !Cookies.get(PLAYER_AUTH_ID_COOKIE)) {
       isRenewingCookie.current = true;
       setTimeout(() => {
         dispatch(ensurePlayer(playerName));
@@ -44,9 +45,9 @@ const ensurePlayerWithCookie = <P extends object>(WrappedComponent: ComponentTyp
     }
 
     return <WrappedComponent {...props} />;
-  };
+  }
 
   return EnsurePlayerCookie;
-};
+}
 
 export default ensurePlayerWithCookie;

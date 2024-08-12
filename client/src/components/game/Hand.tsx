@@ -27,14 +27,14 @@ interface DraggableCardProps {
   onClick?: () => void;
 }
 
-const DraggableCard = ({
+function DraggableCard({
   sortableId,
   cardWidth,
   index,
   card,
   containerStyle,
   onClick,
-}: DraggableCardProps) => {
+}: DraggableCardProps) {
   const data: CardDraggableData = { index, card };
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: sortableId,
@@ -59,7 +59,7 @@ const DraggableCard = ({
       <Card ref={setNodeRef} card={card} style={{ width: cardWidth, WebkitTouchCallout: 'none' }} />
     </div>
   );
-};
+}
 
 const HandWrapper = styled.div<{ paddingRight?: string }>`
   display: flex;
@@ -81,7 +81,7 @@ interface Props {
   onClick?: (card: CardType, index: number) => void;
 }
 
-const Hand = ({ cards, onReorderCards, onClick }: Props) => {
+function Hand({ cards, onReorderCards, onClick }: Props) {
   const wrapperRef = useRef(null);
 
   const { width } = useElementSize(wrapperRef);
@@ -175,6 +175,6 @@ const Hand = ({ cards, onReorderCards, onClick }: Props) => {
       </DragOverlay>
     </SortableContext>
   );
-};
+}
 
 export default Hand;

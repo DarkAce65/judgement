@@ -1,20 +1,16 @@
+import { Button, Form, Input, Modal } from 'antd';
 import { useCallback, useMemo, useState } from 'react';
 
-import { unwrapResult } from '@reduxjs/toolkit';
-import { Button, Form, Input, Modal, message } from 'antd';
+import Cookies from 'js-cookie';
+import { PLAYER_NAME_COOKIE } from '../constants';
 
-import { ensurePlayer, getEnsurePlayerFetchStatus, getPlayerName } from '../data/playerSlice';
-import { useAppDispatch, useAppSelector } from '../data/reduxHooks';
-
-const validatePlayerName = (
-  playerName: string,
-): { isValid: boolean; validationMessage?: string } => {
+function validatePlayerName(playerName: string): { isValid: boolean; validationMessage?: string } {
   if (0 < playerName.length && playerName.length < 2) {
     return { isValid: false, validationMessage: 'Name must be at least two characters' };
   }
 
   return { isValid: true };
-};
+}
 
 interface Props {
   open?: boolean;
@@ -22,12 +18,9 @@ interface Props {
   onCancel?: () => void;
 }
 
-const PlayerNameModal = ({ open, onOk, onCancel }: Props) => {
-  const dispatch = useAppDispatch();
-
-  const playerName = useAppSelector(getPlayerName);
-  const ensurePlayerFetchStatus = useAppSelector(getEnsurePlayerFetchStatus);
-  const [stagedPlayerName, setStagedPlayerName] = useState(() => playerName || '');
+function PlayerNameModal({ open, onOk, onCancel }: Props) {
+  const playerName = useMemo(() => Cookies.get(PLAYER_NAME_COOKIE) ?? null, []);
+  const [stagedPlayerName, setStagedPlayerName] = useState(() => playerName ?? '');
 
   const { isValid, validationMessage } = useMemo(
     () => validatePlayerName(stagedPlayerName),
@@ -40,15 +33,9 @@ const PlayerNameModal = ({ open, onOk, onCancel }: Props) => {
       return;
     }
 
-    dispatch(ensurePlayer(stagedPlayerName))
-      .then(unwrapResult)
-      .then(() => {
-        onOk && onOk();
-      })
-      .catch(() => {
-        message.error('Failed to set name');
-      });
-  }, [canUpdate, dispatch, stagedPlayerName, onOk]);
+    Cookies.set(PLAYER_NAME_COOKIE, stagedPlayerName);
+    onOk?.();
+  }, [canUpdate, onOk, stagedPlayerName]);
 
   return (
     <Modal
@@ -68,7 +55,6 @@ const PlayerNameModal = ({ open, onOk, onCancel }: Props) => {
           <Button
             type="primary"
             disabled={stagedPlayerName.length === 0 || !isValid}
-            loading={ensurePlayerFetchStatus === 'pending'}
             onClick={handlePlayerNameChange}
           >
             Ok
@@ -92,6 +78,6 @@ const PlayerNameModal = ({ open, onOk, onCancel }: Props) => {
       </Form.Item>
     </Modal>
   );
-};
+}
 
 export default PlayerNameModal;

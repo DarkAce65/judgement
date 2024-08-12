@@ -10,7 +10,7 @@ import {
 import { getPlayerNames } from '../../../data/playerSlice';
 import { useAppSelector } from '../../../data/reduxHooks';
 import useConnectedGameSocket from '../../../game/useConnectedGameSocket';
-import { isCardDraggableData } from '../../game/Hand';
+import { isCardDraggableData } from '../Hand';
 
 import { DROPPABLE_TABLE_ID } from './dndConfig';
 
@@ -39,7 +39,7 @@ interface Props {
   canPlayCards?: boolean;
 }
 
-const JudgementTable = ({ game, canPlayCards }: Props) => {
+function JudgementTable({ game, canPlayCards }: Props) {
   const socket = useConnectedGameSocket();
 
   const { isOver, setNodeRef } = useDroppable({ id: DROPPABLE_TABLE_ID, disabled: !canPlayCards });
@@ -135,6 +135,6 @@ const JudgementTable = ({ game, canPlayCards }: Props) => {
       <g>{renderedNameTags}</g>
     </svg>
   );
-};
+}
 
 export default JudgementTable;

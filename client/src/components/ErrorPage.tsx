@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import PageLayout from './PageLayout';
 
-const ErrorPage = () => {
+function ErrorPage() {
   const navigate = useNavigate();
 
   return (
@@ -20,6 +20,6 @@ const ErrorPage = () => {
       />
     </PageLayout>
   );
-};
+}
 
 export default ErrorPage;

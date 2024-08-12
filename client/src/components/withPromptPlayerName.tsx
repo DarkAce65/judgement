@@ -8,9 +8,9 @@ export interface WithPromptPlayerNameProps {
   promptPlayerName: () => Promise<void>;
 }
 
-const withPromptPlayerName = <P extends object>(
+function withPromptPlayerName<P extends object>(
   WrappedComponent: ComponentType<P & WithPromptPlayerNameProps>,
-) => {
+) {
   const PromptPlayerName = (props: P) => {
     const isMounted = useIsMounted();
 
@@ -48,6 +48,6 @@ const withPromptPlayerName = <P extends object>(
   };
 
   return PromptPlayerName;
-};
+}
 
 export default withPromptPlayerName;

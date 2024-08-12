@@ -8,7 +8,7 @@ import { getPlayerName } from '../../data/playerSlice';
 import { useAppSelector } from '../../data/reduxHooks';
 import withPromptPlayerName, { WithPromptPlayerNameProps } from '../withPromptPlayerName';
 
-import LeaveRoomButton from './LeaveRoomButton';
+import LeaveGameButton from './LeaveGameButton';
 
 const CornerDiv = styled.div<{
   floating: boolean;
@@ -28,14 +28,14 @@ const CornerDiv = styled.div<{
 `;
 
 interface Props {
-  roomId: string;
+  gameId: string;
 }
 
-const RoomControls = ({
+function GameControls({
   children,
-  roomId,
+  gameId,
   promptPlayerName,
-}: PropsWithChildren<Props & WithPromptPlayerNameProps>) => {
+}: PropsWithChildren<Props & WithPromptPlayerNameProps>) {
   const breakpoints = Grid.useBreakpoint();
   const playerName = useAppSelector(getPlayerName);
 
@@ -63,7 +63,7 @@ const RoomControls = ({
                 </Button>
               </Typography.Paragraph>
               <Typography.Paragraph style={{ marginBottom: 0 }}>
-                <LeaveRoomButton roomId={roomId} buttonProps={{ block: true }} />
+                <LeaveGameButton gameId={gameId} buttonProps={{ block: true }} />
               </Typography.Paragraph>
             </div>
           }
@@ -80,6 +80,6 @@ const RoomControls = ({
       {children}
     </>
   );
-};
+}
 
-export default withPromptPlayerName(RoomControls);
+export default withPromptPlayerName(GameControls);

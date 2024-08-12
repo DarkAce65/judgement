@@ -8,7 +8,7 @@ const cardStringifyReplacer = (_: string, value: unknown): unknown =>
     ? `${value.suit}${value.rank}`
     : value;
 
-const DebugGameState = () => {
+function DebugGameState() {
   const maybeGame = useAppSelector(getGame);
 
   if (!maybeGame) {
@@ -35,6 +35,6 @@ const DebugGameState = () => {
       </Row>
     </Typography.Paragraph>
   );
-};
+}
 
 export default DebugGameState;

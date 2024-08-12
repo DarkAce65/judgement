@@ -7,23 +7,23 @@ import ErrorPage from '../ErrorPage';
 import LoadingPage from '../LoadingPage';
 import PageLayout from '../PageLayout';
 
-import Room from './Room';
-import RoomControls from './RoomControls';
+import Game from './Game';
+import GameControls from './GameControls';
 
-const RoomContainer = () => {
+function GameContainer() {
   const navigate = useNavigate();
-  const pathParams = useParams<'roomId'>();
-  const roomId = pathParams.roomId!;
+  const pathParams = useParams<'gameId'>();
+  const gameId = pathParams.gameId!;
 
-  const roomExists = useLocationStatePropertyOnce('roomExists');
-  const { status, data } = useFetch<boolean>(`/rooms/${roomId}/exists`, { skip: roomExists });
+  const gameExists = useLocationStatePropertyOnce('gameExists');
+  const { status, data } = useFetch<boolean>(`/games/${gameId}/exists`, { skip: gameExists });
 
-  if (roomExists || (status === 'succeeded' && data === true)) {
+  if (gameExists || (status === 'succeeded' && data === true)) {
     return (
       <PageLayout>
-        <RoomControls roomId={roomId}>
-          <Room roomId={roomId} />
-        </RoomControls>
+        <GameControls gameId={gameId}>
+          <Game gameId={gameId} />
+        </GameControls>
       </PageLayout>
     );
   } else if (status === 'succeeded' && data === false) {
@@ -31,8 +31,8 @@ const RoomContainer = () => {
       <PageLayout>
         <Result
           status="error"
-          title={`Room ${roomId} not found`}
-          subTitle="Double check that you've entered the correct room code"
+          title={`Game ${gameId} not found`}
+          subTitle="Double check that you've entered the correct game code"
           extra={
             <Button type="primary" onClick={() => navigate('/')}>
               Go Home
@@ -46,6 +46,6 @@ const RoomContainer = () => {
   }
 
   return <ErrorPage />;
-};
+}
 
-export default RoomContainer;
+export default GameContainer;

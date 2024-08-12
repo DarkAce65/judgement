@@ -1,16 +1,16 @@
 import { Button, ButtonProps } from 'antd';
 import { useNavigate } from 'react-router-dom';
 
+import { resetGameState } from '../../data/gameSlice';
 import { useAppDispatch } from '../../data/reduxHooks';
-import { resetRoomState } from '../../data/roomSlice';
 import useConnectedGameSocket from '../../game/useConnectedGameSocket';
 
 interface Props {
-  roomId: string;
+  gameId: string;
   buttonProps?: Partial<ButtonProps>;
 }
 
-const LeaveRoomButton = ({ roomId, buttonProps }: Props) => {
+function LeaveGameButton({ gameId, buttonProps }: Props) {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const socket = useConnectedGameSocket();
@@ -22,14 +22,14 @@ const LeaveRoomButton = ({ roomId, buttonProps }: Props) => {
       {...buttonProps}
       onClick={() => {
         if (!socket) return;
-        socket.emit('leave_room', roomId);
+        socket.emit('leave_game', gameId);
         navigate('/');
-        dispatch(resetRoomState());
+        dispatch(resetGameState());
       }}
     >
-      Leave room
+      Leave game
     </Button>
   );
-};
+}
 
-export default LeaveRoomButton;
+export default LeaveGameButton;

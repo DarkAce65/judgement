@@ -3,7 +3,7 @@ import { Socket } from 'socket.io-client';
 import { v4 as uuid } from 'uuid';
 
 import { buildSocket } from '../api/client';
-import { PLAYER_ID_COOKIE } from '../constants';
+import { PLAYER_AUTH_ID_COOKIE } from '../constants';
 
 class BiMap<K, V> {
   private readonly map: Map<K, V>;
@@ -87,7 +87,7 @@ class GameSocket {
     resetConnectionAttempts?: () => void,
   ): Socket {
     const socket = buildSocket({
-      auth: (auth) => auth({ player_auth_id: Cookies.get(PLAYER_ID_COOKIE) }),
+      auth: (auth) => auth({ player_auth_id: Cookies.get(PLAYER_AUTH_ID_COOKIE) }),
       autoConnect: false,
     });
     this.socket = socket;

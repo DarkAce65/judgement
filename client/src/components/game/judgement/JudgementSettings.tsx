@@ -14,7 +14,7 @@ interface Props {
   game: JudgementGameState | JudgementSpectatorGameState;
 }
 
-const JudgementSettings = ({ game: { settings } }: Props) => {
+function JudgementSettings({ game: { settings } }: Props) {
   const socket = useConnectedGameSocket();
 
   const [numRounds, setNumRounds, numRoundsChanged] = useDraftValue<number | null>(
@@ -70,6 +70,6 @@ const JudgementSettings = ({ game: { settings } }: Props) => {
       </Form.Item>
     </Form>
   );
-};
+}
 
 export default JudgementSettings;

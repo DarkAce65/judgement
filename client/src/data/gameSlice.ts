@@ -1,16 +1,30 @@
-import { PayloadAction, createSlice } from '@reduxjs/toolkit';
+import { PayloadAction, createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 
 import { JudgementGameState, JudgementSpectatorGameState } from '../../generated_types/judgement';
-import { GameStateMessage } from '../../generated_types/websocket';
+import { CreateGameRequest } from '../../generated_types/api';
+import { GameIdResponse } from '../../generated_types/api';
+import { ConcreteGameState, GameStateMessage } from '../../generated_types/websocket';
+import { fetchAPI } from '../api/client';
 
-import { loadRoomState } from './roomSlice';
 import { RootState } from './store';
+import { GameName } from '../../generated_types/api';
 
-type GameState = JudgementGameState | JudgementSpectatorGameState | null;
+type GameState = ConcreteGameState | null;
 
 const initialState = null as GameState;
 
 export const getGame = (state: RootState): GameState => state.game;
+
+export const createGame = createAsyncThunk<string, { gameName: GameName }, { state: RootState }>(
+  'game/createGame',
+  async ({ gameName }) => {
+    const data: CreateGameRequest = { gameName };
+    const response = await fetchAPI('/games/create', { method: 'POST', data });
+    const { gameId }: GameIdResponse = await response.json();
+
+    return gameId;
+  },
+);
 
 const gameSlice = createSlice({
   name: 'game',
@@ -30,14 +44,12 @@ const gameSlice = createSlice({
       const movedCard = state.playerState.hand.splice(fromIndex, 1)[0];
       state.playerState.hand.splice(toIndex, 0, movedCard);
     },
-  },
-  extraReducers: (builder) => {
-    builder.addCase(loadRoomState, (_, { payload }) => {
-      return payload.game ?? null;
-    });
+    resetGameState() {
+      return null;
+    },
   },
 });
 
-export const { loadGameState, optimisticallyReorderCards } = gameSlice.actions;
+export const { loadGameState, optimisticallyReorderCards, resetGameState } = gameSlice.actions;
 
 export default gameSlice.reducer;
